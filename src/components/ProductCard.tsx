@@ -1,64 +1,88 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors } from '../utils/theme';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useWishlistStore } from '../store/wishlistStore';
+import { Product } from '../types';
+import { isSoldOut } from '../utils/catalogue';
+import { colors, typography } from '../utils/theme';
+import { Price } from './Price';
+import { SmartImage } from './SmartImage';
 
-interface ProductCardProps {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-  onPress?: () => void;
+interface Props {
+  product: Product;
+  onPress: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
-  id,
-  title,
-  price,
-  image,
-  onPress,
-}) => {
+export const ProductCard: React.FC<Props> = ({ product, onPress }) => {
+  const liked = useWishlistStore(s => s.ids.includes(product.id));
+  const toggle = useWishlistStore(s => s.toggle);
+  const soldOut = isSoldOut(product);
   return (
-    <TouchableOpacity
-      style={styles.container}
+    <Pressable
+      style={styles.card}
       onPress={onPress}
-      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`${product.title}${soldOut ? ', sold out' : ''}`}
     >
-      <Image source={{ uri: image }} style={styles.image} />
-      <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={2}>
-          {title}
-        </Text>
-        <Text style={styles.price}>${price.toFixed(2)}</Text>
+      <View>
+        <SmartImage uri={product.image} label={product.title} style={styles.image} />
+        {soldOut ? (
+          <Text style={[styles.badge, { backgroundColor: colors.textSecondary }]}>SOLD OUT</Text>
+        ) : (
+          (!!product.compareAtPrice || !!product.tag) && (
+            <Text
+              style={[
+                styles.badge,
+                { backgroundColor: product.compareAtPrice ? colors.error : colors.primary },
+              ]}
+            >
+              {product.compareAtPrice ? 'SALE' : product.tag?.toUpperCase()}
+            </Text>
+          )
+        )}
+        <Pressable
+          style={styles.heart}
+          onPress={() => toggle(product.id)}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={liked ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          <Text style={[styles.heartText, liked && { color: colors.error }]}>{liked ? '♥' : '♡'}</Text>
+        </Pressable>
       </View>
-    </TouchableOpacity>
+      <Text style={styles.title} numberOfLines={1}>
+        {product.title}
+      </Text>
+      <Price product={product} />
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    marginBottom: 16,
+  card: { flex: 1, margin: 6 },
+  image: { width: '100%', aspectRatio: 3 / 4, borderRadius: 8, overflow: 'hidden' },
+  title: { ...typography.body, marginTop: 8, marginBottom: 2, color: colors.text },
+  badge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    color: colors.onPrimary,
+    ...typography.label,
+    fontSize: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     overflow: 'hidden',
-    width: '48%',
+    borderRadius: 3,
   },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
+  heart: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  info: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+  heartText: { fontSize: 20, color: colors.text },
 });

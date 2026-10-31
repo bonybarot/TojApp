@@ -1,49 +1,25 @@
 import { create } from 'zustand';
 import { products } from '../data/products';
+import { Product } from '../types';
 
-export interface Product {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-  category: string;
-  description: string;
-  images?: string[];
-}
+export type LoadStatus = 'idle' | 'loading' | 'ready' | 'error';
 
-interface ProductStore {
+interface ProductState {
   products: Product[];
-  filteredProducts: Product[];
-  selectedCategory: string | null;
-  loadProducts: () => void;
-  filterByCategory: (category: string | null) => void;
-  getProductById: (id: string) => Product | undefined;
+  status: LoadStatus;
+  /** Simulates a network fetch so loading/error states are real UI paths. */
+  loadProducts: () => Promise<void>;
 }
 
-export const useProductStore = create<ProductStore>((set, get) => ({
+export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
-  filteredProducts: [],
-  selectedCategory: null,
-  loadProducts: () => {
-    set({
-      products,
-      filteredProducts: products,
-    });
-  },
-  filterByCategory: (category: string | null) => {
-    if (!category) {
-      set({
-        filteredProducts: get().products,
-        selectedCategory: null,
-      });
+  status: 'idle',
+  loadProducts: async () => {
+    if (get().status === 'loading') {
       return;
     }
-    set({
-      filteredProducts: get().products.filter(p => p.category === category),
-      selectedCategory: category,
-    });
-  },
-  getProductById: (id: string) => {
-    return get().products.find(p => p.id === id);
+    set({ status: 'loading' });
+    await new Promise<void>(r => setTimeout(r, 600));
+    set({ products, status: 'ready' });
   },
 }));

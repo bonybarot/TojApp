@@ -1,70 +1,55 @@
 import { create } from 'zustand';
+import { products } from '../data/products';
+import { CartLine } from '../types';
+import { stockFor } from '../utils/catalogue';
 
-export interface CartItem {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
+export type AddResult = 'added' | 'limit' | 'unavailable';
 
 interface CartStore {
-  items: CartItem[];
-  addToCart: (product: {
-    id: string;
-    title: string;
-    price: number;
-    image: string;
-  }) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  lines: CartLine[];
+  addToCart: (productId: string, color: string, size: string, qty?: number) => AddResult;
+  setQuantity: (lineId: string, quantity: number) => void;
+  removeLine: (lineId: string) => void;
   clearCart: () => void;
 }
 
-export const useCartStore = create<CartStore>((set, get) => ({
-  items: [],
-  addToCart: product => {
-    const items = get().items;
-    const existingItem = items.find(item => item.id === product.id);
+const maxFor = (l: { productId: string; color: string; size: string }): number => {
+  const p = products.find(x => x.id === l.productId);
+  return p ? stockFor(p, l.color, l.size) : 0;
+};
 
-    if (existingItem) {
-      set({
-        items: items.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        ),
-      });
-    } else {
-      set({
-        items: [...items, { ...product, quantity: 1 }],
-      });
+export const useCartStore = create<CartStore>((set, get) => ({
+  lines: [],
+  addToCart: (productId, color, size, qty = 1) => {
+    const max = maxFor({ productId, color, size });
+    if (max <= 0) {
+      return 'unavailable';
     }
-  },
-  removeFromCart: id => {
+    const lineId = `${productId}|${color}|${size}`;
+    const existing = get().lines.find(l => l.lineId === lineId);
+    const wanted = (existing?.quantity ?? 0) + qty;
+    const quantity = Math.min(wanted, max);
     set({
-      items: get().items.filter(item => item.id !== id),
+      lines: existing
+        ? get().lines.map(l => (l.lineId === lineId ? { ...l, quantity } : l))
+        : [...get().lines, { lineId, productId, color, size, quantity }],
     });
+    return wanted > max ? 'limit' : 'added';
   },
-  updateQuantity: (id, quantity) => {
+  setQuantity: (lineId, quantity) => {
     if (quantity <= 0) {
-      get().removeFromCart(id);
+      get().removeLine(lineId);
       return;
     }
     set({
-      items: get().items.map(item =>
-        item.id === id ? { ...item, quantity } : item,
+      lines: get().lines.map(l =>
+        l.lineId === lineId ? { ...l, quantity: Math.min(quantity, maxFor(l)) } : l,
       ),
     });
   },
-  clearCart: () => {
-    set({ items: [] });
-  },
+  removeLine: lineId => set({ lines: get().lines.filter(l => l.lineId !== lineId) }),
+  clearCart: () => set({ lines: [] }),
 }));
 
-// Selector for total price
-export const useCartTotalPrice = () => {
-  return useCartStore(state =>
-    state.items.reduce((total, item) => total + item.price * item.quantity, 0),
-  );
-};
+export const selectCartCount = (s: CartStore): number =>
+  s.lines.reduce((n, l) => n + l.quantity, 0);

@@ -1,59 +1,35 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors } from '../utils/theme';
+import { ImageStyle, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Category } from '../types';
+import { colors, typography } from '../utils/theme';
+import { SmartImage } from './SmartImage';
 
-interface CategoryCardProps {
-  id: string;
-  title: string;
-  image: string;
-  onPress?: () => void;
-}
-
-export const CategoryCard: React.FC<CategoryCardProps> = ({
-  id,
-  title,
-  image,
-  onPress,
-}) => {
-  return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <Image source={{ uri: image }} style={styles.image} />
-      <View style={styles.overlay} />
-      <Text style={styles.title}>{title}</Text>
-    </TouchableOpacity>
-  );
-};
+export const CategoryCard: React.FC<{
+  category: Category;
+  onPress: () => void;
+  tall?: boolean;
+}> = ({ category, onPress, tall }) => (
+  <Pressable
+    style={styles.card}
+    onPress={onPress}
+    accessibilityRole="button"
+    accessibilityLabel={`${category.title} category`}
+  >
+    <SmartImage
+      uri={category.image}
+      label={category.title}
+      style={[styles.image, tall ? styles.tall : styles.wide] as unknown as ImageStyle}
+    />
+    <View style={styles.scrim} />
+    <Text style={styles.title}>{category.title.toUpperCase()}</Text>
+  </Pressable>
+);
 
 const styles = StyleSheet.create({
-  container: {
-    width: '48%',
-    height: 150,
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 16,
-    position: 'relative',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.background,
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
-    textAlign: 'center',
-  },
+  card: { flex: 1, margin: 6, borderRadius: 8, overflow: 'hidden', justifyContent: 'flex-end' },
+  image: { width: '100%' },
+  tall: { aspectRatio: 3 / 4 },
+  wide: { aspectRatio: 16 / 9 },
+  scrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.28)' },
+  title: { position: 'absolute', left: 14, bottom: 12, color: colors.onPrimary, ...typography.label, fontSize: 13 },
 });

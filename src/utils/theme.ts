@@ -1,57 +1,54 @@
+import { Platform, TextStyle, ViewStyle } from 'react-native';
+
 export const colors = {
-  primary: '#000000',
-  secondary: '#555555',
-  background: '#ffffff',
-  card: '#f5f5f5',
-  text: '#222222',
-  textSecondary: '#666666',
-  border: '#e0e0e0',
-  error: '#ff4444',
-  success: '#00c851',
-  warning: '#ffbb33',
-  info: '#33b5e5',
+  primary: '#111111',
+  onPrimary: '#FFFFFF',
+  background: '#FFFFFF',
+  surface: '#F6F4F0',
+  card: '#F6F4F0',
+  text: '#111111',
+  textSecondary: '#6E6A63',
+  border: '#E6E2DB',
+  accent: '#8C6B3F',
+  error: '#B3382C',
+  success: '#2F7D4F',
+  warning: '#B7791F',
+  info: '#2F5D8C',
+  overlay: 'rgba(17,17,17,0.45)',
+  disabled: '#C9C5BD',
 };
 
-export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
-};
+export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 };
+
+export const borderRadius = { sm: 4, md: 8, lg: 12, xl: 16, round: 9999 };
+
+const family = Platform.select({ ios: 'System', default: undefined });
 
 export const typography = {
-  h1: {
-    fontSize: 32,
-    fontWeight: 'bold' as const,
+  display: { fontFamily: family, fontSize: 30, fontWeight: '300', letterSpacing: 4 },
+  h1: { fontFamily: family, fontSize: 26, fontWeight: '600', letterSpacing: 0.2 },
+  h2: { fontFamily: family, fontSize: 20, fontWeight: '600' },
+  h3: { fontFamily: family, fontSize: 16, fontWeight: '600' },
+  body: { fontFamily: family, fontSize: 15, fontWeight: '400', lineHeight: 22 },
+  caption: { fontFamily: family, fontSize: 13, fontWeight: '400' },
+  label: { fontFamily: family, fontSize: 11, fontWeight: '600', letterSpacing: 1.4 },
+} satisfies Record<string, TextStyle>;
+
+export const elevation: Record<'sm' | 'md', ViewStyle> = {
+  sm: {
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
-  h2: {
-    fontSize: 24,
-    fontWeight: 'bold' as const,
-  },
-  h3: {
-    fontSize: 20,
-    fontWeight: '600' as const,
-  },
-  body: {
-    fontSize: 16,
-    fontWeight: '400' as const,
-  },
-  caption: {
-    fontSize: 14,
-    fontWeight: '400' as const,
-  },
-  small: {
-    fontSize: 12,
-    fontWeight: '400' as const,
+  md: {
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
 };
 
-export const borderRadius = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  round: 9999,
-};
+export const MIN_TOUCH = 44;
