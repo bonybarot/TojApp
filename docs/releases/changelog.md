@@ -1,0 +1,267 @@
+# Changelog
+
+## 2026-10-31: documentation baseline for `feature/toj-customer-ui`
+
+- Moved the pre-UI `current-state/`, `features/`, `components/`, `api/` pages and the handover
+  report to `docs/archive/pre-ui-baseline/` and marked them HISTORICAL; relative links in the
+  planning docs updated.
+- Added `docs/current-state.md` as the single accurate current-state page.
+- Added baseline notes to the requirements, architecture, implementation, decisions and
+  development pages; rewrote `docs/README.md` and `AGENTS.md` to match.
+- Planning content, decisions D-1..D-16 and ADR status are unchanged.
+
+Status: Started 2026-09-03 with the documentation baseline
+Last Verified: 2026-09-03
+Source: `git log`, `docs/`
+
+---
+
+## Scope of this file
+
+This changelog begins at the documentation baseline. It does **not** attempt to
+reconstruct a release history that was never recorded — no releases have been made, no tags
+exist, and no build has been distributed. Entries before 2026-09-03 are the raw git history,
+reproduced without reinterpretation.
+
+Format: reverse chronological. Each entry states what changed and what did **not**.
+
+---
+
+## [Unreleased] — Product direction documented — 2026-09-03
+
+Documentation only. No application code, dependency, configuration, navigation or UI was
+changed. `git status` shows the same two pre-existing lockfile modifications as before.
+
+### Added
+
+- `docs/requirements/product-vision.md` — **the authoritative product-goal document.**
+  Vision, business model, customer experience goal, MVP direction, catalog direction,
+  marketplace direction, product principles, development strategy, and the full OPEN list.
+- `docs/development/engineering-standards.md` — the approved **C1–C15** standards, the rule
+  governing the introduction of any new library or pattern, and the AI development
+  workflow. Kept separate from `coding-standards.md`, which stays descriptive.
+
+### Decided
+
+| # | Decision |
+|---|---|
+| D-7 | v1 is men's clothing, launching in one city, as a real commercial product |
+| D-8 | Guest browsing allowed; an account is required before checkout |
+| D-9 | Initial credential type is mobile number + OTP |
+| D-10 | Store pickup is supported, modelled per product |
+| D-11 | Notifications are order-related only initially |
+| D-12 | Search, filters and promotions are deferred |
+| D-13 | Profile contents fixed; settings stay functional-only |
+| D-14 | Wishlist and reviews are desired for MVP, conditional; reviews require a verified purchase |
+| D-15 | UI + static data first; backend, payments, seller platform and marketplace infrastructure are not built prematurely |
+| D-16 | The C1–C15 engineering standards are binding on new code |
+
+D-1 to D-6 are unchanged.
+
+### Changed
+
+- `docs/requirements/product-requirements.md` — men's clothing and single-city launch
+  recorded; PR-17 to PR-21 added (pickup, order notifications, wishlist, verified-purchase
+  reviews, size chart); the catalog gap table extended; MVP scope corrected; §7 rewritten
+  and its local open-question numbering replaced with the canonical O-register.
+- `docs/requirements/authentication-requirements.md` — supersession notice added. A-1 and
+  A-2 become DECIDED; A-3's email + password recommendation is superseded by mobile + OTP,
+  with the consequences of that switch analysed; A-6 password reset marked not applicable.
+  The original reasoning is retained, not rewritten.
+- `docs/requirements/checkout-and-order-requirements.md` — pickup added to the checkout
+  flow and as CO-10 to CO-13; the decided customer-facing order vocabulary mapped onto the
+  proposed payment × fulfilment model; an order-notification section added.
+- `docs/architecture/domain-model.md` — identity re-keyed on phone with an internal id as
+  the stable key; `pickupEligible`, `sizeChartId`, `fulfilmentMethod`, `pickupStoreId`
+  added; `SizeChart`, `Wishlist` and `Review` entities specified, with a review bound to an
+  order line; three invariants added.
+- `docs/requirements/marketplace-roadmap.md` — geography separated from the stage model;
+  store discovery and an All Products category named; expansion beyond clothing recorded as
+  unplanned; three rows added to the marketplace-impact table.
+- `docs/implementation/implementation-phases.md` — an alignment section comparing the phase
+  plan against the approved development strategy, and a rewritten readiness checklist.
+- `docs/decisions/README.md` — D-7 to D-16 recorded; O-7 to O-13 added; four new REJECTED
+  entries and a new SUPERSEDED table; five new ADRs (0025 OTP, 0026 pickup, 0027
+  notifications, 0028 wishlist and reviews, 0029 design system). **29 ADRs required, four
+  hard-blocked.**
+- `AGENTS.md`, `docs/README.md` — pointers to the two new documents.
+
+### Conflicts found and resolved in favour of the stated direction
+
+| Conflict | Resolution |
+|---|---|
+| Docs recommended email + password; direction is mobile + OTP | Superseded, with consequences analysed |
+| Password reset was a v1 Must-Have | Removed — no password exists. The real v1 problem is phone-number account recovery, now OPEN |
+| Search was a Should-Have | Deferred |
+| Reviews were a Could-Have, marketplace-era | Conditional MVP, purchase-verified |
+| Push notifications were "nice; polling works" | Order notifications are the decided initial scope |
+| Store pickup appeared in no document | Added to requirements, checkout and the domain model |
+| Two different O-1..O-6 numbering schemes existed | `docs/decisions/README.md` is now the single register |
+
+### Gaps recorded, not closed
+
+- The approved "UI + static data first" strategy has **no phase covering the design system
+  and UI quality**, and the design system is blocked on an undecided final UI direction
+  (O-10). Recorded in `implementation-phases.md`; not resolved here.
+- `OUT_FOR_DELIVERY` cannot be distinguished from `SHIPPED` without carrier data.
+- The decided order vocabulary has no pickup states. `READY_FOR_PICKUP` and `COLLECTED` are
+  proposed, not approved.
+
+---
+
+## [Unreleased] — Planning baseline — 2026-09-03
+
+### Added
+
+Requirements, target architecture and implementation planning. No application code was
+touched; no dependency was added or removed; no configuration was changed.
+
+- `docs/requirements/` — `product-requirements`, `authentication-requirements`,
+  `checkout-and-order-requirements`, `marketplace-roadmap`.
+- `docs/architecture/` — `domain-model`, `target-architecture`, `security-architecture`.
+- `docs/implementation/` — `implementation-phases`, `migration-plan`,
+  `technical-debt-plan`, `testing-plan`.
+- `docs/documentation-strategy.md` — structure, ownership, and the rule that an accepted
+  ADR is superseded rather than rewritten.
+
+### Changed
+
+- `docs/decisions/README.md` — rewritten from "NOT YET DECIDED" into a decision log.
+  Product direction is now **DECIDED** (D-1 to D-6); six questions remain **OPEN**; five
+  options are recorded as **REJECTED** with reasons; 24 required ADRs are registered
+  against the phase that needs each one.
+- `docs/README.md` — index extended with the requirements, architecture and implementation
+  sections, and the current-state / planning split made explicit.
+- `AGENTS.md` — product direction recorded as decided; pointer added to the planning set.
+
+### Decided
+
+| # | Decision |
+|---|---|
+| D-1 | The product is a clothing store. The electronics dataset is not the product |
+| D-2 | v1 is a customer-facing mobile shopping app for a single store |
+| D-3 | The long-term direction is a multi-vendor clothing-first marketplace |
+| D-4 | A backend will exist |
+| D-5 | Seller and admin surfaces are future products |
+| D-6 | Documentation-first: document, decide, record, then implement |
+
+### Recorded, not implemented
+
+- All 65 known issues dispositioned: Fix Now 16 · Fix During Migration 37 · Fix Before
+  Release 5 · Defer 3 · Needs Product Decision 4. Twelve of the 37 are deletions.
+- Nine implementation phases specified, each with rollback, tests and completion criteria.
+- A functional gap not in the current-state register: **the product model has no size or
+  variant**, which makes a clothing order unfulfillable. Captured as a requirement
+  (PR-4) and in the domain model, not as an observed defect.
+
+### Not changed
+
+`git status` shows only the two pre-existing modifications, `ios/Podfile.lock` and
+`package-lock.json`, plus the untracked `AGENTS.md` and `docs/`. The verified baseline
+below is unchanged: `tsc` 1 error, `eslint` 6 errors and 2 warnings, `jest` 0 tests
+executed.
+
+---
+
+## [Unreleased] — Documentation baseline — 2026-09-03
+
+### Added
+
+Complete current-state documentation. No application code was touched.
+
+- `AGENTS.md` at the repository root — orientation for developers and AI agents, including
+  the `.js`/`.ts` resolution warning and the "do not assume" list.
+- `docs/README.md` — documentation index with a START HERE flow.
+- `docs/archive/pre-ui-baseline/current-state/` — 16 documents:
+  `project-overview`, `technology-stack`, `repository-structure`, `architecture`,
+  `application-flow`, `navigation`, `state-management`, `data-flow`, `dependencies`,
+  `configuration`, `android`, `ios`, `testing`, `security`, `performance`, `known-issues`.
+- `docs/archive/pre-ui-baseline/features/` — 13 feature documents, one per real feature, including the abandoned
+  purchase-history code.
+- `docs/archive/pre-ui-baseline/components/` — an inventory plus `ProductCard`, `CategoryCard` and `DrawerHeader`.
+- `docs/archive/pre-ui-baseline/api/current-state.md` — records that no API exists, with the evidence.
+- `docs/development/` — `setup`, `coding-standards`, `testing`, `debugging`.
+- `docs/decisions/README.md` — the ADR area, with an explicit list of what is
+  **NOT YET DECIDED**.
+- `docs/releases/changelog.md` — this file.
+
+### Established as the verified baseline
+
+Measured on 2026-09-03 against an unmodified working tree:
+
+| Check | Result |
+|---|---|
+| `npx tsc --noEmit` | 1 error — `OrderHistoryScreen.tsx(113,5) TS1117` |
+| `npx eslint .` | 8 problems (6 errors, 2 warnings) |
+| `npx jest` | 1 suite failed, **0 tests executed** |
+| Known issues catalogued | **65** — P0: 1, P1: 11, P2: 25, P3: 28 |
+| Files under `src/` | 38 tracked |
+| Dead or unreachable files | 8 |
+| Remote hosts contacted | 2, both HTTPS |
+| API endpoints | 0 |
+
+### Not changed
+
+No source file, dependency, configuration file, Android or iOS setting, or package version
+was modified. The only non-documentation entries in `git status` — `ios/Podfile.lock` and
+`package-lock.json` — were already modified before this work began and were left as found.
+
+### Notable findings recorded
+
+- **P0** — the Android release build type is signed with the committed debug keystore
+  (`android/app/build.gradle:103`).
+- **P1** — `src/data/products.js` and `src/utils/theme.js` shadow their `.ts` counterparts at
+  bundle time. The application that runs is not the application the type-checker reads.
+- **P1** — authentication, sign-up and checkout are mocks that create nothing.
+- **P1** — nothing is persisted; every relaunch starts logged out with an empty cart.
+- **P1** — the test suite cannot load, so no change to this codebase can currently be
+  verified automatically.
+
+---
+
+## Prior git history
+
+Reproduced from `git log`. No release was cut from any of these commits.
+
+### `66044c5` — fix: app not working on the android issue fixed
+
+Brought the app to a runnable state on Android. This is also the commit that introduced the
+dependency set in which `react-native-reanimated` 4.1.7 ships untranspiled ESM, which is
+what breaks Jest.
+
+### `c19596a` — feat: initial ios ui setup of the app
+
+The bulk of the current application: navigation, screens, stores, components and mock data.
+This commit added **both** `src/data/products.ts` and `src/data/products.js`, and both
+`src/utils/theme.ts` and `src/utils/theme.js` — the shadowing pairs were introduced together
+here, not by later drift.
+
+### `c4a8e83` — Initial commit
+
+React Native 0.82.1 project template.
+
+---
+
+## Versioning
+
+The project states its version in five places, and they do not agree:
+
+| Location | Value |
+|---|---|
+| `package.json` `version` | `0.0.1` |
+| `app.json` | no version field |
+| `android/app/build.gradle` `versionName` | `"1.0"` (versionCode `1`) |
+| `ios` `MARKETING_VERSION` | `1.0` (`CURRENT_PROJECT_VERSION` `1`) |
+| `SettingsScreen.tsx:60` | `1.0.0`, hardcoded in the UI |
+
+No versioning scheme has been chosen — **NOT YET DECIDED**. See
+[../decisions/README.md](../decisions/README.md).
+
+---
+
+## How to add an entry
+
+Add a new section at the top under a version heading or `[Unreleased]`, with
+`### Added` / `### Changed` / `### Fixed` / `### Removed` subsections as needed. State what
+was verified and how. If a change was not verified, say so — the project currently has no
+automated test that can verify anything.
