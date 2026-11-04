@@ -32,8 +32,8 @@ Owner instruction (2026-11-05, verbatim summary): push work to new branches, nev
 - [x] A3 Auth from API (OTP request/verify, needsProfile, logout), tokens in memory only
 - [x] A4 Wishlist, addresses, cart against API when signed in; guest merge at login
 - [x] A5 Checkout validate + place order + orders list/detail/cancel; pickup-only UI; ₹ formatting from paise; pickup statuses
-- [ ] A6 Run on iOS simulator against local backend, walk the demo journey, fix what breaks
-- [ ] A7 Docs: ADR for API integration choices, `current-state.md`, `AGENTS.md`, changelog
+- [x] A6 Run on iOS simulator against local backend, walk the demo journey, fix what breaks
+- [x] A7 Docs: ADR for API integration choices, `current-state.md`, `AGENTS.md`, changelog
 
 ## Blocked: needs owner
 
@@ -48,3 +48,5 @@ Owner instruction (2026-11-05, verbatim summary): push work to new branches, nev
 - 2026-11-05 B8 admin auth, transitions, inventory (`b217837`)
 - 2026-11-05 B9 openapi.json (32 paths), docs, decisions B-19..B-28 (`b3971b4`); lint/typecheck clean, unit 17, e2e 27
 - 2026-11-05 A1-A5 API client, catalogue, auth, cart/wishlist/addresses, pickup-only checkout and orders against the local API; tsc/lint clean, jest 5
+- 2026-11-05 A6 iOS build fixed for Xcode 26.4+/iOS 27 (fmt C++17, UIScene adoption, `bcd3b2f`); app launches and loads catalogue from the API. UI tap-through not done (simulator panel needs owner approval)
+- 2026-11-05 A7 ADR-0031, current-state, AGENTS, changelog (`9a16b3c`); report in `overnight-report.md`
