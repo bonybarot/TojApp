@@ -30,13 +30,17 @@ const AddressFormScreen: React.FC<Props> = ({ navigation, route }) => {
     if (!/^\d{10}$/.test(f.phone)) e.phone = 'Enter a 10-digit number.';
     if (f.line1.trim().length < 3) e.line1 = 'Enter the street address.';
     if (!f.city.trim()) e.city = 'Enter the city.';
-    if (!/^\d{5,6}$/.test(f.postalCode)) e.postalCode = 'Enter a valid postal code.';
+    if (!/^\d{6}$/.test(f.postalCode)) e.postalCode = 'Enter a valid postal code.';
     if (!f.label.trim()) e.label = 'Enter a label.';
     setErrors(e);
     if (Object.keys(e).length) return;
-    const id = useAddressStore.getState().save({ ...f, line2: f.line2.trim() || undefined, id: existing?.id });
-    useAddressStore.getState().select(id);
-    navigation.goBack();
+    useAddressStore
+      .getState()
+      .save({ ...f, line2: f.line2.trim() || undefined, id: existing?.id })
+      .then(id => {
+        useAddressStore.getState().select(id);
+        navigation.goBack();
+      }, (err: Error) => setErrors({ label: err.message }));
   };
 
   return (

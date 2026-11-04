@@ -9,7 +9,7 @@ import { colors, typography } from '../../utils/theme';
 const SettingsScreen: React.FC = () => (
   <Screen padded>
     <Text style={typography.h3}>Demo data</Text>
-    <Text style={styles.sub}>Clears your bag, wishlist, saved addresses and demo orders from this device.</Text>
+    <Text style={styles.sub}>Clears your bag and wishlist on this device. Orders and addresses live on the demo server.</Text>
     <Button
       title="Reset demo data"
       variant="secondary"
@@ -20,7 +20,7 @@ const SettingsScreen: React.FC = () => (
         ])
       }
     />
-    <Text style={styles.ver}>TOJ demo build · no backend</Text>
+    <Text style={styles.ver}>TOJ demo build · local demo server</Text>
   </Screen>
 );
 

@@ -3,13 +3,19 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CategoryCard } from '../../components/CategoryCard';
 import { Icon } from '../../components/Icon';
-import { categories } from '../../data/categories';
 import { useRootNavigation } from '../../hooks';
+import { useProductStore } from '../../store/productStore';
 import { Category } from '../../types';
 import { colors, typography } from '../../utils/theme';
 
 const ShopScreen: React.FC = () => {
   const nav = useRootNavigation();
+  const categories = useProductStore(s => s.categories);
+  const tiles: Category[] = [
+    { id: 'all', title: 'All products', image: categories[0]?.image ?? '' },
+    { id: 'sale', title: 'Sale', image: categories[2]?.image ?? '' },
+    ...categories,
+  ];
   const open = (id: string) => {
     if (id === 'all') {
       nav.navigate('ProductList', { title: 'All products' });
@@ -42,12 +48,6 @@ const ShopScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const tiles: Category[] = [
-  { id: 'all', title: 'All products', image: categories[0].image },
-  { id: 'sale', title: 'Sale', image: categories[2].image },
-  ...categories,
-];
 
 const styles = StyleSheet.create({
   grid: { paddingHorizontal: 10, paddingBottom: 24 },

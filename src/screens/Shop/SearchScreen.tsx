@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { EmptyState } from '../../components/States';
 import { ProductGrid } from '../../components/ProductGrid';
 import { Screen } from '../../components/Screen';
-import { categories } from '../../data/categories';
 import { useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
 import { searchProducts } from '../../utils/filter';
@@ -12,6 +11,7 @@ import { borderRadius, colors, typography } from '../../utils/theme';
 const SearchScreen: React.FC = () => {
   const nav = useRootNavigation();
   const products = useProductStore(s => s.products);
+  const categories = useProductStore(s => s.categories);
   const [q, setQ] = useState('');
   const results = useMemo(() => searchProducts(products, q), [products, q]);
   const searching = q.trim().length > 0;

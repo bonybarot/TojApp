@@ -1,43 +1,75 @@
 import { create } from 'zustand';
-import { DEMO_EXISTING_PHONE } from '../data/stores';
+import { api, currentRefreshToken, setSessionLostHandler, setTokens, Tokens } from '../api/client';
 import { User } from '../types';
 import { useAddressStore } from './addressStore';
+import { useCartStore } from './cartStore';
 import { useOrderStore } from './orderStore';
+import { useWishlistStore } from './wishlistStore';
+
+interface VerifyOk extends Tokens {
+  customer: { id: string; name: string; phone: string };
+}
+type VerifyResult = { needsProfile: true } | VerifyOk;
 
 interface UserState {
   user: User | null;
   isLoggedIn: boolean;
-  /** Simulated sign-in after a (simulated) OTP check. */
-  signIn: (phone: string, name?: string) => void;
-  updateName: (name: string) => void;
-  logout: () => void;
+  requestOtp: (phone: string) => Promise<void>;
+  /** 'needsProfile' when the number is new and no name was given yet. */
+  verifyOtp: (phone: string, code: string, name?: string) => Promise<'ok' | 'needsProfile'>;
+  updateName: (name: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-export const isExistingPhone = (phone: string): boolean =>
-  phone === DEMO_EXISTING_PHONE;
+/** The API stores +91XXXXXXXXXX; the app shows and edits the 10-digit number. */
+const toUser = (c: VerifyOk['customer']): User => ({ id: c.id, name: c.name, phone: c.phone.slice(-10) });
+
+const clearAccountData = () => {
+  useCartStore.getState().clearCart();
+  useWishlistStore.getState().clear();
+  useOrderStore.getState().reset();
+  useAddressStore.getState().reset();
+};
 
 export const useUserStore = create<UserState>(set => ({
   user: null,
   isLoggedIn: false,
-  signIn: (phone, name) => {
-    // Only the demo account owns the seeded address and order history.
-    if (isExistingPhone(phone)) {
-      useAddressStore.getState().reset();
-      useOrderStore.getState().reset();
-    } else {
-      useAddressStore.setState({ addresses: [], selectedId: null });
-      useOrderStore.setState({ orders: [], nextNumber: 1005 });
-    }
-    set({
-      user: {
-        id: `u-${phone}`,
-        phone,
-        name: name?.trim() || (isExistingPhone(phone) ? 'Demo Customer' : 'TOJ Customer'),
-      },
-      isLoggedIn: true,
-    });
+  requestOtp: async phone => {
+    await api('/auth/otp/request', { method: 'POST', body: { phone } });
   },
-  updateName: name =>
-    set(state => (state.user ? { user: { ...state.user, name: name.trim() } } : state)),
-  logout: () => set({ user: null, isLoggedIn: false }),
+  verifyOtp: async (phone, code, name) => {
+    const r = await api<VerifyResult>('/auth/otp/verify', { method: 'POST', body: { phone, code, name } });
+    if ('needsProfile' in r) {
+      return 'needsProfile';
+    }
+    setTokens({ accessToken: r.accessToken, refreshToken: r.refreshToken });
+    set({ user: toUser(r.customer), isLoggedIn: true });
+    // Guest bag and hearts move into the account (D-8); then load account data.
+    await Promise.allSettled([
+      useCartStore.getState().mergeIntoServer(),
+      useWishlistStore.getState().mergeIntoServer(),
+      useAddressStore.getState().load(),
+      useOrderStore.getState().load(),
+    ]);
+    return 'ok';
+  },
+  updateName: async name => {
+    const c = await api<VerifyOk['customer']>('/me', { method: 'PATCH', body: { name } });
+    set({ user: toUser(c) });
+  },
+  logout: async () => {
+    const rt = currentRefreshToken();
+    if (rt) {
+      await api('/auth/logout', { method: 'POST', body: { refreshToken: rt } }).catch(() => {});
+    }
+    setTokens(null);
+    set({ user: null, isLoggedIn: false });
+    clearAccountData();
+  },
 }));
+
+// Refresh failed (expired or revoked): drop to guest; account data stays on the server.
+setSessionLostHandler(() => {
+  useUserStore.setState({ user: null, isLoggedIn: false });
+  clearAccountData();
+});

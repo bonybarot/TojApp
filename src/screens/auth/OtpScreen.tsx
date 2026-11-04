@@ -7,7 +7,7 @@ import { Screen } from '../../components/Screen';
 import { DemoBanner } from '../../components/States';
 import { DEMO_OTP } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
-import { isExistingPhone, useUserStore } from '../../store/userStore';
+import { useUserStore } from '../../store/userStore';
 import { finishAuth } from '../../utils/authFlow';
 import { colors, typography } from '../../utils/theme';
 
@@ -26,24 +26,29 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
       return;
     }
     setBusy(true);
-    await new Promise<void>(r => setTimeout(r, 600));
-    setBusy(false);
-    if (code !== DEMO_OTP) {
-      setError('That code is incorrect. Try again.');
-      return;
-    }
-    if (isExistingPhone(phone)) {
-      useUserStore.getState().signIn(phone);
-      finishAuth(navigation, redirect);
-    } else {
-      navigation.navigate('CompleteProfile', { phone, redirect });
+    try {
+      const r = await useUserStore.getState().verifyOtp(phone, code);
+      if (r === 'ok') {
+        finishAuth(navigation, redirect);
+      } else {
+        navigation.navigate('CompleteProfile', { phone, code, redirect });
+      }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
     }
   };
+  const resend = () =>
+    useUserStore.getState().requestOtp(phone).then(
+      () => setResent(true),
+      (e: Error) => setError(e.message),
+    );
 
   return (
     <Screen scroll padded>
       <Text style={styles.title} accessibilityRole="header">Enter code</Text>
-      <Text style={styles.sub}>Sent to +{phone} (simulated)</Text>
+      <Text style={styles.sub}>Sent to +91 {phone} (simulated, no SMS)</Text>
       <Input
         label="6-digit code"
         value={code}
@@ -54,8 +59,8 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
         autoFocus
       />
       <Button title="Verify" onPress={verify} loading={busy} />
-      <Pressable onPress={() => setResent(true)} hitSlop={8} accessibilityRole="button" style={styles.resend}>
-        <Text style={styles.link}>{resent ? 'Code resent (demo)' : 'Resend code'}</Text>
+      <Pressable onPress={resend} hitSlop={8} accessibilityRole="button" style={styles.resend}>
+        <Text style={styles.link}>{resent ? 'Code resent' : 'Resend code'}</Text>
       </Pressable>
       <View style={styles.banner}>
         <DemoBanner text={`Demo: use code ${DEMO_OTP}.`} />

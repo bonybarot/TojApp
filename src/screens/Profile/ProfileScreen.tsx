@@ -4,7 +4,6 @@ import { Button } from '../../components/Button';
 import { Icon } from '../../components/Icon';
 import { Screen } from '../../components/Screen';
 import { useRootNavigation } from '../../hooks';
-import { resetDemoData } from '../../store/resetDemo';
 import { useUserStore } from '../../store/userStore';
 import { colors, typography } from '../../utils/theme';
 
@@ -22,7 +21,7 @@ const ProfileScreen: React.FC = () => {
   const logout = () =>
     Alert.alert('Log out', 'Log out of TOJ?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Log out', style: 'destructive', onPress: () => { useUserStore.getState().logout(); resetDemoData(); } },
+      { text: 'Log out', style: 'destructive', onPress: () => { useUserStore.getState().logout(); } },
     ]);
 
   if (!user) {

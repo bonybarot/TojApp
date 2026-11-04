@@ -20,6 +20,16 @@ export interface Product {
   stock: Record<string, number>;
   pickupAvailable: boolean;
   tag?: 'New' | 'Bestseller';
+  /** Present when loaded from the API; cart and stock calls are keyed by variant id. */
+  variants?: Variant[];
+}
+
+export interface Variant {
+  id: string;
+  sku: string;
+  color: string;
+  size: string;
+  stock: number;
 }
 
 export interface Category {
@@ -62,10 +72,14 @@ export type OrderStatus =
   | 'SHIPPED'
   | 'OUT_FOR_DELIVERY'
   | 'DELIVERED'
+  | 'READY_FOR_PICKUP'
+  | 'COLLECTED'
   | 'CANCELLED';
 
 export interface OrderItem {
   productId: string;
+  variantId?: string;
+  sku?: string;
   title: string;
   image: string;
   color: string;
@@ -86,4 +100,15 @@ export interface Order {
   address?: Address;
   pickupStore?: string;
   paymentMethod: string;
+  orderNumber?: number;
+  paymentStatus?: 'PENDING' | 'PAID' | 'REFUNDED';
+  cancelReason?: string | null;
+  timeline?: { status: OrderStatus; at: string; actor: string; note?: string | null }[];
+}
+
+export interface PickupLocation {
+  id: string;
+  name: string;
+  address: string;
+  hours: string;
 }

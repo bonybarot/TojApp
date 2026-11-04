@@ -7,6 +7,7 @@ import { Screen } from '../../components/Screen';
 import { DemoBanner } from '../../components/States';
 import { DEMO_OTP } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
+import { useUserStore } from '../../store/userStore';
 import { colors, typography } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
@@ -14,12 +15,21 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<string>();
-  const submit = () => {
-    if (!/^\d{10}$/.test(phone)) {
+  const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    if (!/^[6-9]\d{9}$/.test(phone)) {
       setError('Enter a valid 10-digit mobile number.');
       return;
     }
-    navigation.navigate('Otp', { phone, redirect: route.params?.redirect });
+    setBusy(true);
+    try {
+      await useUserStore.getState().requestOtp(phone);
+      navigation.navigate('Otp', { phone, redirect: route.params?.redirect });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
   return (
     <Screen scroll padded edges={['bottom']}>
@@ -35,7 +45,7 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
         error={error}
         autoFocus
       />
-      <Button title="Send code" onPress={submit} />
+      <Button title="Send code" onPress={submit} loading={busy} />
       <View style={styles.banner}>
         <DemoBanner text={`Demo: no SMS is sent. Use code ${DEMO_OTP}.`} />
       </View>

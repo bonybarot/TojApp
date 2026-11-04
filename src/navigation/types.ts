@@ -26,7 +26,7 @@ export type RootStackParamList = {
   Settings: undefined;
   Login: { redirect?: AuthRedirect } | undefined;
   Otp: { phone: string; redirect?: AuthRedirect };
-  CompleteProfile: { phone: string; redirect?: AuthRedirect };
+  CompleteProfile: { phone: string; code: string; redirect?: AuthRedirect };
 };
 
 declare global {

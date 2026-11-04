@@ -15,23 +15,23 @@ Owner instruction (2026-11-05, verbatim summary): push work to new branches, nev
 
 ## Backend (`toj-backend`, branch `feature/backend-core`)
 
-- [ ] B1 Full Prisma schema, migration, constraint SQL, idempotent seed from `prisma/seed-data/` (copied fixtures, INR paise demo prices). Checks: `npm run db:deploy`, seed twice, lint, typecheck, test
-- [ ] B2 Common: error filter with `{error:{code,message,details,requestId}}`, request id, `@Public()`, pagination DTO, throttler
-- [ ] B3 Catalogue: `GET /categories`, `/products` (q, filters, sort, pagination), `/products/:id`, `/store`, `/pickup-locations`. Unit tests for query building, e2e for endpoints
-- [ ] B4 Auth: OTP request/verify (fixed/random), JWT access, refresh rotation with family revocation, logout, `GET/PATCH /me`, global deny-by-default guard. e2e
-- [ ] B5 Wishlist and addresses (+merge), ownership tests
-- [ ] B6 Cart (clamp, merge, warnings)
-- [ ] B7 Checkout validate, order create transaction + idempotency + stock guard, list, detail, cancel + restock. Concurrency e2e (no overselling)
-- [ ] B8 Admin login, admin orders transition, admin inventory list/adjust
-- [ ] B9 `openapi.json` export script + committed file; docs (`IMPLEMENTATION_PROGRESS.md`, `LOCAL_DEVELOPMENT.md`)
+- [x] B1 Full Prisma schema, migration, constraint SQL, idempotent seed from `prisma/seed-data/` (copied fixtures, INR paise demo prices). Checks: `npm run db:deploy`, seed twice, lint, typecheck, test
+- [x] B2 Common: error filter with `{error:{code,message,details,requestId}}`, request id, `@Public()`, pagination DTO, throttler
+- [x] B3 Catalogue: `GET /categories`, `/products` (q, filters, sort, pagination), `/products/:id`, `/store`, `/pickup-locations`. Unit tests for query building, e2e for endpoints
+- [x] B4 Auth: OTP request/verify (fixed/random), JWT access, refresh rotation with family revocation, logout, `GET/PATCH /me`, global deny-by-default guard. e2e
+- [x] B5 Wishlist and addresses (+merge), ownership tests
+- [x] B6 Cart (clamp, merge, warnings)
+- [x] B7 Checkout validate, order create transaction + idempotency + stock guard, list, detail, cancel + restock. Concurrency e2e (no overselling)
+- [x] B8 Admin login, admin orders transition, admin inventory list/adjust
+- [x] B9 `openapi.json` export script + committed file; docs (`IMPLEMENTATION_PROGRESS.md`, `LOCAL_DEVELOPMENT.md`)
 
 ## App (`TojApp`, branch `feature/api-integration`)
 
-- [ ] A1 `src/config/env.ts` base URL (iOS `localhost`, Android `10.0.2.2`), `src/api/client.ts` (fetch, timeout, ApiError, bearer, single-flight refresh), API types
-- [ ] A2 Catalogue from API (categories, products, product detail), loading/error states; fixtures kept for tests
-- [ ] A3 Auth from API (OTP request/verify, needsProfile, logout), tokens in memory only
-- [ ] A4 Wishlist, addresses, cart against API when signed in; guest merge at login
-- [ ] A5 Checkout validate + place order + orders list/detail/cancel; pickup-only UI; ₹ formatting from paise; pickup statuses
+- [x] A1 `src/config/env.ts` base URL (iOS `localhost`, Android `10.0.2.2`), `src/api/client.ts` (fetch, timeout, ApiError, bearer, single-flight refresh), API types
+- [x] A2 Catalogue from API (categories, products, product detail), loading/error states; fixtures kept for tests
+- [x] A3 Auth from API (OTP request/verify, needsProfile, logout), tokens in memory only
+- [x] A4 Wishlist, addresses, cart against API when signed in; guest merge at login
+- [x] A5 Checkout validate + place order + orders list/detail/cancel; pickup-only UI; ₹ formatting from paise; pickup statuses
 - [ ] A6 Run on iOS simulator against local backend, walk the demo journey, fix what breaks
 - [ ] A7 Docs: ADR for API integration choices, `current-state.md`, `AGENTS.md`, changelog
 
@@ -42,3 +42,9 @@ Owner instruction (2026-11-05, verbatim summary): push work to new branches, nev
 ## Log
 
 - 2026-11-05 01:40 queue created; branches cut from `feature/toj-customer-ui` (TojApp) and `main` (toj-backend)
+- 2026-11-05 B1-B6 schema, common, catalogue, auth, wishlist/addresses, cart (toj-backend `5d5348b`..`a9eb96f`)
+- 2026-11-05 spec alignment of routes and shapes (`2e9b9ce`)
+- 2026-11-05 B7 checkout + orders, no-oversell concurrency e2e (`987aa8f`)
+- 2026-11-05 B8 admin auth, transitions, inventory (`b217837`)
+- 2026-11-05 B9 openapi.json (32 paths), docs, decisions B-19..B-28 (`b3971b4`); lint/typecheck clean, unit 17, e2e 27
+- 2026-11-05 A1-A5 API client, catalogue, auth, cart/wishlist/addresses, pickup-only checkout and orders against the local API; tsc/lint clean, jest 5

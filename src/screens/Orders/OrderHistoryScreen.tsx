@@ -12,11 +12,14 @@ import { borderRadius, colors, typography } from '../../utils/theme';
 const OrderHistoryScreen: React.FC = () => {
   const nav = useRootNavigation();
   const orders = useOrderStore(s => s.orders);
+  const loading = useOrderStore(s => s.status === 'loading');
   return (
     <Screen>
       <FlatList
         data={orders}
         keyExtractor={o => o.id}
+        refreshing={loading}
+        onRefresh={() => useOrderStore.getState().load()}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <EmptyState title="No orders yet" message="Your orders will appear here." actionLabel="Start shopping" onAction={() => nav.navigate('Tabs', { screen: 'Shop' })} />

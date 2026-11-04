@@ -5,11 +5,10 @@ import { Button } from '../../components/Button';
 import { QuantityStepper } from '../../components/QuantityStepper';
 import { SmartImage } from '../../components/SmartImage';
 import { EmptyState } from '../../components/States';
-import { FREE_DELIVERY_THRESHOLD } from '../../data/stores';
 import { useRootNavigation } from '../../hooks';
 import { useCartStore } from '../../store/cartStore';
 import { useUserStore } from '../../store/userStore';
-import { deliveryFeeFor, detailLines, subtotalOf } from '../../utils/cart';
+import { detailLines, subtotalOf } from '../../utils/cart';
 import { formatPrice } from '../../utils/format';
 import { colors, typography } from '../../utils/theme';
 
@@ -20,7 +19,6 @@ const CartScreen: React.FC = () => {
   const isLoggedIn = useUserStore(s => s.isLoggedIn);
   const detailed = detailLines(lines);
   const subtotal = subtotalOf(detailed);
-  const fee = deliveryFeeFor(subtotal, 'delivery');
 
   const confirmRemove = (id: string, title: string) =>
     Alert.alert('Remove item', `Remove ${title} from your bag?`, [
@@ -74,11 +72,10 @@ const CartScreen: React.FC = () => {
           <View style={styles.summary}>
             <View style={styles.row}><Text style={styles.sumText}>Subtotal</Text><Text style={styles.sumText}>{formatPrice(subtotal)}</Text></View>
             <View style={styles.row}>
-              <Text style={styles.sumText}>Delivery</Text>
-              <Text style={styles.sumText}>{fee === 0 ? 'Free' : formatPrice(fee)}</Text>
+              <Text style={styles.sumText}>Store pickup</Text>
+              <Text style={styles.sumText}>Free</Text>
             </View>
-            {fee > 0 && <Text style={styles.hint}>Spend {formatPrice(FREE_DELIVERY_THRESHOLD - subtotal)} more for free delivery. Pickup is always free.</Text>}
-            <View style={[styles.row, styles.totalRow]}><Text style={styles.total}>Total</Text><Text style={styles.total}>{formatPrice(subtotal + fee)}</Text></View>
+            <View style={[styles.row, styles.totalRow]}><Text style={styles.total}>Total</Text><Text style={styles.total}>{formatPrice(subtotal)}</Text></View>
             <Button title={isLoggedIn ? 'Checkout' : 'Sign in to checkout'} onPress={checkout} style={styles.checkout} />
           </View>
         </>
@@ -105,7 +102,6 @@ const styles = StyleSheet.create({
   summary: { padding: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   sumText: { ...typography.body, color: colors.textSecondary },
-  hint: { ...typography.caption, color: colors.accent, marginBottom: 4 },
   total: { ...typography.h2 },
 });
 

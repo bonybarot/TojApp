@@ -1,49 +1,44 @@
 import { create } from 'zustand';
+import { api } from '../api/client';
 import { Address } from '../types';
 
-const seed = (): Address[] => [
-  {
-    id: 'a1',
-    label: 'Home',
-    fullName: 'Demo Customer',
-    phone: '9876543210',
-    line1: '24 Garden Road',
-    city: 'Your City',
-    postalCode: '400001',
-  },
-];
+type ServerAddress = Address & { isDefault: boolean };
 
 interface AddressState {
   addresses: Address[];
   selectedId: string | null;
-  save: (a: Omit<Address, 'id'> & { id?: string }) => string;
-  remove: (id: string) => void;
+  load: () => Promise<void>;
+  /** Creates or updates on the server; resolves to the saved id. */
+  save: (a: Omit<Address, 'id'> & { id?: string }) => Promise<string>;
+  remove: (id: string) => Promise<void>;
   select: (id: string) => void;
   reset: () => void;
 }
 
-export const useAddressStore = create<AddressState>(set => ({
-  addresses: seed(),
-  selectedId: 'a1',
-  save: a => {
-    const id = a.id ?? `a${Date.now()}`;
-    const full = { ...a, id } as Address;
-    set(s => ({
-      addresses: s.addresses.some(x => x.id === id)
-        ? s.addresses.map(x => (x.id === id ? full : x))
-        : [...s.addresses, full],
-      selectedId: s.selectedId ?? id,
-    }));
-    return id;
+/** Addresses exist only on a signed-in account (all screens that use them require sign-in). */
+export const useAddressStore = create<AddressState>((set, get) => ({
+  addresses: [],
+  selectedId: null,
+  load: async () => {
+    const list = await api<ServerAddress[]>('/me/addresses');
+    const keep = list.some(a => a.id === get().selectedId);
+    set({
+      addresses: list,
+      selectedId: keep ? get().selectedId : (list.find(a => a.isDefault) ?? list[0])?.id ?? null,
+    });
   },
-  remove: id =>
-    set(s => {
-      const addresses = s.addresses.filter(x => x.id !== id);
-      return {
-        addresses,
-        selectedId: s.selectedId === id ? addresses[0]?.id ?? null : s.selectedId,
-      };
-    }),
+  save: async ({ id, ...body }) => {
+    const saved = await api<ServerAddress>(id ? `/me/addresses/${id}` : '/me/addresses', {
+      method: id ? 'PATCH' : 'POST',
+      body,
+    });
+    await get().load();
+    return saved.id;
+  },
+  remove: async id => {
+    await api(`/me/addresses/${id}`, { method: 'DELETE' });
+    await get().load();
+  },
   select: id => set({ selectedId: id }),
-  reset: () => set({ addresses: seed(), selectedId: 'a1' }),
+  reset: () => set({ addresses: [], selectedId: null }),
 }));

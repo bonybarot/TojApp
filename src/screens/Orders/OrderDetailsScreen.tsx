@@ -8,7 +8,7 @@ import { EmptyState } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { CANCELLABLE, useOrderStore } from '../../store/orderStore';
 import { formatDate, formatPrice } from '../../utils/format';
-import { STATUS_COLOR, STATUS_LABEL, TIMELINE } from '../../utils/orderStatus';
+import { PAYMENT_LABEL, STATUS_COLOR, STATUS_LABEL, timelineFor } from '../../utils/orderStatus';
 import { colors, typography } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
@@ -20,11 +20,12 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     return <Screen><EmptyState title="Order not found" actionLabel="My orders" onAction={() => navigation.navigate('OrderHistory')} /></Screen>;
   }
   const cancelled = order.status === 'CANCELLED';
-  const step = TIMELINE.indexOf(order.status);
+  const steps = timelineFor(order.fulfilment);
+  const step = steps.indexOf(order.status);
   const confirmCancel = () =>
     Alert.alert('Cancel order', `Cancel ${order.id}?`, [
       { text: 'Keep order', style: 'cancel' },
-      { text: 'Cancel order', style: 'destructive', onPress: () => cancel(order.id) },
+      { text: 'Cancel order', style: 'destructive', onPress: () => { cancel(order.id).catch((e: Error) => Alert.alert('Could not cancel', e.message)); } },
     ]);
 
   return (
@@ -35,7 +36,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
       {!cancelled && (
         <View style={styles.timeline}>
-          {TIMELINE.map((s, i) => (
+          {steps.map((s, i) => (
             <View key={s} style={styles.tRow}>
               <View style={[styles.dot, i <= step && styles.dotOn]} />
               <Text style={[styles.tText, i <= step && styles.tTextOn]}>{STATUS_LABEL[s]}</Text>
@@ -66,7 +67,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       ) : null}
 
       <Text style={styles.h}>PAYMENT</Text>
-      <Text style={typography.body}>{order.paymentMethod}</Text>
+      <Text style={typography.body}>{PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod}</Text>
 
       <View style={styles.totals}>
         <View style={styles.row}><Text style={styles.sub}>Subtotal</Text><Text style={typography.body}>{formatPrice(order.subtotal)}</Text></View>

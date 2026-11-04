@@ -8,14 +8,13 @@ import { SectionHeader } from '../../components/SectionHeader';
 import { SmartImage } from '../../components/SmartImage';
 import { ProductGridSkeleton } from '../../components/Skeleton';
 import { ErrorState } from '../../components/States';
-import { categories } from '../../data/categories';
 import { useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
 import { colors, typography } from '../../utils/theme';
 
 const HomeScreen: React.FC = () => {
   const nav = useRootNavigation();
-  const { products, status, loadProducts } = useProductStore();
+  const { products, categories, status, loadProducts } = useProductStore();
   const hero = products.find(p => p.tag === 'New') ?? products[0];
   const newIn = products.filter(p => p.tag === 'New' || p.tag === 'Bestseller').slice(0, 8);
   const sale = products.filter(p => p.compareAtPrice).slice(0, 8);

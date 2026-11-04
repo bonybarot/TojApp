@@ -13,13 +13,12 @@ const PersonalInfoScreen: React.FC = () => {
   const [saved, setSaved] = useState(false);
   const save = () => {
     if (name.trim().length < 2) { setError('Enter your name.'); return; }
-    useUserStore.getState().updateName(name.trim());
-    setSaved(true);
+    useUserStore.getState().updateName(name.trim()).then(() => setSaved(true), (e: Error) => setError(e.message));
   };
   return (
     <Screen scroll padded>
       <Input label="Name" value={name} onChangeText={t => { setName(t); setError(undefined); setSaved(false); }} error={error} autoCapitalize="words" />
-      <Input label="Mobile number" value={user ? `+${user.phone}` : ''} editable={false} />
+      <Input label="Mobile number" value={user ? `+91 ${user.phone}` : ''} editable={false} />
       <Text style={styles.note}>Your mobile number is your sign-in and cannot be changed here.</Text>
       <Button title="Save changes" onPress={save} />
       {saved && <Text style={styles.ok} accessibilityRole="alert">Saved</Text>}
