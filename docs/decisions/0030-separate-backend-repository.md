@@ -37,7 +37,7 @@ Monorepo (option 1): rejected for team independence, not on technical grounds; i
 ## Risks
 - **Contract drift** between app and API. Warning sign: app types disagree with Swagger. Mitigation: commit an exported `openapi.json` in `toj-backend` and review it in every API PR (roadmap item).
 - **Seed data drift**: the backend seed can no longer import the app's `src/data/` fixtures. Mitigation: copy them once into `toj-backend/prisma/seed-data/`, owned by the backend from then on.
-- **No remote yet** for `toj-backend`: until one exists, the code lives on one machine only.
+- ~~No remote yet~~ Resolved 2026-11-05: `toj-backend` is a private GitHub repository, `https://github.com/softyoi-bony/toj-backend` (`main` at `8af4b46`). It sits under a different GitHub account than this repo (`bonybarot/TojApp`); team access must be granted on both.
 
 ## Consequences
 - This repo: the five backend exclusions in `tsconfig.json`, `jest.config.js`, `.eslintrc.js`, `metro.config.js`, `.gitignore` were reverted (they excluded only `backend/`). AGENTS.md §7b now points to the backend repo.
