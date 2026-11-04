@@ -18,6 +18,18 @@ Status: Completion report for the autonomous queue ([autonomous-queue.md](autono
 | Tapping through the UI journey on the simulator | **NOT DONE**: simulator control needs owner approval of the panel, which was not available unattended. Covered at API level by the journey script |
 | Android | NOT RUN |
 
+## Re-verification run (2026-11-05 05:13 IST)
+Queue had no unchecked tasks; this run re-ran every check on the pushed heads (`toj-backend` `feature/backend-core`, `TojApp` `d2aa093`). No code changed.
+| Check | Result |
+|---|---|
+| Backend `db:deploy` | No pending migrations |
+| Backend lint, typecheck | Clean |
+| Backend unit / e2e (vitest) | 17 / 27 pass |
+| App tsc, lint, jest | Clean, clean, 5 pass |
+| Live API smoke (seeded demo account): categories, products (`pickup&inStock`), detail, pickup locations, OTP request/verify, `/me`, cart set, wishlist add, checkout validate, place order, list, detail, cancel | Pass; order 1006 placed then cancelled (stock restored) |
+
+Still not done: UI tap-through on the simulator, Android run.
+
 ## Decisions made (Level 1-2)
 - ADR-0031: fetch client, base URL in `src/config/env.ts`, tokens in memory, server as source of truth with guest merge, catalogue loaded once (50 max), pickup-only checkout with idempotency key and `expectedTotal`.
 - Podfile override for fmt / RCT-Folly (remove when React Native ships a fixed fmt).
