@@ -61,6 +61,13 @@ The authoritative statement of **product intent** is
 | [implementation/technical-debt-plan.md](implementation/technical-debt-plan.md) | All 65 known issues, dispositioned |
 | [implementation/testing-plan.md](implementation/testing-plan.md) | What is tested, at which layer, and what is not |
 
+## Backend — APPROVED, in progress
+
+| Document | |
+|---|---|
+| `toj-backend` repo, `docs/README.md` | Backend blueprint (NestJS, PostgreSQL, Prisma): index, reading order. Approved 2026-10-31. Moved to its own repository 2026-11-05 ([ADR-0030](decisions/0030-separate-backend-repository.md)) |
+| `toj-backend` repo, `docs/IMPLEMENTATION_PROGRESS.md` | What is built, versions, tests, issues, next milestone |
+
 ## Decisions
 
 | Document | |

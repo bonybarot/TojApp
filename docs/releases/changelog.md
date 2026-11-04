@@ -1,5 +1,30 @@
 # Changelog
 
+
+## [Unreleased] — 2026-11-05 backend moved to its own repository
+
+### Changed
+- `backend/`, `docs/backend/` and `docs/BACKEND_READINESS_AUDIT.md` moved to the new `toj-backend` repository (sibling folder, first commit `8af4b46`). [ADR-0030](../decisions/0030-separate-backend-repository.md) accepted.
+- Root `tsconfig.json`, `jest.config.js`, `.eslintrc.js`, `metro.config.js`, `.gitignore`: backend exclusions reverted (back to their committed state).
+- `AGENTS.md` §1, §1a, §1b, §7b, `docs/README.md`, `docs/current-state.md`, ADR index: point to `toj-backend`. ADR-0007 status notes the amendment.
+
+### Verified
+`toj-backend`: lint, typecheck, unit 5/5, build, e2e 3/3. App: see the commit or PR for tsc, lint, jest.
+
+## [Unreleased] — 2026-10-31 backend foundation (Day 1)
+
+### Added
+- `backend/`: NestJS 12 + Prisma 7 + PostgreSQL 17 foundation (health endpoints, config validation, Swagger, unit and e2e tests). (Now in the `toj-backend` repository.)
+- ADRs 0007-0013, 0020, 0022, 0026 (Accepted). ADR index populated.
+- `docs/backend/` blueprint (11 files) and `IMPLEMENTATION_PROGRESS.md`.
+
+### Changed
+- `AGENTS.md`: backend gate lifted; autonomous engineering policy added.
+- Root `tsconfig.json`, `jest.config.js`, `.eslintrc.js`, `metro.config.js`, `.gitignore` exclude `backend/` (RN app unaffected; verified by tsc, lint, jest, Metro bundle).
+
+### Verified
+Backend unit 5/5, e2e 3/3, lint and typecheck clean; root tsc 0 errors, jest 5/5. Not verified: any RN-to-API call (not built yet).
+
 ## 2026-10-31: documentation baseline for `feature/toj-customer-ui`
 
 - Moved the pre-UI `current-state/`, `features/`, `components/`, `api/` pages and the handover

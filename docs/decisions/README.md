@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-> **Baseline note (2026-10-31).** Planning document written 2026-09-03 against the pre-UI baseline (commit `66044c5`). Since then the v1 customer UI was implemented against static mock data on explicit request (D-15). Phrases such as "nothing is implemented" and references to `.js` twins, electronics data, the drawer or 0 running tests describe that baseline. Backend, real auth, payment and persistence remain unapproved and gated on ADRs. Current facts: [../current-state.md](../current-state.md). Cited evidence: [../archive/pre-ui-baseline/](../archive/pre-ui-baseline/README.md).
+> **Baseline note (2026-10-31).** Planning document written 2026-09-03 against the pre-UI baseline (commit `66044c5`). Since then the v1 customer UI was implemented against static mock data on explicit request (D-15). Phrases such as "nothing is implemented" and references to `.js` twins, electronics data, the drawer or 0 running tests describe that baseline. The backend implementation gate was lifted on 2026-10-31 (see the status update at the end); payment, real SMS OTP and persistence on the device remain unapproved. Current facts: [../current-state.md](../current-state.md). Cited evidence: [../archive/pre-ui-baseline/](../archive/pre-ui-baseline/README.md).
 
 Status: Decision log — product direction DECIDED, architecture PROPOSED
 Last Verified: 2026-09-03
@@ -10,7 +10,7 @@ Source: repository state, and the planning set under `docs/requirements/`, `docs
 
 ## 1. Purpose
 
-Architecture Decision Records live here. **No ADR has been written yet.** What follows is
+Architecture Decision Records live here. Ten ADRs were accepted on 2026-10-31 (§7); the rest are still PROPOSED or OPEN. What follows is
 the register of decisions that must be recorded, their current state, and the rules that
 govern them.
 
@@ -158,29 +158,29 @@ it is written. Grouped by the phase that needs it.
 
 | ID | Title | State |
 |---|---|---|
-| ADR-0007 | Backend platform | **OPEN — blocked on O-1 and O-2** |
-| ADR-0008 | API style: REST + OpenAPI | PROPOSED, contingent on ADR-0007 |
+| ADR-0007 | Backend platform | **ACCEPTED 2026-10-31** ([0007](0007-backend-platform.md)) |
+| ADR-0008 | API style: REST + OpenAPI | **ACCEPTED 2026-10-31** ([0008](0008-api-style.md)) |
 | ADR-0004 | Server-state library (TanStack Query recommended) | PROPOSED |
-| ADR-0013 | Multi-tenancy readiness: `storeId` on catalogue and order rows from day one | PROPOSED — cheap now, expensive later |
-| ADR-0020 | Environment and configuration strategy | PROPOSED — none exists today |
+| ADR-0013 | Multi-tenancy readiness: `storeId` on catalogue and order rows from day one | **ACCEPTED 2026-10-31** ([0013](0013-multi-store-readiness.md)) |
+| ADR-0020 | Environment and configuration strategy | **ACCEPTED 2026-10-31** ([0020](0020-environment-configuration.md)); backend part only, app `API_BASE_URL` pending |
 
 ### Before Phase 5
 
 | ID | Title | State |
 |---|---|---|
-| ADR-0009 | Authentication model: **mobile + OTP** (D-9), build vs buy | PROPOSED — credential type decided, everything else open |
-| ADR-0010 | Session and token lifecycle: in-memory access token, rotating refresh | PROPOSED |
+| ADR-0009 | Authentication model: **mobile + OTP** (D-9), build vs buy | **ACCEPTED 2026-10-31** ([0009](0009-authentication-model.md)) with simulated OTP |
+| ADR-0010 | Session and token lifecycle: in-memory access token, rotating refresh | **ACCEPTED 2026-10-31** ([0010](0010-session-and-tokens.md)) |
 | ADR-0025 | OTP provider and OTP policy: length, expiry, attempt and resend limits, per-number rate limiting, account recovery | **OPEN — blocked on O-7** |
 
 ### Before Phase 6
 
 | ID | Title | State |
 |---|---|---|
-| ADR-0012 | Order state: payment status × fulfilment status, with a derived display status | PROPOSED |
+| ADR-0012 | Order state: payment status × fulfilment status, with a derived display status | **ACCEPTED 2026-10-31** ([0012](0012-order-state.md)); single status + separate payment status |
 | ADR-0014 | Payment provider and PCI scope | **OPEN — blocked on O-4** |
-| ADR-0022 | Product variants and the inventory model | PROPOSED — without this, a clothing order is unfulfillable |
+| ADR-0022 | Product variants and the inventory model | **ACCEPTED 2026-10-31** ([0022](0022-variants-and-inventory.md)) |
 | ADR-0023 | E2E tooling (Maestro recommended) | PROPOSED |
-| ADR-0026 | Store pickup: eligibility model, checkout branch, pickup order states | PROPOSED — needs O-9 for the rules, not for the model |
+| ADR-0026 | Store pickup: eligibility model, checkout branch, pickup order states | **ACCEPTED 2026-10-31** ([0026](0026-store-pickup.md)); demo checkout pickup-only |
 | ADR-0027 | Order notifications: transport, triggers, idempotency | **Needs O-13** |
 
 ### Before wishlist and reviews are built (D-14, conditional)
@@ -308,7 +308,19 @@ Then add a row to §7 and a line in [../releases/changelog.md](../releases/chang
 
 | ID | Title | Date | Status |
 |---|---|---|---|
-| — | *No ADR written yet* | — | — |
+| 0007 | [Backend platform: NestJS, Prisma, PostgreSQL](0007-backend-platform.md) | 2026-10-31 | Accepted |
+| 0008 | [API style: REST, `/api/v1`, OpenAPI](0008-api-style.md) | 2026-10-31 | Accepted |
+| 0009 | [Authentication model: mobile number + OTP](0009-authentication-model.md) | 2026-10-31 | Accepted |
+| 0010 | [Session and token lifecycle](0010-session-and-tokens.md) | 2026-10-31 | Accepted |
+| 0011 | [Money as integer paise, currency INR](0011-money-inr-paise.md) | 2026-10-31 | Accepted |
+| 0012 | [Order state and cancellation rules](0012-order-state.md) | 2026-10-31 | Accepted |
+| 0013 | [Multi-store readiness: `storeId`](0013-multi-store-readiness.md) | 2026-10-31 | Accepted |
+| 0020 | [Environment and configuration strategy](0020-environment-configuration.md) | 2026-10-31 | Accepted |
+| 0022 | [Product variants and the inventory model](0022-variants-and-inventory.md) | 2026-10-31 | Accepted |
+| 0026 | [Store pickup](0026-store-pickup.md) | 2026-10-31 | Accepted |
+| 0030 | [Backend in a separate repository](0030-separate-backend-repository.md) | 2026-11-05 | Accepted |
+
+Note: ADR-0011 (money) is new; the planning table in §3 did not list it separately.
 
 ---
 
@@ -320,6 +332,7 @@ Then add a row to §7 and a line in [../releases/changelog.md](../releases/chang
 - [../implementation/implementation-phases.md](../implementation/implementation-phases.md) — which ADR gates which phase
 - [../documentation-strategy.md](../documentation-strategy.md) — the supersede-never-rewrite rule
 - [../archive/pre-ui-baseline/current-state/known-issues.md](../archive/pre-ui-baseline/current-state/known-issues.md) — the 65 findings behind most of these
+- `toj-backend/docs/DECISIONS.md` (separate repository since 2026-11-05) — backend decisions (B-xx), verified facts and the owner questions; ADRs accepted 2026-10-31
 
 ---
 
@@ -329,3 +342,11 @@ D-15 ("UI + static data first") was exercised: the v1 customer UI was implemente
 data on explicit request. No ADR was approved and no backend, auth, payment or persistence phase
 was started. ADR-0002 (TypeScript-only tree) is satisfied in practice: the `.js` shadows were
 deleted. All other ADRs remain PROPOSED.
+
+## Status update 2026-10-31 (backend approval)
+
+The product owner approved the backend blueprint and decisions Q-1, Q-2, Q-5, Q-7 and Q-8. The `AGENTS.md` §1a gate is lifted for the backend: ten ADRs above are Accepted, and the Day-1 backend foundation exists under `backend/`. Still gated: payment gateway, real SMS OTP (ADR-0025, O-7), device persistence, seller/admin products, production hosting. Details: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md`.
+
+## Status update 2026-11-05 (repository split)
+
+The owner decided the backend lives in its own repository, `toj-backend`, so a backend team can work independently: [ADR-0030](0030-separate-backend-repository.md). This register stays the single ADR log for both repositories. Accepted ADRs that mention `backend/` or `docs/backend/` in prose are not rewritten; read them as `toj-backend/` and `toj-backend/docs/`.

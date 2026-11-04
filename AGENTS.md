@@ -1,7 +1,7 @@
 # AGENTS.md — Instructions for AI Coding Agents
 
 Status: Current State
-Last Verified: 2026-10-31
+Last Verified: 2026-11-05 (backend moved to its own repository, ADR-0030)
 Source: branch `feature/toj-customer-ui`, on top of commit `66044c5`. The UI described below lands in the commit that follows this documentation baseline
 
 Read this file first. Then read the documentation it points to. Then read the code.
@@ -14,7 +14,8 @@ Read this file first. Then read the documentation it points to. Then read the co
 whole v1 customer journey is implemented against **mock data**. It is a UI prototype, not a
 production system.
 
-There is **no backend**. Every screen renders from typed fixtures in `src/data/`.
+The app is **not connected to a backend yet**. Every screen renders from typed fixtures in
+`src/data/`. A backend foundation exists in the separate **`toj-backend`** repository (sibling folder `../toj-backend`; see §1a, §7b, [ADR-0030](docs/decisions/0030-separate-backend-repository.md)); the app will integrate it later.
 
 | Aspect | Current reality |
 |---|---|
@@ -25,7 +26,8 @@ There is **no backend**. Every screen renders from typed fixtures in `src/data/`
 | Styling | `StyleSheet.create` + `src/utils/theme.ts` tokens. No inline styles (ESLint-enforced) |
 | Data | Typed fixtures: `products.ts` (15 clothing items), `categories.ts`, `orders.ts`, `stores.ts` |
 | Money | Integer minor units (cents); `$` is a placeholder currency; format via `utils/format.ts` |
-| Backend / Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
+| Backend | Separate repo `toj-backend` (`../toj-backend`): Day-1 foundation (NestJS 12, Prisma 7, PostgreSQL 17, Node 24). Health endpoints only; the app does not call it yet. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
+| Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
 | Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts`; 5 tests pass |
 | tsc / ESLint | 0 errors / 0 warnings |
 
@@ -76,10 +78,34 @@ seller/admin and persistence are not. The planning set that follows from these d
 | In what order, with what rollback | [`docs/implementation/implementation-phases.md`](docs/implementation/implementation-phases.md) |
 | What is decided, open, rejected | [`docs/decisions/README.md`](docs/decisions/README.md) |
 
-**The v1 customer UI (static data) was implemented on explicit request. No backend, auth,
-payment or persistence phase has been approved — do not begin one.** Those phases are gated on
-ADRs that have not been written yet — see the readiness checklist at the end of
-`implementation-phases.md`.
+**The v1 customer UI (static data) was implemented on explicit request.**
+
+**Backend gate LIFTED 2026-10-31.** The product owner approved the backend blueprint
+(now `toj-backend/docs/`) and decisions Q-1 (Node 24 via fnm, Docker), Q-2
+(INR, integer paise, pickup-only demo checkout), Q-5 (customer cancel only from PLACED and
+CONFIRMED; CANCELLED terminal; no refund integration), Q-7 (keep search/filters/sort/sale,
+server-backed) and Q-8. ADRs 0007-0013, 0020, 0022, 0026 are Accepted. Still NOT approved:
+payment gateway, real SMS OTP, device persistence, seller/admin products, production hosting
+and deployment. Do not begin those.
+
+---
+
+## 1b. Autonomous engineering and decision-making policy (approved 2026-10-31)
+
+Act as senior engineer, architect, QA and documentation owner.
+
+| Level | Kind | Who decides |
+|---|---|---|
+| 1 | Internal technical (naming, structure, tests, tooling inside the approved stack) | Agent, documented |
+| 2 | Reversible architectural (module boundaries, library choice within approved decisions, config) | Agent, recorded in `toj-backend/docs/DECISIONS.md` (backend) or an ADR here |
+| 3 | Customer-facing business behaviour, pricing/payments/refunds/cancellations, privacy, legal, scope, recurring costs, irreversible data migrations or destructive operations, production releases, git commits/pushes/merges/deployments | Product owner. Batch every blocking question into one report |
+
+Standards:
+- Verify against official docs; never claim a test passed unless it was executed.
+- Document what changed, why, alternatives, assumptions, testing, limitations and migration implications, in the same change.
+- Git safety: never commit, push, merge, rebase or modify protected branches without explicit authorisation. Never discard, overwrite or reset pre-existing user changes. Lockfiles are committed and must stay in sync with `package.json` (`npm ci` must pass on a clean clone). Inspect `git status` before and after work.
+- Destructive database commands (`prisma migrate reset`) are blocked for agents by Prisma; do not set `PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION` without the owner's consent.
+- Completion report lists: completed work, technical decisions, files created or modified, tests and verification, limitations, blockers, decisions needing approval, recommended next milestone.
 
 ---
 
@@ -148,8 +174,9 @@ not made silently inside code.
 - Business rules live once in `src/utils/` (`cart.ts`, `filter.ts`, `orderStatus.ts`, `catalogue.ts`).
 - `jest.config.js` adds `transformIgnorePatterns` so React Navigation ESM modules load. The
   Reanimated import was removed from `App.tsx` because nothing uses Reanimated.
-- Working tree carries pre-existing modifications to `ios/Podfile.lock` and `package-lock.json`
-  that are unrelated to the UI work. Do not revert or regenerate them casually.
+- `package-lock.json` and `ios/Podfile.lock` were out of sync with `package.json` (Reanimated 4 +
+  Worklets) until commit `2ab68a2`. Do not regenerate them casually; change them only with a
+  dependency change, in the same commit.
 
 ---
 
@@ -207,10 +234,30 @@ Do not skip verification. Report what was verified and what was not.
 
 ---
 
+## 7b. Backend (separate repository `toj-backend`)
+
+The backend is its own repository since 2026-11-05 ([ADR-0030](docs/decisions/0030-separate-backend-repository.md)),
+cloned as `../toj-backend`. Read its `AGENTS.md` before working on it. This repo keeps the
+product docs and the single ADR register; new ADRs from either repo are numbered here.
+The API contract is the OpenAPI document at `/api/docs`.
+
+```bash
+eval "$(fnm env)" && cd ../toj-backend && fnm use   # Node 24 from .nvmrc
+npm run db:up                                   # Postgres 17 in Docker (127.0.0.1:5432)
+npm run db:deploy                               # apply migrations
+npm run start:dev                               # API at http://localhost:3000/api/v1
+npm run lint && npm run typecheck && npm test && npm run test:e2e
+```
+
+Swagger: `/api/docs` (non-production). Details: `toj-backend/docs/LOCAL_DEVELOPMENT.md`.
+
+---
+
 ## 8. Before you change anything
 
-1. The UI layer is implemented against mock data. Backend, real auth, payment and
-   persistence are **not** approved; do not start them until their ADRs exist.
+1. The UI layer is implemented against mock data. The backend is approved and in progress
+   (§1a). Payment, real SMS OTP and device persistence are **not** approved; do not start
+   them until their ADRs exist.
 2. If you believe something must change, write it down — an issue, an ADR, a note on the
    relevant page — rather than changing it.
 3. Documentation is updated in the same change as the code. See

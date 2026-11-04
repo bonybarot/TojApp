@@ -1,7 +1,7 @@
 # Current State
 
 Status: Current State (target branch `feature/toj-customer-ui`)
-Last Verified: 2026-10-31
+Last Verified: 2026-11-05
 Source: working tree; code is the final authority
 
 This is the single, accurate description of what TojApp is today. It replaces the former
@@ -24,7 +24,8 @@ baseline commit. Screen-by-screen detail and verification results live in
 | Styling | `StyleSheet.create` + tokens in `src/utils/theme.ts`; no inline styles (ESLint) |
 | Data | Typed fixtures in `src/data/` (15 products, categories, orders, store). Remote Unsplash images |
 | Money | Integer minor units; `$` placeholder; formatted by `utils/format.ts` |
-| Backend, real OTP, payment, persistence, push, reviews | NOT IMPLEMENTED. Simulated and labelled "Demo" in the UI |
+| Backend | Separate repository `toj-backend` (`../toj-backend`, [ADR-0030](decisions/0030-separate-backend-repository.md)): Day-1 foundation (NestJS 12, Prisma 7, Postgres 17, Node 24). Health endpoints and a spike `Store` table only. The app does not call it. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
+| Real OTP, payment, persistence, push, reviews | NOT IMPLEMENTED. Simulated and labelled "Demo" in the UI |
 | Quality gates | `npx tsc --noEmit` 0 errors; `npm run lint` 0 errors/warnings; `npm test` 2 suites, 5 tests pass |
 
 ## Source layout
