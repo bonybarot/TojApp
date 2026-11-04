@@ -14,8 +14,7 @@ Read this file first. Then read the documentation it points to. Then read the co
 whole v1 customer journey is implemented against **mock data**. It is a UI prototype, not a
 production system.
 
-The app is **not connected to a backend yet**. Every screen renders from typed fixtures in
-`src/data/`. A backend foundation exists in the separate **`toj-backend`** repository (sibling folder `../toj-backend`; see §1a, §7b, [ADR-0030](docs/decisions/0030-separate-backend-repository.md)); the app will integrate it later.
+On branch `feature/api-integration` the app **calls the local `toj-backend` API** ([ADR-0031](docs/decisions/0031-app-api-integration.md)); the backend lives in the separate **`toj-backend`** repository (sibling folder `../toj-backend`; see §1a, §7b, [ADR-0030](docs/decisions/0030-separate-backend-repository.md)). Fixtures in `src/data/` remain for tests.
 
 | Aspect | Current reality |
 |---|---|
@@ -24,9 +23,9 @@ The app is **not connected to a backend yet**. Every screen renders from typed f
 | Navigation | React Navigation v7: root native-stack + bottom tabs (Home, Shop, Bag, Account). No drawer |
 | State | Zustand 4.5.2, stores: cart, user, wishlist, address, order, product. No persistence |
 | Styling | `StyleSheet.create` + `src/utils/theme.ts` tokens. No inline styles (ESLint-enforced) |
-| Data | Typed fixtures: `products.ts` (15 clothing items), `categories.ts`, `orders.ts`, `stores.ts` |
-| Money | Integer minor units (cents); `$` is a placeholder currency; format via `utils/format.ts` |
-| Backend | Separate repo `toj-backend` (`../toj-backend`): Day-1 foundation (NestJS 12, Prisma 7, PostgreSQL 17, Node 24). Health endpoints only; the app does not call it yet. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
+| Data | Local API via `src/api/client.ts` (fetch, in-memory tokens). Fixtures `products.ts`, `categories.ts`, `orders.ts`, `stores.ts` for tests |
+| Money | Integer paise, INR; format via `utils/format.ts` |
+| Backend | Separate repo `toj-backend` (`../toj-backend`), NestJS 12, Prisma 7, PostgreSQL 17, Node 24: catalogue, OTP auth, cart, wishlist, addresses, pickup orders, admin (branch `feature/backend-core`). Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
 | Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts`; 5 tests pass |
 | tsc / ESLint | 0 errors / 0 warnings |
@@ -134,18 +133,17 @@ not made silently inside code.
 
 ## 3. Mock behaviour you must know
 
-- **Demo OTP is `123456`.** Demo existing account phone is `9876543210` (seeded address and
-  orders). Any other number creates a new empty account (name required). Constants live in
-  `src/data/stores.ts` with `PICKUP_STORE`, `DELIVERY_FEE` (599) and `FREE_DELIVERY_THRESHOLD` (10000).
+- **Demo OTP is `123456`** (server `OTP_MODE=fixed`). Demo existing account phone is `9876543210`
+  (seeded by `toj-backend`). Any other number creates a new account on the server (name required).
+- **The local backend must be running** (§7b). iOS uses `localhost`, Android `10.0.2.2`.
 - **Guest browsing allowed; checkout requires sign-in** (D-8). `utils/authFlow.ts` redirects back.
 - **Stock is per `color|size`.** Cart lines are keyed `productId|color|size` and quantity is
   clamped to stock. Pickup is per product (`pickupAvailable`); checkout blocks pickup if any
   line does not support it.
-- **Placing an order is simulated.** It creates a local order (`TOJ-1005…`), clears the bag,
-  and shows "Demo order placed". Nothing is charged or sent. Orders can be cancelled while
-  placed/confirmed.
-- **Nothing persists.** Cart, session, wishlist, addresses, orders reset on cold start.
-  Settings → "Reset demo data" clears them in-session.
+- **Checkout is pickup-only** (Q-2). Placing an order creates it on the local server
+  (`TOJ-1005…`); nothing is charged. Orders can be cancelled while placed/confirmed.
+- **Session is in memory only**: a cold start signs out. Orders, addresses, signed-in cart and
+  wishlist live on the server. Settings → "Reset demo data" clears the local bag and wishlist.
 - **Search, filters, sort and sale rails exist** although D-12 deferred them; they were built
   per the UI brief and are flagged for product review.
 
@@ -155,10 +153,10 @@ not made silently inside code.
 
 | Do not assume | Reality |
 |---|---|
-| An API exists | NOT IMPLEMENTED. No HTTP client or endpoint. Images are remote Unsplash URLs only |
-| Authentication is real | MOCK (`src/store/userStore.ts`, OTP check is a constant compare) |
-| Checkout takes payment | It does not. Order creation is local state only |
-| Persistence exists | NOT IMPLEMENTED |
+| The API is deployed | It is not. It runs locally only (`../toj-backend`); hosting is not approved. Images are remote Unsplash URLs |
+| Authentication is real | PARTIAL. Server-side OTP + JWT, but the OTP is a fixed demo code and no SMS is sent |
+| Checkout takes payment | It does not. Orders are created on the local server; payment is `PAY_AT_STORE` or `CARD_SIMULATED` |
+| Persistence exists | Server-side only (Postgres). The app keeps nothing on the device; tokens are in memory |
 | Release signing is production-ready | KNOWN ISSUE. Android `release` uses the committed debug keystore (`android/app/build.gradle`) |
 | VoiceOver / TalkBack tested | NOT TESTED. Labels, roles and 44pt targets exist in code and were inspected via the iOS accessibility tree only |
 | A future architecture has been chosen | **Proposed, not approved.** Architecture is `PROPOSED` and gated on unwritten ADRs ([`docs/decisions/README.md`](docs/decisions/README.md)) |

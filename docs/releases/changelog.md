@@ -1,6 +1,20 @@
 # Changelog
 
 
+## [Unreleased] — 2026-11-05 app connected to the local API (`feature/api-integration`)
+
+### Added
+- `src/api/client.ts`, `src/config/env.ts`; [ADR-0031](../decisions/0031-app-api-integration.md).
+
+### Changed
+- Catalogue, auth (OTP request/verify, needsProfile, logout), cart, wishlist, addresses, orders come from `toj-backend`. Guest cart and wishlist merge at sign-in.
+- Checkout pickup-only (Q-2) with idempotency key; delivery fee removed; payment `PAY_AT_STORE` / `CARD_SIMULATED`.
+- Prices in paise, shown as `₹` with Indian grouping. Order statuses `READY_FOR_PICKUP`, `COLLECTED`.
+- `ios/Podfile`: `fmt` and `RCT-Folly` pods built as C++17 so they compile with Xcode 26.4+ clang.
+
+### Verified
+tsc 0, lint 0, jest 5/5. API journey script (OTP, needsProfile, merge cart, wishlist, address, pickup order, idempotent replay, cancel, refresh, logout) against local backend.
+
 ## [Unreleased] — 2026-11-05 backend moved to its own repository
 
 ### Changed
