@@ -12,8 +12,12 @@
 - Prices in paise, shown as `₹` with Indian grouping. Order statuses `READY_FOR_PICKUP`, `COLLECTED`.
 - `ios/Podfile`: `fmt` and `RCT-Folly` pods built as C++17 so they compile with Xcode 26.4+ clang.
 
+### Fixed
+- Items without store pickup could be added to the bag but never ordered. Product details now disables "Add to bag" for them; the bag marks them and disables Checkout.
+- Checkout kept stale stock after the server rejected an order (`INSUFFICIENT_STOCK`, `PRICE_CHANGED`, `VARIANT_UNAVAILABLE`, `PICKUP_NOT_AVAILABLE`). It now reloads the catalogue and the clamped server cart and asks the customer to review. Verified on Android (TOJ-1009).
+
 ### Verified
-tsc 0, lint 0, jest 5/5. API journey script (OTP, needsProfile, merge cart, wishlist, address, pickup order, idempotent replay, cancel, refresh, logout) against local backend.
+tsc 0, lint 0, jest 6/6. API journey script (OTP, needsProfile, merge cart, wishlist, address, pickup order, idempotent replay, cancel, refresh, logout) against local backend.
 
 ## [Unreleased] — 2026-11-05 backend moved to its own repository
 

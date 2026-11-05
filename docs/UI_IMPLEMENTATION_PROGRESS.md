@@ -24,7 +24,7 @@ Root native-stack (`src/navigation/RootNavigator.tsx`) containing the tab naviga
 ## Mock data behaviour
 - Demo OTP `123456`. Phone `9876543210` = existing demo account (seeded address and orders). Any other number = new empty account that must give a name.
 - Stock is keyed `color|size`; cart line id `productId|color|size`; quantity clamped to stock ("Max available quantity").
-- Pickup is per product. Checkout blocks pickup if any bag line does not support it and says which.
+- Pickup is per product and checkout is pickup-only (Q-2): product details disables "Add to bag" for items without pickup; the bag flags such lines and disables Checkout. If the server rejects an order for stale stock, price or availability, Checkout reloads the catalogue and server cart and asks the customer to review.
 - Delivery fee 599, free at or over 10000 (minor units). Pickup is free.
 - Placing an order creates a local order (numbering from `TOJ-1005`), clears the bag, shows "Demo order placed". Cancel allowed while placed/confirmed.
 - No persistence. Settings > "Reset demo data" restores the seeded state in-session; logout also resets.

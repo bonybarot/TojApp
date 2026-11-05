@@ -20,6 +20,8 @@ interface CartStore {
   clearCart: () => void;
   /** After sign-in: merge the guest bag into the server cart and adopt the result. */
   mergeIntoServer: () => Promise<void>;
+  /** Signed in: adopt the server cart (it clamps lines to current stock). */
+  refresh: () => Promise<void>;
 }
 
 const keyOf = (l: { productId: string; color: string; size: string }) => `${l.productId}|${l.color}|${l.size}`;
@@ -105,6 +107,9 @@ export const useCartStore = create<CartStore>((set, get) => {
         ? await api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
         : await api<ServerCart>('/me/cart');
       set({ lines: fromServer(c) });
+    },
+    refresh: async () => {
+      set({ lines: fromServer(await api<ServerCart>('/me/cart')) });
     },
   };
 });

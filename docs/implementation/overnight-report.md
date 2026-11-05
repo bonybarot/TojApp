@@ -83,3 +83,10 @@ Same journey as iOS: guest adds Classic White T-Shirt (White, M), "Sign in to ch
 
 ## Next milestone
 Owner decisions above (session persistence, D-12 rails, merging the two feature branches).
+
+## Android flow testing (2026-11-05 08:50 IST, Pixel 9 Pro emulator)
+New account (9000000123, name validation), empty states, profile edit, wishlist sync, low-stock clamp, guest-cart merge into a non-empty server cart, stale stock at checkout, cancel restock. Two bugs fixed:
+- Non-pickup items could reach the bag but never be ordered: product details and bag now block them.
+- Checkout kept stale stock after `INSUFFICIENT_STOCK`: now refreshes catalogue and server cart (order TOJ-1009 placed after refresh, then cancelled; inventory restored).
+
+Dev note: Metro hot reload of a store or client module re-creates the in-memory session, so the app signs out. Expected for in-memory tokens.
