@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { useRootNavigation } from '../hooks';
+import { padGrid, useGridColumns, useRootNavigation } from '../hooks';
 import { Product } from '../types';
 import { ProductCard } from './ProductCard';
 
@@ -12,10 +12,12 @@ interface Props {
 
 export const ProductGrid: React.FC<Props> = ({ data, header, empty }) => {
   const nav = useRootNavigation();
+  const cols = useGridColumns();
   return (
     <FlatList
-      data={data.length % 2 ? [...data, null] : data}
-      numColumns={2}
+      key={cols}
+      data={padGrid(data, cols)}
+      numColumns={cols}
       keyExtractor={(p, i) => p?.id ?? `pad-${i}`}
       ListHeaderComponent={header}
       ListEmptyComponent={empty}
