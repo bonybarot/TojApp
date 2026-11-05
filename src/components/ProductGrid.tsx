@@ -1,0 +1,38 @@
+import React from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { useRootNavigation } from '../hooks';
+import { Product } from '../types';
+import { ProductCard } from './ProductCard';
+
+interface Props {
+  data: Product[];
+  header?: React.ReactElement | null;
+  empty?: React.ReactElement | null;
+}
+
+export const ProductGrid: React.FC<Props> = ({ data, header, empty }) => {
+  const nav = useRootNavigation();
+  return (
+    <FlatList
+      data={data.length % 2 ? [...data, null] : data}
+      numColumns={2}
+      keyExtractor={(p, i) => p?.id ?? `pad-${i}`}
+      ListHeaderComponent={header}
+      ListEmptyComponent={empty}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item }) =>
+        item ? (
+          <ProductCard product={item} onPress={() => nav.navigate('ProductDetails', { productId: item.id })} />
+        ) : (
+          <View style={styles.pad} />
+        )
+      }
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  content: { paddingHorizontal: 10, paddingBottom: 24, flexGrow: 1 },
+  pad: { flex: 1, margin: 6 },
+});

@@ -1,18 +1,14 @@
-import 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';
-import { StatusBar, useColorScheme } from 'react-native';
+import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigator } from './src/navigation/RootNavigator';
-import { navigationRef } from './src/navigation/StackKeys';
-import 'react-native-gesture-handler';
 
+// Light theme only for now; status bar is always dark-content.
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NavigationContainer ref={navigationRef}>
+      <StatusBar barStyle="dark-content" />
+      <NavigationContainer>
         <RootNavigator />
       </NavigationContainer>
     </SafeAreaProvider>

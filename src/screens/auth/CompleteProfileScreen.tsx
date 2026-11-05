@@ -1,0 +1,45 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useState } from 'react';
+import { Text, StyleSheet } from 'react-native';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import { Screen } from '../../components/Screen';
+import { RootStackParamList } from '../../navigation/types';
+import { useUserStore } from '../../store/userStore';
+import { finishAuth } from '../../utils/authFlow';
+import { typography } from '../../utils/theme';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'CompleteProfile'>;
+
+const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
+  const [name, setName] = useState('');
+  const [error, setError] = useState<string>();
+  const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    if (name.trim().length < 2) {
+      setError('Enter your name.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const { phone, code, redirect } = route.params;
+      await useUserStore.getState().verifyOtp(phone, code, name.trim());
+      finishAuth(navigation, redirect);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Screen scroll padded>
+      <Text style={styles.title} accessibilityRole="header">Welcome to TOJ</Text>
+      <Input label="Your name" value={name} onChangeText={t => { setName(t); setError(undefined); }} error={error} autoFocus autoCapitalize="words" />
+      <Button title="Create account" onPress={submit} loading={busy} />
+    </Screen>
+  );
+};
+
+const styles = StyleSheet.create({ title: { ...typography.h1, marginVertical: 8, marginBottom: 24 } });
+
+export default CompleteProfileScreen;

@@ -1,138 +1,41 @@
-export interface OrderItem {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
+import { Order } from '../types';
+import { products } from './products';
 
-export interface Order {
-  id: string;
-  date: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  items: OrderItem[];
-  total: number;
-  shippingAddress: {
-    name: string;
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
+const item = (productId: string, color: string, size: string, quantity: number) => {
+  const p = products.find(x => x.id === productId)!;
+  return { productId, title: p.title, image: p.image, color, size, quantity, unitPrice: p.price };
+};
+
+const mk = (
+  id: string,
+  placedAt: string,
+  status: Order['status'],
+  items: Order['items'],
+  fulfilment: Order['fulfilment'],
+): Order => {
+  const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+  const deliveryFee = fulfilment === 'pickup' || subtotal >= 10000 ? 0 : 599;
+  return {
+    id,
+    placedAt,
+    status,
+    items,
+    subtotal,
+    deliveryFee,
+    total: subtotal + deliveryFee,
+    fulfilment,
+    address:
+      fulfilment === 'delivery'
+        ? { id: 'seed', label: 'Home', fullName: 'Demo Customer', phone: '9876543210', line1: '24 Garden Road', city: 'Your City', postalCode: '400001' }
+        : undefined,
+    pickupStore: fulfilment === 'pickup' ? 'TOJ Flagship Store' : undefined,
+    paymentMethod: fulfilment === 'pickup' ? 'Pay at store' : 'Cash on delivery',
   };
-  paymentMethod: string;
-}
+};
 
-export const orders: Order[] = [
-  {
-    id: 'ORD-001',
-    date: '2024-01-15',
-    status: 'delivered',
-    items: [
-      {
-        id: '1',
-        title: 'Classic White T-Shirt',
-        price: 29.99,
-        image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400',
-        quantity: 2,
-      },
-      {
-        id: '2',
-        title: 'Slim Fit Jeans',
-        price: 79.99,
-        image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400',
-        quantity: 1,
-      },
-    ],
-    total: 139.97,
-    shippingAddress: {
-      name: 'John Doe',
-      street: '123 Main St',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      country: 'USA',
-    },
-    paymentMethod: 'Credit Card ending in 1234',
-  },
-  {
-    id: 'ORD-002',
-    date: '2024-01-20',
-    status: 'shipped',
-    items: [
-      {
-        id: '3',
-        title: 'Black Leather Jacket',
-        price: 199.99,
-        image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400',
-        quantity: 1,
-      },
-    ],
-    total: 199.99,
-    shippingAddress: {
-      name: 'John Doe',
-      street: '123 Main St',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      country: 'USA',
-    },
-    paymentMethod: 'Credit Card ending in 1234',
-  },
-  {
-    id: 'ORD-003',
-    date: '2024-02-01',
-    status: 'processing',
-    items: [
-      {
-        id: '4',
-        title: 'Cotton Hoodie',
-        price: 59.99,
-        image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400',
-        quantity: 1,
-      },
-      {
-        id: '5',
-        title: 'Chino Pants',
-        price: 69.99,
-        image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400',
-        quantity: 1,
-      },
-    ],
-    total: 129.98,
-    shippingAddress: {
-      name: 'John Doe',
-      street: '123 Main St',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      country: 'USA',
-    },
-    paymentMethod: 'PayPal',
-  },
-  {
-    id: 'ORD-004',
-    date: '2024-02-10',
-    status: 'pending',
-    items: [
-      {
-        id: '6',
-        title: 'Polo Shirt',
-        price: 39.99,
-        image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400',
-        quantity: 3,
-      },
-    ],
-    total: 119.97,
-    shippingAddress: {
-      name: 'John Doe',
-      street: '123 Main St',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      country: 'USA',
-    },
-    paymentMethod: 'Credit Card ending in 1234',
-  },
+export const seedOrders = (): Order[] => [
+  mk('TOJ-1004', '2026-09-20T10:15:00Z', 'OUT_FOR_DELIVERY', [item('1', 'White', 'M', 2)], 'delivery'),
+  mk('TOJ-1003', '2026-09-02T16:40:00Z', 'DELIVERED', [item('2', 'Black', '32', 1), item('6', 'Black', 'M', 1)], 'delivery'),
+  mk('TOJ-1002', '2026-08-18T09:05:00Z', 'DELIVERED', [item('5', 'Stone', '32', 1)], 'pickup'),
+  mk('TOJ-1001', '2026-07-30T13:20:00Z', 'CANCELLED', [item('7', 'Charcoal', 'L', 1)], 'delivery'),
 ];
-

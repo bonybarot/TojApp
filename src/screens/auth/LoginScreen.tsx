@@ -1,127 +1,62 @@
-import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import { Screen } from '../../components/Screen';
+import { DemoBanner } from '../../components/States';
+import { DEMO_OTP } from '../../data/stores';
+import { RootStackParamList } from '../../navigation/types';
 import { useUserStore } from '../../store/userStore';
-import { colors } from '../../utils/theme';
+import { colors, typography } from '../../utils/theme';
 
-const LoginScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const login = useUserStore(state => state.login);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
+  const [phone, setPhone] = useState('');
+  const [error, setError] = useState<string>();
+  const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      setError('Enter a valid 10-digit mobile number.');
       return;
     }
-
-    // Mock login - in real app, this would validate with backend
-    login(email, password);
+    setBusy(true);
+    try {
+      await useUserStore.getState().requestOtp(phone);
+      navigation.navigate('Otp', { phone, redirect: route.params?.redirect });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to continue</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor={colors.textSecondary}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor={colors.textSecondary}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Sign In</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.signupLink}
-          onPress={() => navigation.navigate('Signup' as never)}
-        >
-          <Text style={styles.signupLinkText}>
-            Don't have an account? Sign Up
-          </Text>
-        </TouchableOpacity>
+    <Screen scroll padded edges={['bottom']}>
+      <Text style={styles.title} accessibilityRole="header">Sign in or create account</Text>
+      <Text style={styles.sub}>We will send a one-time code to your mobile number.</Text>
+      <Input
+        label="Mobile number"
+        value={phone}
+        onChangeText={t => { setPhone(t.replace(/\D/g, '').slice(0, 10)); setError(undefined); }}
+        keyboardType="number-pad"
+        maxLength={10}
+        placeholder="10-digit number"
+        error={error}
+        autoFocus
+      />
+      <Button title="Send code" onPress={submit} loading={busy} />
+      <View style={styles.banner}>
+        <DemoBanner text={`Demo: no SMS is sent. Use code ${DEMO_OTP}.`} />
       </View>
-    </View>
+    </Screen>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'center',
-  },
-  content: {
-    padding: 32,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.textSecondary,
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.text,
-  },
-  loginButton: {
-    backgroundColor: colors.primary,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  loginButtonText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.background,
-  },
-  signupLink: {
-    marginTop: 24,
-    alignItems: 'center',
-  },
-  signupLinkText: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.primary,
-  },
+  banner: { marginTop: 16 },
+  title: { ...typography.h1, marginTop: 8 },
+  sub: { ...typography.body, color: colors.textSecondary, marginTop: 6, marginBottom: 24 },
 });
 
 export default LoginScreen;

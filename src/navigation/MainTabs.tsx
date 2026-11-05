@@ -1,52 +1,51 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import ProfileScreen from '../screens/User/ProfileScreen';
-import { colors } from '../utils/theme';
-import { CartStack } from './CartStack';
-import { HomeStack } from './HomeStack';
+import { StyleSheet, Text } from 'react-native';
+import CartScreen from '../screens/Cart/CartScreen';
+import HomeScreen from '../screens/Home/HomeScreen';
+import ProfileScreen from '../screens/Profile/ProfileScreen';
+import ShopScreen from '../screens/Shop/ShopScreen';
+import { selectCartCount, useCartStore } from '../store/cartStore';
+import { colors, typography } from '../utils/theme';
+import { TabParamList } from './types';
 
-export type MainTabsParamList = {
-  HomeStack: undefined;
-  CartStack: undefined;
-  Profile: undefined;
-};
+const Tab = createBottomTabNavigator<TabParamList>();
 
-const Tab = createBottomTabNavigator<MainTabsParamList>();
+const label = (text: string) => ({ focused }: { focused: boolean }) => (
+  <Text style={[styles.label, focused ? styles.on : styles.off]}>{text.toUpperCase()}</Text>
+);
 
 export const MainTabs: React.FC = () => {
+  const count = useCartStore(selectCartCount);
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
-        },
+        tabBarShowLabel: true,
+        tabBarIcon: () => null,
+        tabBarIconStyle: { display: 'none' },
+        tabBarStyle: { backgroundColor: colors.background, borderTopColor: colors.border },
+        tabBarItemStyle: styles.item,
       }}
     >
+      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: label('Home') }} />
+      <Tab.Screen name="Shop" component={ShopScreen} options={{ tabBarLabel: label('Shop') }} />
       <Tab.Screen
-        name="HomeStack"
-        component={HomeStack}
+        name="Cart"
+        component={CartScreen}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: label(count > 0 ? `Bag · ${count}` : 'Bag'),
+          tabBarAccessibilityLabel: count > 0 ? `Bag, ${count} items` : 'Bag',
         }}
       />
-      <Tab.Screen
-        name="CartStack"
-        component={CartStack}
-        options={{
-          tabBarLabel: 'Cart',
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Profile',
-        }}
-      />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: label('Account') }} />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  label: { ...typography.label, fontSize: 10 },
+  on: { color: colors.primary },
+  off: { color: colors.textSecondary },
+  item: { justifyContent: 'center' },
+});

@@ -30,5 +30,13 @@ target 'TojApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    # Xcode 26.4+ clang rejects fmt 11's consteval format strings (pods fmt/RCT-Folly).
+    # Build fmt users as C++17 so FMT_CONSTEVAL is off. Drop once RN ships a fixed fmt.
+    installer.pods_project.targets.each do |target|
+      next unless %w[fmt RCT-Folly].include?(target.name)
+      target.build_configurations.each do |c|
+        c.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+      end
+    end
   end
 end

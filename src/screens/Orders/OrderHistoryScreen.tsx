@@ -1,134 +1,60 @@
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { orders } from '../../data/orders';
-import { OrdersStackParamList } from '../../navigation/OrdersStack';
-import { colors } from '../../utils/theme';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Screen } from '../../components/Screen';
+import { SmartImage } from '../../components/SmartImage';
+import { EmptyState } from '../../components/States';
+import { useRootNavigation } from '../../hooks';
+import { useOrderStore } from '../../store/orderStore';
+import { formatDate, formatPrice } from '../../utils/format';
+import { STATUS_COLOR, STATUS_LABEL } from '../../utils/orderStatus';
+import { borderRadius, colors, typography } from '../../utils/theme';
 
-type OrderHistoryScreenNavigationProp =
-  NativeStackNavigationProp<OrdersStackParamList>;
+const itemCount = (n: number) => `${n} item${n === 1 ? '' : 's'}`;
 
 const OrderHistoryScreen: React.FC = () => {
-  const navigation = useNavigation<OrderHistoryScreenNavigationProp>();
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'delivered':
-        return colors.success;
-      case 'shipped':
-        return colors.info;
-      case 'processing':
-        return colors.warning;
-      case 'pending':
-        return colors.textSecondary;
-      case 'cancelled':
-        return colors.error;
-      default:
-        return colors.textSecondary;
-    }
-  };
-
-  const handleOrderPress = (orderId: string) => {
-    navigation.navigate('OrderDetails', { orderId });
-  };
-
-  const renderOrder = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      style={styles.orderCard}
-      onPress={() => handleOrderPress(item.id)}
-    >
-      <View style={styles.orderHeader}>
-        <Text style={styles.orderId}>{item.id}</Text>
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: getStatusColor(item.status) },
-          ]}
-        >
-          <Text style={styles.statusText}>{item.status.toUpperCase()}</Text>
-        </View>
-      </View>
-      <Text style={styles.orderDate}>{item.date}</Text>
-      <Text style={styles.orderTotal}>Total: ${item.total.toFixed(2)}</Text>
-      <Text style={styles.orderItems}>
-        {item.items.length} item{item.items.length !== 1 ? 's' : ''}
-      </Text>
-    </TouchableOpacity>
-  );
-
+  const nav = useRootNavigation();
+  const orders = useOrderStore(s => s.orders);
+  const loading = useOrderStore(s => s.status === 'loading');
   return (
-    <View style={styles.container}>
+    <Screen>
       <FlatList
         data={orders}
-        renderItem={renderOrder}
-        keyExtractor={item => item.id}
+        keyExtractor={o => o.id}
+        refreshing={loading}
+        onRefresh={() => useOrderStore.getState().load()}
         contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <EmptyState title="No orders yet" message="Your orders will appear here." actionLabel="Start shopping" onAction={() => nav.navigate('Tabs', { screen: 'Shop' })} />
+        }
+        renderItem={({ item: o }) => (
+          <Pressable style={styles.card} onPress={() => nav.navigate('OrderDetails', { orderId: o.id })} accessibilityRole="button" accessibilityLabel={`Order ${o.id}, ${STATUS_LABEL[o.status]}`}>
+            <View style={styles.head}>
+              <Text style={typography.h3}>{o.id}</Text>
+              <Text style={[styles.status, { color: STATUS_COLOR[o.status] }]}>{STATUS_LABEL[o.status].toUpperCase()}</Text>
+            </View>
+            <Text style={styles.sub}>{formatDate(o.placedAt)} · {itemCount(o.items.reduce((n, i) => n + i.quantity, 0))}</Text>
+            <View style={styles.thumbs}>
+              {o.items.slice(0, 4).map(i => (
+                <SmartImage key={`${i.productId}${i.color}${i.size}`} uri={i.image} label={i.title} style={styles.thumb} />
+              ))}
+              <Text style={[typography.h3, styles.total]}>{formatPrice(o.total)}</Text>
+            </View>
+          </Pressable>
+        )}
       />
-    </View>
+    </Screen>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  list: {
-    padding: 16,
-  },
-  orderCard: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-  },
-  orderHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  orderId: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: colors.background,
-    fontWeight: '600',
-  },
-  orderDate: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
-  orderTotal: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  orderItems: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.textSecondary,
-  },
+  list: { padding: 16, flexGrow: 1 },
+  total: { marginLeft: 'auto' },
+  card: { padding: 14, borderWidth: 1, borderColor: colors.border, borderRadius: borderRadius.lg, marginBottom: 12 },
+  head: { flexDirection: 'row', justifyContent: 'space-between' },
+  status: { ...typography.label },
+  sub: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
+  thumbs: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 },
+  thumb: { width: 44, height: 56, borderRadius: 6 },
 });
 
 export default OrderHistoryScreen;

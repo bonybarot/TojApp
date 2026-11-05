@@ -1,221 +1,103 @@
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { orders } from '../../data/orders';
-import { colors } from '../../utils/theme';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Button } from '../../components/Button';
+import { Screen } from '../../components/Screen';
+import { SmartImage } from '../../components/SmartImage';
+import { EmptyState } from '../../components/States';
+import { RootStackParamList } from '../../navigation/types';
+import { CANCELLABLE, useOrderStore } from '../../store/orderStore';
+import { formatDate, formatPrice } from '../../utils/format';
+import { PAYMENT_LABEL, STATUS_COLOR, STATUS_LABEL, timelineFor } from '../../utils/orderStatus';
+import { colors, typography } from '../../utils/theme';
 
-type OrderDetailsRouteProp = RouteProp<
-  { params: { orderId: string } },
-  'params'
->;
+type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 
-const OrderDetailsScreen: React.FC = () => {
-  const route = useRoute<OrderDetailsRouteProp>();
-  const { orderId } = route.params;
-  const order = orders.find(o => o.id === orderId);
-
+const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
+  const order = useOrderStore(s => s.orders.find(o => o.id === route.params.orderId));
+  const cancel = useOrderStore(s => s.cancelOrder);
   if (!order) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Order not found</Text>
-      </View>
-    );
+    return <Screen><EmptyState title="Order not found" actionLabel="My orders" onAction={() => navigation.navigate('OrderHistory')} /></Screen>;
   }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'delivered':
-        return colors.success;
-      case 'shipped':
-        return colors.info;
-      case 'processing':
-        return colors.warning;
-      case 'pending':
-        return colors.textSecondary;
-      case 'cancelled':
-        return colors.error;
-      default:
-        return colors.textSecondary;
-    }
-  };
+  const cancelled = order.status === 'CANCELLED';
+  const steps = timelineFor(order.fulfilment);
+  const step = steps.indexOf(order.status);
+  const confirmCancel = () =>
+    Alert.alert('Cancel order', `Cancel ${order.id}?`, [
+      { text: 'Keep order', style: 'cancel' },
+      { text: 'Cancel order', style: 'destructive', onPress: () => { cancel(order.id).catch((e: Error) => Alert.alert('Could not cancel', e.message)); } },
+    ]);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Order Information</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Order ID:</Text>
-          <Text style={styles.infoValue}>{order.id}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Date:</Text>
-          <Text style={styles.infoValue}>{order.date}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Status:</Text>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(order.status) },
-            ]}
-          >
-            <Text style={styles.statusText}>{order.status.toUpperCase()}</Text>
-          </View>
-        </View>
-      </View>
+    <Screen scroll padded>
+      <Text style={typography.h1}>{order.id}</Text>
+      <Text style={[styles.status, { color: STATUS_COLOR[order.status] }]}>{STATUS_LABEL[order.status].toUpperCase()}</Text>
+      <Text style={styles.sub}>Placed {formatDate(order.placedAt)}</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Items</Text>
-        {order.items.map(item => (
-          <View key={item.id} style={styles.itemContainer}>
-            <Image source={{ uri: item.image }} style={styles.itemImage} />
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemTitle}>{item.title}</Text>
-              <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
-              <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
+      {!cancelled && (
+        <View style={styles.timeline}>
+          {steps.map((s, i) => (
+            <View key={s} style={styles.tRow}>
+              <View style={[styles.dot, i <= step && styles.dotOn]} />
+              <Text style={[styles.tText, i <= step && styles.tTextOn]}>{STATUS_LABEL[s]}</Text>
             </View>
-            <Text style={styles.itemTotal}>
-              ${(item.price * item.quantity).toFixed(2)}
-            </Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Shipping Address</Text>
-        <Text style={styles.addressText}>{order.shippingAddress.name}</Text>
-        <Text style={styles.addressText}>{order.shippingAddress.street}</Text>
-        <Text style={styles.addressText}>
-          {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
-          {order.shippingAddress.zipCode}
-        </Text>
-        <Text style={styles.addressText}>{order.shippingAddress.country}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Payment</Text>
-        <Text style={styles.paymentText}>{order.paymentMethod}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total:</Text>
-          <Text style={styles.totalPrice}>${order.total.toFixed(2)}</Text>
+          ))}
         </View>
+      )}
+
+      <Text style={styles.h}>ITEMS</Text>
+      {order.items.map(i => (
+        <View key={`${i.productId}${i.color}${i.size}`} style={styles.item}>
+          <SmartImage uri={i.image} label={i.title} style={styles.thumb} />
+          <View style={styles.itemText}>
+            <Text style={typography.body}>{i.title}</Text>
+            <Text style={styles.sub}>{i.color} · {i.size} · Qty {i.quantity}</Text>
+          </View>
+          <Text style={typography.body}>{formatPrice(i.unitPrice * i.quantity)}</Text>
+        </View>
+      ))}
+
+      <Text style={styles.h}>{order.fulfilment === 'pickup' ? 'PICKUP' : 'DELIVERY ADDRESS'}</Text>
+      {order.fulfilment === 'pickup' ? (
+        <Text style={typography.body}>{order.pickupStore}</Text>
+      ) : order.address ? (
+        <Text style={typography.body}>
+          {order.address.fullName}{'\n'}{order.address.line1}{order.address.line2 ? `, ${order.address.line2}` : ''}{'\n'}{order.address.city} {order.address.postalCode}
+        </Text>
+      ) : null}
+
+      <Text style={styles.h}>PAYMENT</Text>
+      <Text style={typography.body}>{PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod}</Text>
+
+      <View style={styles.totals}>
+        <View style={styles.row}><Text style={styles.sub}>Subtotal</Text><Text style={typography.body}>{formatPrice(order.subtotal)}</Text></View>
+        <View style={styles.row}><Text style={styles.sub}>{order.fulfilment === 'pickup' ? 'Pickup' : 'Delivery'}</Text><Text style={typography.body}>{order.deliveryFee ? formatPrice(order.deliveryFee) : 'Free'}</Text></View>
+        <View style={styles.row}><Text style={typography.h2}>Total</Text><Text style={typography.h2}>{formatPrice(order.total)}</Text></View>
       </View>
-    </ScrollView>
+
+      {CANCELLABLE.includes(order.status) && (
+        <Button title="Cancel order" variant="secondary" onPress={confirmCancel} style={styles.cancel} />
+      )}
+    </Screen>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  section: {
-    padding: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  infoLabel: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.textSecondary,
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.text,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    color: colors.background,
-    fontWeight: '600',
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    alignItems: 'center',
-  },
-  itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 4,
-    marginRight: 16,
-  },
-  itemInfo: {
-    flex: 1,
-  },
-  itemTitle: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  itemPrice: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.textSecondary,
-  },
-  itemQuantity: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  itemTotal: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  addressText: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  paymentText: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.text,
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  totalLabel: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  totalPrice: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  errorText: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.error,
-    textAlign: 'center',
-    marginTop: 32,
-  },
+  tTextOn: { color: colors.text, fontWeight: '600' },
+  itemText: { flex: 1, marginLeft: 12 },
+  cancel: { marginTop: 20 },
+  status: { ...typography.label, marginTop: 4 },
+  sub: { ...typography.caption, color: colors.textSecondary },
+  h: { ...typography.label, color: colors.textSecondary, marginTop: 24, marginBottom: 10 },
+  timeline: { marginTop: 20, paddingLeft: 4 },
+  tRow: { flexDirection: 'row', alignItems: 'center', minHeight: 30 },
+  dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.border, marginRight: 12 },
+  dotOn: { backgroundColor: colors.primary },
+  tText: { ...typography.body, color: colors.textSecondary },
+  item: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  thumb: { width: 52, height: 64, borderRadius: 6 },
+  totals: { marginTop: 24, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border, paddingTop: 12, gap: 6 },
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
 });
 
 export default OrderDetailsScreen;
