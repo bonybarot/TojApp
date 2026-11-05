@@ -31,6 +31,16 @@ Queue had no unchecked tasks; this run re-ran every check on the pushed heads (`
 
 Still not done: UI tap-through on the simulator, Android run.
 
+## Re-verification run (2026-11-05 06:13 IST)
+No unchecked tasks; checks re-run on pushed heads (`TojApp` `01651b6`, `toj-backend` `feature/backend-core`). No code changed.
+
+| Check | Result |
+|---|---|
+| Backend `db:deploy` | No pending migrations |
+| Backend lint, typecheck | Clean |
+| Backend unit / e2e (vitest) | 17 / 27 pass |
+| App tsc, lint, jest | Clean, clean, 5 pass |
+
 ## Decisions made (Level 1-2)
 - ADR-0031: fetch client, base URL in `src/config/env.ts`, tokens in memory, server as source of truth with guest merge, catalogue loaded once (50 max), pickup-only checkout with idempotency key and `expectedTotal`.
 - Podfile override for fmt / RCT-Folly (remove when React Native ships a fixed fmt).

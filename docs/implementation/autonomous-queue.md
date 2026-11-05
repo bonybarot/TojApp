@@ -51,3 +51,4 @@ Owner instruction (2026-11-05, verbatim summary): push work to new branches, nev
 - 2026-11-05 A6 iOS build fixed for Xcode 26.4+/iOS 27 (fmt C++17, UIScene adoption, `bcd3b2f`); app launches and loads catalogue from the API. UI tap-through not done (simulator panel needs owner approval)
 - 2026-11-05 A7 ADR-0031, current-state, AGENTS, changelog (`9a16b3c`); report in `overnight-report.md`
 - 2026-11-05 05:13 re-verification run: no open tasks; backend lint/typecheck clean, unit 17, e2e 27; app tsc/lint clean, jest 5; live API smoke pass (order 1006 placed and cancelled)
+- 2026-11-05 06:13 re-verification run: no open tasks; backend lint/typecheck clean, unit 17, e2e 27; app tsc/lint clean, jest 5
