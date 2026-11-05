@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CategoryCard } from '../../components/CategoryCard';
 import { Icon } from '../../components/Icon';
@@ -14,6 +14,8 @@ import { colors, typography } from '../../utils/theme';
 
 const HomeScreen: React.FC = () => {
   const nav = useRootNavigation();
+  // Square on phones; capped so tablets keep the categories above the fold.
+  const heroHeight = Math.min(useWindowDimensions().width - 32, 420);
   const { products, categories, status, loadProducts } = useProductStore();
   const hero = products.find(p => p.tag === 'New') ?? products[0];
   const newIn = products.filter(p => p.tag === 'New' || p.tag === 'Bestseller').slice(0, 8);
@@ -45,7 +47,7 @@ const HomeScreen: React.FC = () => {
               accessibilityRole="button"
               accessibilityLabel={`Featured: ${hero.title}`}
             >
-              <SmartImage uri={hero.image} label={hero.title} style={styles.heroImg} />
+              <SmartImage uri={hero.image} label={hero.title} style={[styles.heroImg, { height: heroHeight }]} />
               <View style={styles.heroScrim} />
               <View style={styles.heroText}>
                 <Text style={styles.heroKicker}>NEW SEASON</Text>
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
   bar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, height: 52 },
   brand: { ...typography.display, color: colors.text },
   hero: { marginHorizontal: 16, borderRadius: 12, overflow: 'hidden' },
-  heroImg: { width: '100%', aspectRatio: 1 },
+  heroImg: { width: '100%' },
   heroScrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.25)' },
   heroText: { position: 'absolute', left: 20, right: 20, bottom: 24 },
   heroKicker: { ...typography.label, color: colors.onPrimary },

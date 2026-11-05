@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CategoryCard } from '../../components/CategoryCard';
 import { Icon } from '../../components/Icon';
-import { useRootNavigation } from '../../hooks';
+import { padGrid, useGridColumns, useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
 import { Category } from '../../types';
 import { colors, typography } from '../../utils/theme';
@@ -11,6 +11,7 @@ import { colors, typography } from '../../utils/theme';
 const ShopScreen: React.FC = () => {
   const nav = useRootNavigation();
   const categories = useProductStore(s => s.categories);
+  const cols = useGridColumns();
   const tiles: Category[] = [
     { id: 'all', title: 'All products', image: categories[0]?.image ?? '' },
     { id: 'sale', title: 'Sale', image: categories[2]?.image ?? '' },
@@ -33,8 +34,9 @@ const ShopScreen: React.FC = () => {
         <Text style={styles.searchText}>Search TOJ</Text>
       </Pressable>
       <FlatList
-        data={tiles.length % 2 ? [...tiles, null] : tiles}
-        numColumns={2}
+        key={cols}
+        data={padGrid(tiles, cols)}
+        numColumns={cols}
         keyExtractor={(c, i) => c?.id ?? `pad-${i}`}
         contentContainerStyle={styles.grid}
         renderItem={({ item }) =>

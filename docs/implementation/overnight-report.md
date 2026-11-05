@@ -90,3 +90,13 @@ New account (9000000123, name validation), empty states, profile edit, wishlist 
 - Checkout kept stale stock after `INSUFFICIENT_STOCK`: now refreshes catalogue and server cart (order TOJ-1009 placed after refresh, then cancelled; inventory restored).
 
 Dev note: Metro hot reload of a store or client module re-creates the in-memory session, so the app signs out. Expected for in-memory tokens.
+
+## Backend-down and token refresh (2026-11-05 09:10 IST, Android)
+- API paused: Home and All products show skeleton then "Something went wrong / Try again" after the 10 s timeout; sign-in shows "Cannot reach the TOJ server". Resuming the API and tapping Try again loads 21 products.
+- Fixed: a network failure during token refresh signed the user out. `api/client.ts` now rethrows the network error and keeps the session.
+- Access token expired (15 min) then pull-to-refresh on My Orders: refresh rotated the session silently (`Session.rotatedAt` set), orders reloaded.
+
+## Small and tablet screens (2026-11-05 09:37 IST, Android emulator via `wm size`)
+- 720x1280 @ 320 (360x640 dp): PDP, bag, sign-in, OTP, profile, personal info, checkout usable. Fixed: keyboard covered Send code / Verify (Android 15 forces edge-to-edge, so `adjustResize` no longer shrinks the window; KAV was also off by the header height). `Screen` now uses `behavior="padding"` on both platforms with `keyboardVerticalOffset` = its `measure()` page Y.
+- 1600x2560 @ 320 (800x1280 dp): grids were 2 huge columns. Now `useGridColumns()` (width / 220, min 2): 3 columns on this tablet, 2 on phones. Home hero capped at 420 dp. Checkout full width, usable.
+- tsc 0, lint 0, jest 6/6. iOS not re-checked for the keyboard change (simulator taps unavailable this session).

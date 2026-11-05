@@ -15,6 +15,9 @@
 ### Fixed
 - Items without store pickup could be added to the bag but never ordered. Product details now disables "Add to bag" for them; the bag marks them and disables Checkout.
 - Checkout kept stale stock after the server rejected an order (`INSUFFICIENT_STOCK`, `PRICE_CHANGED`, `VARIANT_UNAVAILABLE`, `PICKUP_NOT_AVAILABLE`). It now reloads the catalogue and the clamped server cart and asks the customer to review. Verified on Android (TOJ-1009).
+- A network failure during token refresh signed the user out; the session is now kept and the network error shown (`67f1aa6`).
+- Android 15+ (edge-to-edge) and screens under a stack header: the keyboard covered inputs and the sticky footer (Send code, Verify). `Screen` now pads with `KeyboardAvoidingView` on both platforms, offset by its measured page Y.
+- Tablets: product and category grids were fixed at 2 columns with very large cards; columns now follow window width (`useGridColumns`, about 220 dp per card). Home hero capped at 420 dp tall.
 
 ### Verified
 tsc 0, lint 0, jest 6/6. API journey script (OTP, needsProfile, merge cart, wishlist, address, pickup order, idempotent replay, cancel, refresh, logout) against local backend.

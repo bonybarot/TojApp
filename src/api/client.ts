@@ -79,7 +79,8 @@ const refresh = (): Promise<boolean> => {
             tokens = { accessToken: t.accessToken, refreshToken: t.refreshToken };
             return true;
           },
-          () => false,
+          // Unreachable server is not a lost session: rethrow so the caller shows a network error.
+          e => (e instanceof ApiError && e.status === 0 ? Promise.reject(e) : false),
         )
       : Promise.resolve(false)
     ).finally(() => {
