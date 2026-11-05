@@ -41,6 +41,16 @@ No unchecked tasks; checks re-run on pushed heads (`TojApp` `01651b6`, `toj-back
 | Backend unit / e2e (vitest) | 17 / 27 pass |
 | App tsc, lint, jest | Clean, clean, 5 pass |
 
+## Re-verification run (2026-11-05 08:13 IST)
+No unchecked tasks; checks re-run on pushed heads (`TojApp` `ff88b34`, `toj-backend` `b3971b4`). No code changed.
+
+| Check | Result |
+|---|---|
+| Backend `db:deploy` | No pending migrations |
+| Backend lint, typecheck | Clean |
+| Backend unit / e2e (vitest) | 17 / 27 pass |
+| App tsc, lint, jest | Clean, clean, 5 pass |
+
 ## UI walkthrough (2026-11-05 06:52 IST, iPhone 17 simulator, iOS 27.2)
 Guest adds Classic White T-Shirt (White, M) to bag, then "Sign in to checkout", phone `9876543210`, OTP `123456`, back to Checkout with the guest bag merged. Pay at store, place order: TOJ-1007, ₹2,999, store pickup. View order, cancel: CANCELLED. My Orders lists it. Log out returns to the guest profile. All pass.
 
