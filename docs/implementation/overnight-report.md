@@ -16,7 +16,7 @@ Status: Completion report for the autonomous queue ([autonomous-queue.md](autono
 | API journey script (OTP new account, cart merge, wishlist, address, order, idempotent replay, cancel, refresh, logout) | Pass against `localhost:3000` |
 | iOS simulator | Builds, launches, home screen shows API products (product store starts empty, so the hero proves an API load) |
 | Tapping through the UI journey on the simulator | Done 06:52 IST, see below |
-| Android | Pixel 9 Pro emulator: `installDebug` builds, app launches, home renders products from the API via `10.0.2.2`. Journey not tapped through on Android |
+| Android | Pixel 9 Pro emulator (API via `10.0.2.2`): builds, launches, journey tapped through 08:37 IST, see below |
 
 ## Re-verification run (2026-11-05 05:13 IST)
 Queue had no unchecked tasks; this run re-ran every check on the pushed heads (`toj-backend` `feature/backend-core`, `TojApp` `d2aa093`). No code changed.
@@ -62,6 +62,9 @@ Fixed during the walk (`577450f`):
 
 tsc, lint and jest (5) clean after the fixes.
 
+## Android walkthrough (2026-11-05 08:37 IST, Pixel 9 Pro emulator)
+Same journey as iOS: guest adds Classic White T-Shirt (White, M), "Sign in to checkout", `9876543210` / `123456`, Checkout with the merged bag, Pay at store, place order: TOJ-1008, ₹2,999, store pickup. View order, cancel via the native dialog: CANCELLED. My Orders lists TOJ-1008, then 1007, 1006. Log out returns to the guest profile. All pass; no code change needed, no JS errors in logcat. The iOS copy fixes (`577450f`) show correctly on Android.
+
 ## Decisions made (Level 1-2)
 - ADR-0031: fetch client, base URL in `src/config/env.ts`, tokens in memory, server as source of truth with guest merge, catalogue loaded once (50 max), pickup-only checkout with idempotency key and `expectedTotal`.
 - Podfile override for fmt / RCT-Folly (remove when React Native ships a fixed fmt).
@@ -79,4 +82,4 @@ tsc, lint and jest (5) clean after the fixes.
 3. Merge `feature/backend-core` and `feature/api-integration` (not done: merges need owner authorisation).
 
 ## Next milestone
-Tap through the journey on the Android emulator; then owner decisions above (session persistence, D-12 rails, merging the two feature branches).
+Owner decisions above (session persistence, D-12 rails, merging the two feature branches).
