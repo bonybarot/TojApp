@@ -90,6 +90,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const soldOut = isSoldOut(product);
+  // Checkout is pickup-only (Q-2): a product without pickup cannot be ordered yet.
+  const orderable = product.pickupAvailable;
   const left = size ? stockFor(product, color, size) : null;
   const availability = soldOut
     ? 'Sold out'
@@ -147,8 +149,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             />
           ) : (
             <Button
-              title={soldOut ? 'Sold out' : 'Add to bag'}
-              disabled={soldOut}
+              title={soldOut ? 'Sold out' : orderable ? 'Add to bag' : 'Not available for pickup'}
+              disabled={soldOut || !orderable}
               onPress={onAdd}
             />
           )}
@@ -239,7 +241,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={styles.boxText}>
             {product.pickupAvailable
               ? `Available at ${PICKUP_STORE.name}, ${PICKUP_STORE.address}.`
-              : 'Not available for this item.'}
+              : 'Not available for this item. Orders are store pickup only for now, so it cannot be ordered yet. Save it to your wishlist.'}
           </Text>
         </View>
 

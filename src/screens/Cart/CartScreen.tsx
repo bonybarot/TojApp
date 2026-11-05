@@ -8,7 +8,7 @@ import { EmptyState } from '../../components/States';
 import { useRootNavigation } from '../../hooks';
 import { useCartStore } from '../../store/cartStore';
 import { useUserStore } from '../../store/userStore';
-import { detailLines, subtotalOf } from '../../utils/cart';
+import { detailLines, pickupBlockers, subtotalOf } from '../../utils/cart';
 import { formatPrice } from '../../utils/format';
 import { colors, typography } from '../../utils/theme';
 
@@ -19,6 +19,7 @@ const CartScreen: React.FC = () => {
   const isLoggedIn = useUserStore(s => s.isLoggedIn);
   const detailed = detailLines(lines);
   const subtotal = subtotalOf(detailed);
+  const blocked = pickupBlockers(detailed).length > 0;
 
   const confirmRemove = (id: string, title: string) =>
     Alert.alert('Remove item', `Remove ${title} from your bag?`, [
@@ -65,6 +66,7 @@ const CartScreen: React.FC = () => {
                     </Pressable>
                   </View>
                   {d.line.quantity >= d.maxQuantity && <Text style={styles.limit}>Max available quantity</Text>}
+                  {!d.product.pickupAvailable && <Text style={styles.blocked}>Not available for store pickup</Text>}
                 </View>
               </View>
             )}
@@ -76,7 +78,12 @@ const CartScreen: React.FC = () => {
               <Text style={styles.sumText}>Free</Text>
             </View>
             <View style={[styles.row, styles.totalRow]}><Text style={styles.total}>Total</Text><Text style={styles.total}>{formatPrice(subtotal)}</Text></View>
-            <Button title={isLoggedIn ? 'Checkout' : 'Sign in to checkout'} onPress={checkout} style={styles.checkout} />
+            {blocked && (
+              <Text style={styles.blocked} accessibilityRole="alert">
+                Orders are store pickup only. Remove items not available for pickup to check out.
+              </Text>
+            )}
+            <Button title={isLoggedIn ? 'Checkout' : 'Sign in to checkout'} onPress={checkout} disabled={blocked} style={styles.checkout} />
           </View>
         </>
       )}
@@ -99,6 +106,7 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 },
   remove: { ...typography.caption, color: colors.textSecondary, textDecorationLine: 'underline' },
   limit: { ...typography.caption, color: colors.warning, marginTop: 4 },
+  blocked: { ...typography.caption, color: colors.error, marginTop: 4 },
   summary: { padding: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   sumText: { ...typography.body, color: colors.textSecondary },

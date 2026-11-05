@@ -4,7 +4,7 @@ import { Button } from '../../components/Button';
 import { Screen, StickyFooter } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
 import { DemoBanner, EmptyState } from '../../components/States';
-import { uuid } from '../../api/client';
+import { ApiError, uuid } from '../../api/client';
 import { useRootNavigation } from '../../hooks';
 import { useCartStore } from '../../store/cartStore';
 import { useOrderStore } from '../../store/orderStore';
@@ -28,6 +28,9 @@ const Option: React.FC<{ title: string; sub?: string; selected: boolean; disable
     </View>
   </Pressable>
 );
+
+/** Order rejected because the bag no longer matches the server's stock, prices or availability. */
+const STALE_BAG = ['INSUFFICIENT_STOCK', 'PRICE_CHANGED', 'VARIANT_UNAVAILABLE', 'PICKUP_NOT_AVAILABLE'];
 
 const CheckoutScreen: React.FC = () => {
   const nav = useRootNavigation();
@@ -72,7 +75,13 @@ const CheckoutScreen: React.FC = () => {
       useCartStore.getState().clearCart();
       nav.reset({ index: 1, routes: [{ name: 'Tabs' }, { name: 'OrderConfirmation', params: { orderId: id } }] });
     } catch (e) {
-      setError((e as Error).message);
+      if (e instanceof ApiError && STALE_BAG.includes(e.code)) {
+        // Catalogue is loaded once per launch; fetch fresh stock and prices, then the clamped cart.
+        await Promise.all([useProductStore.getState().loadProducts(), useCartStore.getState().refresh()]).catch(() => {});
+        setError(`${e.message}. Your bag has been updated, please review it and place the order again.`);
+      } else {
+        setError((e as Error).message);
+      }
       setPlacing(false);
     }
   };

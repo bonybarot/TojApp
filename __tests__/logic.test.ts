@@ -1,7 +1,7 @@
 import { products } from '../src/data/products';
 import { useCartStore } from '../src/store/cartStore';
 import { useProductStore } from '../src/store/productStore';
-import { detailLines, subtotalOf } from '../src/utils/cart';
+import { detailLines, pickupBlockers, subtotalOf } from '../src/utils/cart';
 import { stockFor } from '../src/utils/catalogue';
 
 const p = products[0];
@@ -37,4 +37,12 @@ test('quantity 0 removes the line', () => {
   useCartStore.getState().addToCart(p.id, color, size);
   useCartStore.getState().setQuantity(`${p.id}|${color}|${size}`, 0);
   expect(useCartStore.getState().lines).toHaveLength(0);
+});
+
+test('lines without store pickup block checkout', () => {
+  useCartStore.getState().addToCart(p.id, color, size);
+  const d = detailLines(useCartStore.getState().lines);
+  expect(pickupBlockers(d)).toHaveLength(0);
+  useProductStore.setState({ products: [{ ...p, pickupAvailable: false }] });
+  expect(pickupBlockers(detailLines(useCartStore.getState().lines))).toHaveLength(1);
 });
