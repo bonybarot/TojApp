@@ -30,7 +30,7 @@ const Option: React.FC<{ title: string; sub?: string; selected: boolean; disable
 );
 
 /** Order rejected because the bag no longer matches the server's stock, prices or availability. */
-const STALE_BAG = ['INSUFFICIENT_STOCK', 'PRICE_CHANGED', 'VARIANT_UNAVAILABLE', 'PICKUP_NOT_AVAILABLE'];
+const STALE_BAG = ['INSUFFICIENT_STOCK', 'PRICE_CHANGED', 'VARIANT_UNAVAILABLE', 'PICKUP_NOT_AVAILABLE', 'CART_EMPTY'];
 
 const CheckoutScreen: React.FC = () => {
   const nav = useRootNavigation();
