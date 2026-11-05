@@ -235,11 +235,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </Text>
 
         <View style={styles.box}>
-          <Text style={styles.boxTitle}>Delivery</Text>
-          <Text style={styles.boxText}>
-            Home delivery available. Free over $100.
-          </Text>
-          <Text style={[styles.boxTitle, styles.boxGap]}>Store pickup</Text>
+          <Text style={styles.boxTitle}>Store pickup</Text>
           <Text style={styles.boxText}>
             {product.pickupAvailable
               ? `Available at ${PICKUP_STORE.name}, ${PICKUP_STORE.address}.`
@@ -274,7 +270,6 @@ const styles = StyleSheet.create({
   },
   heartIcon: { fontSize: 24, color: colors.text },
   heartOn: { color: colors.error },
-  boxGap: { marginTop: 10 },
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',

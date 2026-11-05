@@ -40,7 +40,7 @@ const ProfileScreen: React.FC = () => {
   return (
     <Screen edges={['top']} scroll padded>
       <Text style={styles.title} accessibilityRole="header">{user.name}</Text>
-      <Text style={styles.sub}>+{user.phone}</Text>
+      <Text style={styles.sub}>+91 {user.phone}</Text>
       <Row title="Personal Information" onPress={() => nav.navigate('PersonalInfo')} />
       <Row title="My Orders" onPress={() => nav.navigate('OrderHistory')} />
       <Row title="Wishlist" onPress={() => nav.navigate('Wishlist')} />

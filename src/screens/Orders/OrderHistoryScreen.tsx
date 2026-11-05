@@ -9,6 +9,8 @@ import { formatDate, formatPrice } from '../../utils/format';
 import { STATUS_COLOR, STATUS_LABEL } from '../../utils/orderStatus';
 import { borderRadius, colors, typography } from '../../utils/theme';
 
+const itemCount = (n: number) => `${n} item${n === 1 ? '' : 's'}`;
+
 const OrderHistoryScreen: React.FC = () => {
   const nav = useRootNavigation();
   const orders = useOrderStore(s => s.orders);
@@ -30,7 +32,7 @@ const OrderHistoryScreen: React.FC = () => {
               <Text style={typography.h3}>{o.id}</Text>
               <Text style={[styles.status, { color: STATUS_COLOR[o.status] }]}>{STATUS_LABEL[o.status].toUpperCase()}</Text>
             </View>
-            <Text style={styles.sub}>{formatDate(o.placedAt)} · {o.items.reduce((n, i) => n + i.quantity, 0)} items</Text>
+            <Text style={styles.sub}>{formatDate(o.placedAt)} · {itemCount(o.items.reduce((n, i) => n + i.quantity, 0))}</Text>
             <View style={styles.thumbs}>
               {o.items.slice(0, 4).map(i => (
                 <SmartImage key={`${i.productId}${i.color}${i.size}`} uri={i.image} label={i.title} style={styles.thumb} />

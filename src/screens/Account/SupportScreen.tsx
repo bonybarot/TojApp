@@ -6,8 +6,8 @@ import { PICKUP_STORE } from '../../data/stores';
 import { colors, typography } from '../../utils/theme';
 
 const FAQ = [
-  ['How does delivery work?', 'Orders over the free-delivery threshold ship free; otherwise a flat fee applies.'],
-  ['Can I pick up in store?', `Where a product supports pickup, choose it at checkout. Store: ${PICKUP_STORE.name}.`],
+  ['Do you deliver?', `Not yet. Orders are collected free from ${PICKUP_STORE.name}, ${PICKUP_STORE.address}.`],
+  ['Can every product be picked up?', 'Only products marked for store pickup. The bag tells you if an item cannot be picked up.'],
   ['How do I cancel an order?', 'Open My Orders, select the order and tap Cancel while it is still placed or confirmed.'],
   ['What is your returns policy?', 'Not yet defined for this demo.'],
 ];
