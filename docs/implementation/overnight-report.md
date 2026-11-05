@@ -15,8 +15,8 @@ Status: Completion report for the autonomous queue ([autonomous-queue.md](autono
 | `npm test` | 2 suites, 5 tests pass |
 | API journey script (OTP new account, cart merge, wishlist, address, order, idempotent replay, cancel, refresh, logout) | Pass against `localhost:3000` |
 | iOS simulator | Builds, launches, home screen shows API products (product store starts empty, so the hero proves an API load) |
-| Tapping through the UI journey on the simulator | **NOT DONE**: simulator control needs owner approval of the panel, which was not available unattended. Covered at API level by the journey script |
-| Android | NOT RUN |
+| Tapping through the UI journey on the simulator | Done 06:52 IST, see below |
+| Android | Pixel 9 Pro emulator: `installDebug` builds, app launches, home renders products from the API via `10.0.2.2`. Journey not tapped through on Android |
 
 ## Re-verification run (2026-11-05 05:13 IST)
 Queue had no unchecked tasks; this run re-ran every check on the pushed heads (`toj-backend` `feature/backend-core`, `TojApp` `d2aa093`). No code changed.
@@ -41,6 +41,17 @@ No unchecked tasks; checks re-run on pushed heads (`TojApp` `01651b6`, `toj-back
 | Backend unit / e2e (vitest) | 17 / 27 pass |
 | App tsc, lint, jest | Clean, clean, 5 pass |
 
+## UI walkthrough (2026-11-05 06:52 IST, iPhone 17 simulator, iOS 27.2)
+Guest adds Classic White T-Shirt (White, M) to bag, then "Sign in to checkout", phone `9876543210`, OTP `123456`, back to Checkout with the guest bag merged. Pay at store, place order: TOJ-1007, ₹2,999, store pickup. View order, cancel: CANCELLED. My Orders lists it. Log out returns to the guest profile. All pass.
+
+Fixed during the walk (`577450f`):
+- Product detail said "Home delivery available. Free over $100"; now shows store pickup only.
+- Support FAQ described delivery fees; now says orders are collected from the store.
+- Profile showed `+9876543210`; now `+91 9876543210`.
+- Order list said "1 items"; now singular.
+
+tsc, lint and jest (5) clean after the fixes.
+
 ## Decisions made (Level 1-2)
 - ADR-0031: fetch client, base URL in `src/config/env.ts`, tokens in memory, server as source of truth with guest merge, catalogue loaded once (50 max), pickup-only checkout with idempotency key and `expectedTotal`.
 - Podfile override for fmt / RCT-Folly (remove when React Native ships a fixed fmt).
@@ -58,4 +69,4 @@ No unchecked tasks; checks re-run on pushed heads (`TojApp` `01651b6`, `toj-back
 3. Merge `feature/backend-core` and `feature/api-integration` (not done: merges need owner authorisation).
 
 ## Next milestone
-Walk the full UI journey on the simulator (sign in, bag, checkout, cancel) with the simulator panel approved, then Android emulator run.
+Tap through the journey on the Android emulator; then owner decisions above (session persistence, D-12 rails, merging the two feature branches).
