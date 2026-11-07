@@ -13,6 +13,8 @@
 - `ios/Podfile`: `fmt` and `RCT-Folly` pods built as C++17 so they compile with Xcode 26.4+ clang.
 
 ### Fixed
+
+- Bag reloads the catalogue when the server cart reports a changed unit price, so the bag no longer shows a stale price.
 - Items without store pickup could be added to the bag but never ordered. Product details now disables "Add to bag" for them; the bag marks them and disables Checkout.
 - Checkout kept stale stock after the server rejected an order (`INSUFFICIENT_STOCK`, `PRICE_CHANGED`, `VARIANT_UNAVAILABLE`, `PICKUP_NOT_AVAILABLE`). It now reloads the catalogue and the clamped server cart and asks the customer to review. Verified on Android (TOJ-1009).
 - A network failure during token refresh signed the user out; the session is now kept and the network error shown (`67f1aa6`).
