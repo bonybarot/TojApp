@@ -18,6 +18,10 @@
 - A network failure during token refresh signed the user out; the session is now kept and the network error shown (`67f1aa6`).
 - Android 15+ (edge-to-edge) and screens under a stack header: the keyboard covered inputs and the sticky footer (Send code, Verify). `Screen` now pads with `KeyboardAvoidingView` on both platforms, offset by its measured page Y.
 - Tablets: product and category grids were fixed at 2 columns with very large cards; columns now follow window width (`useGridColumns`, about 220 dp per card). Home hero capped at 420 dp tall.
+- My Orders showed a stale list (status changes made by the store never appeared). It now reloads from the server on open, with an error state and retry when that fails (`8de1b32`).
+- A bag change that failed while the server was unreachable stayed local. The Bag tab now re-adopts the server cart on focus when signed in; `CART_EMPTY` at checkout also refreshes the bag (`6aee72e`).
+
+- A revoked or expired session left account screens (My Orders, Checkout) showing errors. Session loss now resets navigation to the guest Account tab and shows "Signed out" (`src/navigation/ref.ts`). Verified on Android and iOS with `ACCESS_TTL_S=60`.
 
 ### Verified
 tsc 0, lint 0, jest 6/6. API journey script (OTP, needsProfile, merge cart, wishlist, address, pickup order, idempotent replay, cancel, refresh, logout) against local backend.

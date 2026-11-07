@@ -100,3 +100,15 @@ Dev note: Metro hot reload of a store or client module re-creates the in-memory 
 - 720x1280 @ 320 (360x640 dp): PDP, bag, sign-in, OTP, profile, personal info, checkout usable. Fixed: keyboard covered Send code / Verify (Android 15 forces edge-to-edge, so `adjustResize` no longer shrinks the window; KAV was also off by the header height). `Screen` now uses `behavior="padding"` on both platforms with `keyboardVerticalOffset` = its `measure()` page Y.
 - 1600x2560 @ 320 (800x1280 dp): grids were 2 huge columns. Now `useGridColumns()` (width / 220, min 2): 3 columns on this tablet, 2 on phones. Home hero capped at 420 dp. Checkout full width, usable.
 - tsc 0, lint 0, jest 6/6. iOS not re-checked for the keyboard change (simulator taps unavailable this session).
+
+## iOS flows and server revalidation (2026-11-05 09:47 IST, iPhone 17 simulator)
+- New account 9000000123 signed in; Personal Information with the keyboard up keeps Save visible (the `Screen` keyboard change from the Android run holds on iOS).
+- Fixed: My Orders kept the list loaded at sign-in. TOJ-1010 placed through the API did not appear; it now reloads on open (`8de1b32`). Cancelling TOJ-1010 in the app after it was already cancelled server-side shows CANCELLED with no error (cancel is idempotent).
+- Fixed: a signed-in bag change made while the server was down stayed local. Bag now re-adopts the server cart on focus: quantity 2 set through the API appeared on opening Bag (`6aee72e`).
+- `CART_EMPTY` at checkout (server cart emptied elsewhere): bag refreshed, Checkout shows "Your bag is empty", no order created.
+- Note: `Addresses` / `AddressForm` screens are registered but unreachable (pickup-only checkout). Left in place for delivery later.
+
+## Revoked session (2026-11-07 15:05 IST, Android + iOS)
+- Backend: customer access-token TTL now env `ACCESS_TTL_S` (default 900; `toj-backend` 45dc596). Local `.env` set to 60 to test expiry. e2e pins 900.
+- Sessions revoked in the DB, then My Orders opened after the access token expired: refresh fails, "Signed out" alert, app lands on the guest Account tab. Before the fix, the reset targeted a non-existent tab route (`Account`; the route is `Profile`) and landed on Home.
+- The JWT guard does not check the session table, so a revoked session stays usable until its access token expires (up to `ACCESS_TTL_S`). Accepted for now; note for owner review.
