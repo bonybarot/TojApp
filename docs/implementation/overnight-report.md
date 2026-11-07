@@ -137,7 +137,7 @@ Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 1
 ## Store-side order statuses (2026-11-08, Android)
 - TOJ-1014 moved by the admin API through CONFIRMED, PACKED, READY_FOR_PICKUP, COLLECTED. Order details show each label and the pickup timeline; Cancel shows for placed and confirmed only; My Orders lists COLLECTED in green.
 - Fixed: Cancel tapped on a screen still showing "Order placed" after the store packed the order: the error was right but the screen kept the old status and button. A refused cancel now re-reads the order (TOJ-1016).
-- Known: My Orders revalidates on open, not on return from details; opening details updates the row.
+- Fixed 2026-11-08: My Orders revalidates on focus, so a status changed while details were open shows on return (verified on Android, TOJ-1018 packed by the store).
 - Test data: 10 Polo Navy L collected in TOJ-1014; restocked +10 through the admin inventory API.
 
 ## Guest wishlist and iOS guest checkout (2026-11-08)

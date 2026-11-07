@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
@@ -15,11 +16,11 @@ const OrderHistoryScreen: React.FC = () => {
   const nav = useRootNavigation();
   const orders = useOrderStore(s => s.orders);
   const status = useOrderStore(s => s.status);
-  // Revalidate on open: status can change on the server (store confirms, ready for pickup).
-  const reload = () => useOrderStore.getState().load().catch(() => {});
-  useEffect(() => {
-    reload();
+  // Revalidate on focus (also when back from details): the store can move an order on.
+  const reload = useCallback(() => {
+    useOrderStore.getState().load().catch(() => {});
   }, []);
+  useFocusEffect(reload);
   if (status === 'error' && orders.length === 0) {
     return (
       <Screen>
