@@ -112,3 +112,12 @@ Dev note: Metro hot reload of a store or client module re-creates the in-memory 
 - Backend: customer access-token TTL now env `ACCESS_TTL_S` (default 900; `toj-backend` 45dc596). Local `.env` set to 60 to test expiry. e2e pins 900.
 - Sessions revoked in the DB, then My Orders opened after the access token expired: refresh fails, "Signed out" alert, app lands on the guest Account tab. Before the fix, the reset targeted a non-existent tab route (`Account`; the route is `Profile`) and landed on Home.
 - The JWT guard does not check the session table, so a revoked session stays usable until its access token expires (up to `ACCESS_TTL_S`). Accepted for now; note for owner review.
+
+## Cross-device sync (2026-11-07, Android + iOS)
+Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 17 simulator.
+- Bag: Polo Navy L added on Android shows in iOS Bag; quantity 2 set on iOS shows on Android (₹7,998).
+- Fixed: Wishlist kept the list loaded at sign-in. It now re-reads the server wishlist on focus (`wishlistStore.refresh`). Hearts on grids and product details update after the Wishlist screen is visited (not on their own focus).
+- Order TOJ-1011 placed on Android, cancelled on iOS: CANCELLED in the DB.
+- Fixed: Order details showed the stale "Order placed" after a cancel on another device. It now re-reads the order on focus (`orderStore.refreshOne`). Verified: TOJ-1012 placed on Android, cancelled through the API, "View order" shows CANCELLED.
+- OTP limit (5 codes per phone per hour) blocked re-sign-in during testing; cleared the test phone's `OtpChallenge` rows in the local DB. Backend e2e 27/27.
+- tsc 0, lint 0, jest 6/6.

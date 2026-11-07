@@ -22,6 +22,7 @@
 - A bag change that failed while the server was unreachable stayed local. The Bag tab now re-adopts the server cart on focus when signed in; `CART_EMPTY` at checkout also refreshes the bag (`6aee72e`).
 
 - A revoked or expired session left account screens (My Orders, Checkout) showing errors. Session loss now resets navigation to the guest Account tab and shows "Signed out" (`src/navigation/ref.ts`). Verified on Android and iOS with `ACCESS_TTL_S=60`.
+- Wishlist and Order details showed data loaded earlier, so changes made on another device never appeared. Both now re-read from the server on focus when signed in (`wishlistStore.refresh`, `orderStore.refreshOne`). Verified Android + iOS on one account.
 
 ### Verified
 tsc 0, lint 0, jest 6/6. API journey script (OTP, needsProfile, merge cart, wishlist, address, pickup order, idempotent replay, cancel, refresh, logout) against local backend.
