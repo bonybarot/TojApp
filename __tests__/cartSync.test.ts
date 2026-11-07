@@ -10,7 +10,7 @@ jest.mock('../src/api/client', () => ({
 }));
 
 const p = { ...products[0], stock: { 'Navy|L': 10 }, variants: [{ id: 'v1', sku: 's', color: 'Navy', size: 'L', stock: 10 }] };
-const mockLine = { variantId: 'v1', productId: p.id, color: 'Navy', size: 'L' };
+const mockLine = { variantId: 'v1', productId: p.id, color: 'Navy', size: 'L', unitPrice: p.price };
 const flush = () => new Promise<void>(r => setTimeout(r, 0));
 
 test('an older server answer does not undo a newer tap', async () => {
@@ -24,4 +24,5 @@ test('an older server answer does not undo a newer tap', async () => {
   mockPending[0](1);
   await flush();
   expect(useCartStore.getState().lines[0].quantity).toBe(3);
+  expect(mockPending).toHaveLength(3); // prices match: no catalogue reload
 });

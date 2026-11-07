@@ -8,7 +8,7 @@ export type AddResult = 'added' | 'limit' | 'unavailable';
 
 /** GET/PUT /me/cart response (subset the app uses). */
 interface ServerCart {
-  lines: { variantId: string; productId: string; color: string; size: string; quantity: number }[];
+  lines: { variantId: string; productId: string; color: string; size: string; quantity: number; unitPrice: number }[];
 }
 
 interface CartStore {
@@ -26,8 +26,18 @@ interface CartStore {
 
 const keyOf = (l: { productId: string; color: string; size: string }) => `${l.productId}|${l.color}|${l.size}`;
 
-const fromServer = (c: ServerCart): CartLine[] =>
-  c.lines.map(l => ({ lineId: keyOf(l), productId: l.productId, color: l.color, size: l.size, quantity: l.quantity }));
+const fromServer = (c: ServerCart): CartLine[] => {
+  // The bag prices from the catalogue loaded at start; a server price change means it is stale.
+  const ps = useProductStore.getState();
+  const stale = (l: ServerCart['lines'][number]) => {
+    const p = ps.products.find(x => x.id === l.productId);
+    return !!p && p.price !== l.unitPrice;
+  };
+  if (c.lines.some(stale)) {
+    ps.loadProducts().catch(() => {});
+  }
+  return c.lines.map(l => ({ lineId: keyOf(l), productId: l.productId, color: l.color, size: l.size, quantity: l.quantity }));
+};
 
 const maxFor = (l: { productId: string; color: string; size: string }): number => {
   const p = useProductStore.getState().products.find(x => x.id === l.productId);
