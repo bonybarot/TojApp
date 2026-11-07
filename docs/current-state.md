@@ -26,7 +26,7 @@ baseline commit. Screen-by-screen detail and verification results live in
 | Money | Integer paise, INR (`₹`, Indian grouping) via `utils/format.ts` |
 | Backend | Separate repository `toj-backend` (`../toj-backend`, [ADR-0030](decisions/0030-separate-backend-repository.md)): Day-1 foundation (NestJS 12, Prisma 7, Postgres 17, Node 24). Catalogue, OTP auth, cart, wishlist, addresses, pickup checkout, orders, admin (branch `feature/backend-core`). The app calls it. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Real SMS OTP, payment, device persistence, push, reviews | NOT IMPLEMENTED. OTP is a fixed demo code on the server; payment is simulated |
-| Quality gates | `npx tsc --noEmit` 0 errors; `npm run lint` 0 errors/warnings; `npm test` 2 suites, 6 tests pass |
+| Quality gates | `npx tsc --noEmit` 0 errors; `npm run lint` 0 errors/warnings; `npm test` 3 suites, 7 tests pass |
 
 ## Source layout
 

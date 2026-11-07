@@ -68,7 +68,10 @@ const CartScreen: React.FC = () => {
                     <QuantityStepper
                       value={d.line.quantity}
                       max={d.maxQuantity}
-                      onChange={n => (n <= 0 ? confirmRemove(d.line.lineId, d.product.title) : setQuantity(d.line.lineId, n))}
+                      onStep={delta => {
+                        const now = useCartStore.getState().lines.find(l => l.lineId === d.line.lineId)?.quantity ?? 0;
+                        return now + delta <= 0 ? confirmRemove(d.line.lineId, d.product.title) : setQuantity(d.line.lineId, now + delta);
+                      }}
                     />
                     <Pressable onPress={() => confirmRemove(d.line.lineId, d.product.title)} hitSlop={10} accessibilityRole="button" accessibilityLabel={`Remove ${d.product.title}`}>
                       <Text style={styles.remove}>Remove</Text>

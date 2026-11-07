@@ -25,6 +25,7 @@
 - Wishlist and Order details showed data loaded earlier, so changes made on another device never appeared. Both now re-read from the server on focus when signed in (`wishlistStore.refresh`, `orderStore.refreshOne`). Verified Android + iOS on one account.
 - Hearts on product lists and details, the bag and orders stayed stale after changes on another device until their screen was reopened. Returning the app to the foreground now re-reads cart, wishlist and orders when signed in (`userStore`, `AppState`). Verified on Android and iOS: item hearted through the API while backgrounded shows filled on resume.
 - OTP rate limit now says how long to wait (`toj-backend` dcf9907).
+- Bag quantity: fast taps on + or − were lost (the stepper sent its render-time value) and an older server answer could undo a newer tap. The stepper now sends a step applied to the store's current quantity, and only the latest cart request's answer is adopted (`__tests__/cartSync.test.ts`). Verified on Android: 5 fast taps from 1 give 6 in the UI and the DB; 11 taps clamp at stock 10.
 - Settings > "Reset demo data" cleared the bag and wishlist only on the device; when signed in they came back on the next refresh. It now also clears the server cart and wishlist. Verified on Android (DB counts 1/2 to 0/0).
 
 ### Verified

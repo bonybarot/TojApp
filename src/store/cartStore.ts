@@ -39,6 +39,8 @@ export const useCartStore = create<CartStore>((set, get) => {
    * Signed in: the server cart is the source of truth. The local change is applied
    * optimistically, then replaced by the server's answer (which clamps to stock).
    */
+  // Rapid taps send several requests; adopting an older answer would undo newer taps.
+  let latest = 0;
   const sync = (l: CartLine, quantity: number) => {
     if (!hasSession()) {
       return;
@@ -47,13 +49,14 @@ export const useCartStore = create<CartStore>((set, get) => {
     if (!vid) {
       return;
     }
+    const mine = ++latest;
     const req =
       quantity > 0
         ? api<ServerCart>(`/me/cart/items/${vid}`, { method: 'PUT', body: { quantity: Math.min(quantity, 20) } })
         : api<ServerCart>(`/me/cart/items/${vid}`, { method: 'DELETE' });
     req
       .catch(() => api<ServerCart>('/me/cart'))
-      .then(c => set({ lines: fromServer(c) }))
+      .then(c => mine === latest && set({ lines: fromServer(c) }))
       .catch(() => {});
   };
 
