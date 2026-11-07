@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { Alert, AppState } from 'react-native';
 import { create } from 'zustand';
 import { api, currentRefreshToken, setSessionLostHandler, setTokens, Tokens } from '../api/client';
 import { navigationRef } from '../navigation/ref';
@@ -79,4 +79,15 @@ setSessionLostHandler(() => {
     navigationRef.reset({ index: 0, routes: [{ name: 'Tabs', params: { screen: 'Profile' } }] });
   }
   Alert.alert('Signed out', 'Your session has ended. Please sign in again.');
+});
+
+// Back in the foreground: account data may have changed on another device.
+AppState.addEventListener('change', state => {
+  if (state === 'active' && useUserStore.getState().isLoggedIn) {
+    Promise.allSettled([
+      useCartStore.getState().refresh(),
+      useWishlistStore.getState().refresh(),
+      useOrderStore.getState().load(),
+    ]);
+  }
 });
