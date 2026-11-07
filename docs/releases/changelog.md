@@ -14,6 +14,7 @@
 
 ### Fixed
 
+- My Orders reloads each time it comes into view, so a status the store changed while order details were open shows on return.
 - Bag reloads the catalogue when the server cart reports a changed unit price, so the bag no longer shows a stale price.
 - Items without store pickup could be added to the bag but never ordered. Product details now disables "Add to bag" for them; the bag marks them and disables Checkout.
 - Checkout kept stale stock after the server rejected an order (`INSUFFICIENT_STOCK`, `PRICE_CHANGED`, `VARIANT_UNAVAILABLE`, `PICKUP_NOT_AVAILABLE`). It now reloads the catalogue and the clamped server cart and asks the customer to review. Verified on Android (TOJ-1009).
