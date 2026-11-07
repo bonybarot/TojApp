@@ -143,7 +143,7 @@ not made silently inside code.
 - **Checkout is pickup-only** (Q-2). Placing an order creates it on the local server
   (`TOJ-1005…`); nothing is charged. Orders can be cancelled while placed/confirmed.
 - **Session is in memory only**: a cold start signs out. Orders, addresses, signed-in cart and
-  wishlist live on the server. Settings → "Reset demo data" clears the local bag and wishlist.
+  wishlist live on the server. Settings → "Reset demo data" clears the bag and wishlist (on the server too when signed in).
 - **Search, filters, sort and sale rails exist** although D-12 deferred them; they were built
   per the UI brief and are flagged for product review.
 
