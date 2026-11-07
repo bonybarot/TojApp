@@ -9,14 +9,14 @@ import { colors, typography } from '../../utils/theme';
 const SettingsScreen: React.FC = () => (
   <Screen padded>
     <Text style={typography.h3}>Demo data</Text>
-    <Text style={styles.sub}>Clears your bag and wishlist on this device. Orders and addresses live on the demo server.</Text>
+    <Text style={styles.sub}>Clears your bag and wishlist (also on the demo server when signed in). Orders and addresses are kept.</Text>
     <Button
       title="Reset demo data"
       variant="secondary"
       onPress={() =>
         Alert.alert('Reset demo data', 'This cannot be undone.', [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Reset', style: 'destructive', onPress: resetDemoData },
+          { text: 'Reset', style: 'destructive', onPress: () => { resetDemoData(); } },
         ])
       }
     />

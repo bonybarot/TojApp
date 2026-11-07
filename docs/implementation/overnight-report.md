@@ -121,3 +121,8 @@ Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 1
 - Fixed: Order details showed the stale "Order placed" after a cancel on another device. It now re-reads the order on focus (`orderStore.refreshOne`). Verified: TOJ-1012 placed on Android, cancelled through the API, "View order" shows CANCELLED.
 - OTP limit (5 codes per phone per hour) blocked re-sign-in during testing; cleared the test phone's `OtpChallenge` rows in the local DB. Backend e2e 27/27.
 - tsc 0, lint 0, jest 6/6.
+
+## Foreground refresh and demo reset (2026-11-08, Android + iOS)
+- Returning the app to the foreground re-reads cart, wishlist and orders when signed in. Verified on both: Classic White T-Shirt hearted through the API while backgrounded shows filled on resume.
+- Fixed: "Reset demo data" cleared only the device; signed-in bag and wishlist came back on the next refresh. It now deletes the server cart and wishlist too.
+- iOS tooling note: the simulator MCP screenshot lags several seconds; `xcrun simctl io booted screenshot` is current.

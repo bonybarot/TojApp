@@ -27,7 +27,7 @@ Root native-stack (`src/navigation/RootNavigator.tsx`) containing the tab naviga
 - Pickup is per product and checkout is pickup-only (Q-2): product details disables "Add to bag" for items without pickup; the bag flags such lines and disables Checkout. If the server rejects an order for stale stock, price or availability, Checkout reloads the catalogue and server cart and asks the customer to review.
 - Delivery fee 599, free at or over 10000 (minor units). Pickup is free.
 - Placing an order creates a local order (numbering from `TOJ-1005`), clears the bag, shows "Demo order placed". Cancel allowed while placed/confirmed.
-- No persistence. Settings > "Reset demo data" restores the seeded state in-session; logout also resets.
+- No persistence. Settings > "Reset demo data" clears the bag and wishlist (also on the server when signed in); orders and addresses are kept.
 
 ## Design decisions
 - Premium minimal: monochrome tokens in `src/utils/theme.ts`, one muted accent, generous spacing, 44pt minimum touch targets, safe-area aware `Screen`/`StickyFooter`.
