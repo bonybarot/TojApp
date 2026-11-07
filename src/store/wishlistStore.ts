@@ -7,6 +7,8 @@ interface WishlistState {
   clear: () => void;
   /** After sign-in: merge guest hearts into the account wishlist. */
   mergeIntoServer: () => Promise<void>;
+  /** Signed in: adopt the server wishlist (may have changed on another device). */
+  refresh: () => Promise<void>;
 }
 
 export const useWishlistStore = create<WishlistState>((set, get) => ({
@@ -27,6 +29,10 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
     const list = ids.length
       ? await api<{ id: string }[]>('/me/wishlist/merge', { method: 'POST', body: { productIds: ids } })
       : await api<{ id: string }[]>('/me/wishlist');
+    set({ ids: list.map(p => p.id) });
+  },
+  refresh: async () => {
+    const list = await api<{ id: string }[]>('/me/wishlist');
     set({ ids: list.map(p => p.id) });
   },
 }));

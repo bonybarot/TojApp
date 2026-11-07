@@ -1,5 +1,6 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
@@ -16,6 +17,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const order = useOrderStore(s => s.orders.find(o => o.id === route.params.orderId));
   const cancel = useOrderStore(s => s.cancelOrder);
+  const id = route.params.orderId;
+  useFocusEffect(
+    useCallback(() => {
+      useOrderStore.getState().refreshOne(id).catch(() => {});
+    }, [id]),
+  );
   if (!order) {
     return <Screen><EmptyState title="Order not found" actionLabel="My orders" onAction={() => navigation.navigate('OrderHistory')} /></Screen>;
   }

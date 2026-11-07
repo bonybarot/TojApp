@@ -16,6 +16,8 @@ interface OrderState {
   load: () => Promise<void>;
   placeOrder: (o: PlaceOrderInput) => Promise<string>;
   cancelOrder: (id: string) => Promise<void>;
+  /** Re-read one order (it may have changed on another device). */
+  refreshOne: (id: string) => Promise<void>;
   reset: () => void;
 }
 
@@ -50,6 +52,10 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   },
   cancelOrder: async id => {
     const order = await api<Order>(`/orders/${id}/cancel`, { method: 'POST', body: {} });
+    set({ orders: upsert(get().orders, order) });
+  },
+  refreshOne: async id => {
+    const order = await api<Order>(`/orders/${id}`);
     set({ orders: upsert(get().orders, order) });
   },
   reset: () => set({ orders: [], status: 'idle' }),
