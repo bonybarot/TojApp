@@ -51,7 +51,11 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     return order.id;
   },
   cancelOrder: async id => {
-    const order = await api<Order>(`/orders/${id}/cancel`, { method: 'POST', body: {} });
+    const order = await api<Order>(`/orders/${id}/cancel`, { method: 'POST', body: {} }).catch(e => {
+      // The store may have moved it on (e.g. packed): show the real status, then report the error.
+      get().refreshOne(id).catch(() => {});
+      throw e;
+    });
     set({ orders: upsert(get().orders, order) });
   },
   refreshOne: async id => {
