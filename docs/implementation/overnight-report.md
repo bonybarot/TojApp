@@ -126,3 +126,10 @@ Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 1
 - Returning the app to the foreground re-reads cart, wishlist and orders when signed in. Verified on both: Classic White T-Shirt hearted through the API while backgrounded shows filled on resume.
 - Fixed: "Reset demo data" cleared only the device; signed-in bag and wishlist came back on the next refresh. It now deletes the server cart and wishlist too.
 - iOS tooling note: the simulator MCP screenshot lags several seconds; `xcrun simctl io booted screenshot` is current.
+
+## Catalogue edge cases and bag stepper (2026-11-08, Android)
+- Sold out (Cotton Hoodie, seeded with 0 stock): grid badge "SOLD OUT", sizes announced "unavailable", button "Sold out" disabled.
+- Sale category: 4 items, sale and compare-at prices match the DB.
+- Price raised in the DB while on Checkout: "Prices changed…" message, summary updated to the new price, no order created; placing again created TOJ-1013 at the new price (then cancelled, price restored).
+- Fixed: fast taps on the bag quantity stepper were lost, and an older server answer could undo a newer tap. Now 5 fast taps from 1 give 6 (UI = DB). New jest test `cartSync.test.ts` (fails without the fix).
+- Known: product prices in lists, details and the bag come from the catalogue loaded at start (ADR-0031), so they can be stale until Checkout reports `PRICE_CHANGED`. The server cart already carries `unitPrice`; adopting it in the bag is a possible follow-up.

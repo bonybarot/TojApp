@@ -1,6 +1,6 @@
 # Testing — How To (Current State)
 
-> **Baseline note (2026-10-31).** Written against the pre-UI baseline (commit `66044c5`). Statements about failing tests, `.js`/`.ts` shadowing, the drawer or electronics data are historical. Today: `npx tsc --noEmit` 0 errors, `npm run lint` clean, `npm test` 2 suites / 6 tests pass. Current facts: [../current-state.md](../current-state.md).
+> **Baseline note (2026-10-31).** Written against the pre-UI baseline (commit `66044c5`). Statements about failing tests, `.js`/`.ts` shadowing, the drawer or electronics data are historical. Today: `npx tsc --noEmit` 0 errors, `npm run lint` clean, `npm test` 3 suites / 7 tests pass. Current facts: [../current-state.md](../current-state.md).
 
 Status: **BROKEN — 0 tests execute**
 Last Verified: 2026-09-03

@@ -5,12 +5,13 @@ import { colors, MIN_TOUCH, typography } from '../utils/theme';
 export const QuantityStepper: React.FC<{
   value: number;
   max: number;
-  onChange: (n: number) => void;
-}> = ({ value, max, onChange }) => (
+  /** Delta, not a new value: fast taps can outrun a re-render. */
+  onStep: (delta: 1 | -1) => void;
+}> = ({ value, max, onStep }) => (
   <View style={styles.row}>
     <Pressable
       style={styles.btn}
-      onPress={() => onChange(value - 1)}
+      onPress={() => onStep(-1)}
       accessibilityRole="button"
       accessibilityLabel="Decrease quantity"
     >
@@ -22,7 +23,7 @@ export const QuantityStepper: React.FC<{
     <Pressable
       style={[styles.btn, value >= max && styles.dim]}
       disabled={value >= max}
-      onPress={() => onChange(value + 1)}
+      onPress={() => onStep(1)}
       accessibilityRole="button"
       accessibilityLabel="Increase quantity"
     >
