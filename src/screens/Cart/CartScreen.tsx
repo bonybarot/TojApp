@@ -1,4 +1,5 @@
-import React from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../components/Button';
@@ -17,6 +18,14 @@ const CartScreen: React.FC = () => {
   const lines = useCartStore(s => s.lines);
   const { setQuantity, removeLine } = useCartStore.getState();
   const isLoggedIn = useUserStore(s => s.isLoggedIn);
+  // Signed in: server cart is the truth; re-adopt it on focus so a change that failed offline does not linger.
+  useFocusEffect(
+    useCallback(() => {
+      if (isLoggedIn) {
+        useCartStore.getState().refresh().catch(() => {});
+      }
+    }, [isLoggedIn]),
+  );
   const detailed = detailLines(lines);
   const subtotal = subtotalOf(detailed);
   const blocked = pickupBlockers(detailed).length > 0;

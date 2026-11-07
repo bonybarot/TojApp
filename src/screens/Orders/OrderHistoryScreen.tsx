@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
-import { EmptyState } from '../../components/States';
+import { EmptyState, ErrorState } from '../../components/States';
 import { useRootNavigation } from '../../hooks';
 import { useOrderStore } from '../../store/orderStore';
 import { formatDate, formatPrice } from '../../utils/format';
@@ -14,14 +14,26 @@ const itemCount = (n: number) => `${n} item${n === 1 ? '' : 's'}`;
 const OrderHistoryScreen: React.FC = () => {
   const nav = useRootNavigation();
   const orders = useOrderStore(s => s.orders);
-  const loading = useOrderStore(s => s.status === 'loading');
+  const status = useOrderStore(s => s.status);
+  // Revalidate on open: status can change on the server (store confirms, ready for pickup).
+  const reload = () => useOrderStore.getState().load().catch(() => {});
+  useEffect(() => {
+    reload();
+  }, []);
+  if (status === 'error' && orders.length === 0) {
+    return (
+      <Screen>
+        <ErrorState onRetry={reload} />
+      </Screen>
+    );
+  }
   return (
     <Screen>
       <FlatList
         data={orders}
         keyExtractor={o => o.id}
-        refreshing={loading}
-        onRefresh={() => useOrderStore.getState().load()}
+        refreshing={status === 'loading'}
+        onRefresh={reload}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <EmptyState title="No orders yet" message="Your orders will appear here." actionLabel="Start shopping" onAction={() => nav.navigate('Tabs', { screen: 'Shop' })} />

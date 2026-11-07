@@ -1,5 +1,7 @@
+import { Alert } from 'react-native';
 import { create } from 'zustand';
 import { api, currentRefreshToken, setSessionLostHandler, setTokens, Tokens } from '../api/client';
+import { navigationRef } from '../navigation/ref';
 import { User } from '../types';
 import { useAddressStore } from './addressStore';
 import { useCartStore } from './cartStore';
@@ -72,4 +74,9 @@ export const useUserStore = create<UserState>(set => ({
 setSessionLostHandler(() => {
   useUserStore.setState({ user: null, isLoggedIn: false });
   clearAccountData();
+  // Account-only screens (My Orders, Checkout) would otherwise show a misleading error.
+  if (navigationRef.isReady()) {
+    navigationRef.reset({ index: 0, routes: [{ name: 'Tabs', params: { screen: 'Profile' } }] });
+  }
+  Alert.alert('Signed out', 'Your session has ended. Please sign in again.');
 });
