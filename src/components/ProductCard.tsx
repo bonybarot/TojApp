@@ -44,7 +44,7 @@ export const ProductCard: React.FC<Props> = ({ product, onPress }) => {
           onPress={() => toggle(product.id)}
           hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel={liked ? 'Remove from wishlist' : 'Add to wishlist'}
+          accessibilityLabel={`${liked ? 'Remove' : 'Add'} ${product.title} ${liked ? 'from' : 'to'} wishlist`}
         >
           <Text style={[styles.heartText, liked && { color: colors.error }]}>{liked ? '♥' : '♡'}</Text>
         </Pressable>

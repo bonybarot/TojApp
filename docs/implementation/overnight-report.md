@@ -139,3 +139,9 @@ Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 1
 - Fixed: Cancel tapped on a screen still showing "Order placed" after the store packed the order: the error was right but the screen kept the old status and button. A refused cancel now re-reads the order (TOJ-1016).
 - Known: My Orders revalidates on open, not on return from details; opening details updates the row.
 - Test data: 10 Polo Navy L collected in TOJ-1014; restocked +10 through the admin inventory API.
+
+## Guest wishlist and iOS guest checkout (2026-11-08)
+- Android: heart as guest, sign in in-app: the heart is merged into the account wishlist (API and Wishlist screen agree).
+- Fixed: card hearts had the same screen-reader label on every product; the label now names the product.
+- iOS: guest adds Classic White T-Shirt (M), "Sign in to checkout", 9876543210 / 123456, returns to Checkout with the guest line merged into the account bag (quantities add), places TOJ-1017 (then cancelled through admin).
+- Once this session the Android app was found signed out with no revoked session and no process restart; not reproduced (the next session held over 4 minutes with refresh rotations). Most likely a Metro reload during git operations.
