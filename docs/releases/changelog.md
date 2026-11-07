@@ -26,6 +26,7 @@
 - Hearts on product lists and details, the bag and orders stayed stale after changes on another device until their screen was reopened. Returning the app to the foreground now re-reads cart, wishlist and orders when signed in (`userStore`, `AppState`). Verified on Android and iOS: item hearted through the API while backgrounded shows filled on resume.
 - OTP rate limit now says how long to wait (`toj-backend` dcf9907).
 - Bag quantity: fast taps on + or − were lost (the stepper sent its render-time value) and an older server answer could undo a newer tap. The stepper now sends a step applied to the store's current quantity, and only the latest cart request's answer is adopted (`__tests__/cartSync.test.ts`). Verified on Android: 5 fast taps from 1 give 6 in the UI and the DB; 11 taps clamp at stock 10.
+- Order details: cancelling an order the store had already packed showed "This order can no longer be cancelled" but left the stale status and the Cancel button. A refused cancel now re-reads the order (`__tests__/orderCancel.test.ts`). Verified on Android with TOJ-1016.
 - Settings > "Reset demo data" cleared the bag and wishlist only on the device; when signed in they came back on the next refresh. It now also clears the server cart and wishlist. Verified on Android (DB counts 1/2 to 0/0).
 
 ### Verified

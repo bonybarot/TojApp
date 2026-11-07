@@ -27,7 +27,7 @@ On branch `feature/api-integration` the app **calls the local `toj-backend` API*
 | Money | Integer paise, INR; format via `utils/format.ts` |
 | Backend | Separate repo `toj-backend` (`../toj-backend`), NestJS 12, Prisma 7, PostgreSQL 17, Node 24: catalogue, OTP auth, cart, wishlist, addresses, pickup orders, admin (branch `feature/backend-core`). Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
-| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts`; 7 tests pass |
+| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts`; 8 tests pass |
 | tsc / ESLint | 0 errors / 0 warnings |
 
 Screen inventory, navigation and mock behaviour:
@@ -201,7 +201,7 @@ npm run android      # build + run Android
 npm run ios          # build + run iOS (requires pod install first)
 npm run lint         # eslint .            → 0 errors, 0 warnings
 npx tsc --noEmit     # type check          → 0 errors
-npm test             # jest                → 3 suites, 7 tests pass
+npm test             # jest                → 4 suites, 8 tests pass
 ```
 
 Full detail: [`docs/development/setup.md`](docs/development/setup.md)

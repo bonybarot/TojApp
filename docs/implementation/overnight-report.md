@@ -133,3 +133,9 @@ Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 1
 - Price raised in the DB while on Checkout: "Prices changed…" message, summary updated to the new price, no order created; placing again created TOJ-1013 at the new price (then cancelled, price restored).
 - Fixed: fast taps on the bag quantity stepper were lost, and an older server answer could undo a newer tap. Now 5 fast taps from 1 give 6 (UI = DB). New jest test `cartSync.test.ts` (fails without the fix).
 - Known: product prices in lists, details and the bag come from the catalogue loaded at start (ADR-0031), so they can be stale until Checkout reports `PRICE_CHANGED`. The server cart already carries `unitPrice`; adopting it in the bag is a possible follow-up.
+
+## Store-side order statuses (2026-11-08, Android)
+- TOJ-1014 moved by the admin API through CONFIRMED, PACKED, READY_FOR_PICKUP, COLLECTED. Order details show each label and the pickup timeline; Cancel shows for placed and confirmed only; My Orders lists COLLECTED in green.
+- Fixed: Cancel tapped on a screen still showing "Order placed" after the store packed the order: the error was right but the screen kept the old status and button. A refused cancel now re-reads the order (TOJ-1016).
+- Known: My Orders revalidates on open, not on return from details; opening details updates the row.
+- Test data: 10 Polo Navy L collected in TOJ-1014; restocked +10 through the admin inventory API.
