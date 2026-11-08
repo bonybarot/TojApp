@@ -7,7 +7,7 @@
 - `src/api/client.ts`, `src/config/env.ts`; [ADR-0031](../decisions/0031-app-api-integration.md).
 - Session survives a cold start: tokens in Keychain/Keystore via `react-native-keychain` 10.0.0, restored with `GET /me` at launch; wiped on logout and session loss ([ADR-0006](../decisions/0006-secure-token-storage.md), `__tests__/sessionRestore.test.ts`).
 - Android release signing reads the upload key from `TOJ_UPLOAD_*` gradle properties (BUILD-01 config; falls back to the debug key for local builds).
-- Guest bag survives a cold start (Keychain service `toj.guestBag`, ADR-0006 amendment); wiped once a session exists.
+- Guest bag survives a cold start (Keychain service `toj.guestBag`, ADR-0006 amendment); wiped once a session exists. Guest wishlist hearts too (`toj.guestWishlist`).
 
 ### Changed
 - Bag tab screen-reader label says "1 item", not "1 items".

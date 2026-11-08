@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { api, hasSession } from '../api/client';
+import { keepForGuest } from './guestCopy';
 
 interface WishlistState {
   ids: string[];
@@ -36,3 +37,5 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
     set({ ids: list.map(p => p.id) });
   },
 }));
+
+export const restoreGuestWishlist = keepForGuest(useWishlistStore, 'ids', 'toj.guestWishlist');

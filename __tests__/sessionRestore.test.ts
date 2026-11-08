@@ -2,6 +2,7 @@ import * as Keychain from 'react-native-keychain';
 import { hasSession, setTokens, storedTokens } from '../src/api/client';
 import { restoreGuestBag, useCartStore } from '../src/store/cartStore';
 import { useUserStore } from '../src/store/userStore';
+import { restoreGuestWishlist, useWishlistStore } from '../src/store/wishlistStore';
 
 const STORE = { service: 'toj.session' };
 const saved = { accessToken: 'a', refreshToken: 'r' };
@@ -57,4 +58,16 @@ test('guest bag survives a cold start; signing in moves it to the server and wip
   await new Promise<void>(r => setTimeout(r, 0));
   expect(await Keychain.getGenericPassword(BAG)).toBe(false);
   setTokens(null, false);
+});
+
+test('guest wishlist survives a cold start', async () => {
+  const W = { service: 'toj.guestWishlist' };
+  useWishlistStore.setState({ ids: ['p1'] });
+  await new Promise<void>(r => setTimeout(r, 0));
+  const kept = await Keychain.getGenericPassword(W);
+  useWishlistStore.setState({ ids: [] });
+  await new Promise<void>(r => setTimeout(r, 0));
+  await Keychain.setGenericPassword('toj', kept ? kept.password : '', W);
+  await restoreGuestWishlist();
+  expect(useWishlistStore.getState().ids).toEqual(['p1']);
 });
