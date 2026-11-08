@@ -76,6 +76,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A38 My Orders shows a spinner on first load and +N for long orders
 - [x] A39 Guest bag waits for the catalogue instead of showing empty
 - [x] A40 Android: no crash when the activity is recreated
+- [x] A41 iOS: relayout after a text size change while open
 
 ## Blocked: needs owner
 
@@ -127,3 +128,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A38: My Orders flashed "No orders yet" before the first load finished; it now shows the spinner until the list arrives. Orders with more than four lines show "+N" after the thumbnails. Checked on Android.
 - 2026-11-08 A39: on a cold start the Bag tab could show "Your bag is empty" for a saved guest bag, because it read the catalogue once with `getState()` and never re-rendered when it arrived. It now subscribes to the catalogue and shows a spinner, or an error with Try again, until it loads. Checked on Android with the API paused (SIGSTOP): spinner, then error after the 10 s timeout, then the bag after resume and Try again.
 - 2026-11-08 A40: Android crashed ("Screen fragments should never be restored") whenever MainActivity was recreated: changing the system font size or language, or restoring the app after the OS killed it in the background. `MainActivity.onCreate` now sets react-native-screens' `RNScreensFragmentFactory`, as its README says. Checked on the emulator: font scale 1.3 then 1.0 while on My Orders; the app restarts at Home with no crash and stays signed in. Layout at 1.3x checked on Home and the product page.
+- 2026-11-09 A41: on iOS (Fabric), changing Dynamic Type while the app was open left text clipped or overlapping until a relaunch. `App.tsx` keys `NavigationContainer` on `fontScale` and restores the same navigation state, so the tree remounts on the current screen. Unsaved in-screen state (typed text, scroll) is lost on that remount; stores are untouched. Checked on the iPhone 17 simulator: Home large to AX3 and back, product page kept with its back stack.
