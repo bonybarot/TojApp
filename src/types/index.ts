@@ -22,6 +22,13 @@ export interface Product {
   tag?: 'New' | 'Bestseller';
   /** Present when loaded from the API; cart and stock calls are keyed by variant id. */
   variants?: Variant[];
+  /** From the API (ADR-0028); null or absent when unrated. */
+  rating?: Rating | null;
+}
+
+export interface Rating {
+  average: number;
+  count: number;
 }
 
 export interface Variant {

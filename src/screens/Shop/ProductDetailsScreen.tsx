@@ -17,6 +17,7 @@ import { SmartImage } from '../../components/SmartImage';
 import { EmptyState } from '../../components/States';
 import { PICKUP_STORE } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
+import { Rating } from '../../types';
 import { useCartStore } from '../../store/cartStore';
 import { formatDate } from '../../utils/format';
 import { useProductStore } from '../../store/productStore';
@@ -46,7 +47,7 @@ const HeartButton: React.FC<{ productId: string }> = ({ productId }) => {
 
 /** ADR-0028. Read-only here; customers write from a collected order. */
 const plural = (n: number) => `${n} ${n === 1 ? 'review' : 'reviews'}`;
-const Summary: React.FC<{ r: ProductReviews & { average: number } }> = ({ r }) => (
+const Summary: React.FC<{ r: Rating }> = ({ r }) => (
   <Text style={styles.rSummary} accessibilityLabel={`Rated ${r.average} out of 5 from ${plural(r.count)}`}>
     <Text style={styles.rStars}>{stars(r.average)}</Text>  {r.average.toFixed(1)} · {plural(r.count)}
   </Text>
@@ -114,6 +115,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     },
     [],
   );
+
+  // Fresh reviews win (a review written this session); the catalogue figure shows until they load.
+  const rating: Rating | null | undefined = reviews
+    ? reviews.average === null ? null : { average: reviews.average, count: reviews.count }
+    : product?.rating;
 
   if (!product) {
     return (
@@ -229,7 +235,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         )}
         <Text style={styles.title}>{product.title}</Text>
         <Price product={product} large />
-        {reviews?.average != null && <Summary r={{ ...reviews, average: reviews.average }} />}
+        {!!rating && <Summary r={rating} />}
 
         <Text style={styles.label}>COLOUR — {color.toUpperCase()}</Text>
         <View style={styles.row}>
