@@ -60,6 +60,7 @@
 - A slow bag or orders refresh no longer undoes a change you just made (A52).
 - Logging out while the app renews your session now always signs you out; quantity taps made while your bag moves to your account are kept (A53).
 - Bag quantity buttons are easier to hit (A54).
+- Small text links (Sort and filter, Remove, Resend code, Write a review) are easier to hit (A55).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.

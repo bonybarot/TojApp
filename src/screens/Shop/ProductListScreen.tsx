@@ -9,7 +9,7 @@ import { Screen } from '../../components/Screen';
 import { RootStackParamList } from '../../navigation/types';
 import { useProductStore } from '../../store/productStore';
 import { applyFilters } from '../../utils/filter';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, LINK_SLOP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductList'>;
 
@@ -41,7 +41,7 @@ const ProductListScreen: React.FC<Props> = ({ route }) => {
         <>
           <View style={styles.bar}>
             <Text style={styles.count}>{data.length} {data.length === 1 ? 'item' : 'items'}</Text>
-            <Pressable onPress={() => setOpen(true)} hitSlop={8} accessibilityRole="button" accessibilityLabel="Sort and filter">
+            <Pressable onPress={() => setOpen(true)} hitSlop={LINK_SLOP} accessibilityRole="button" accessibilityLabel="Sort and filter">
               <Text style={styles.filter}>SORT & FILTER{n ? ` (${n})` : ''}</Text>
             </Pressable>
           </View>
