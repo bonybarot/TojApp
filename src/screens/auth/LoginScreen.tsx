@@ -42,6 +42,8 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
         keyboardType="number-pad"
         maxLength={10}
         placeholder="10-digit number"
+        autoComplete="tel"
+        onSubmitEditing={submit}
         error={error}
         autoFocus
       />
