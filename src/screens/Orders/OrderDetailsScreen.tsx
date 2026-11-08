@@ -1,7 +1,8 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useCallback } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { myReviews } from '../../api/reviews';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
@@ -18,10 +19,15 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const order = useOrderStore(s => s.orders.find(o => o.id === route.params.orderId));
   const cancel = useOrderStore(s => s.cancelOrder);
   const id = route.params.orderId;
+  const [reviewed, setReviewed] = useState<string[]>([]);
+  const collected = order?.status === 'COLLECTED';
   useFocusEffect(
     useCallback(() => {
       useOrderStore.getState().refreshOne(id).catch(() => {});
-    }, [id]),
+      if (collected) {
+        myReviews().then(l => setReviewed(l.map(r => r.productId)), () => {});
+      }
+    }, [id, collected]),
   );
   if (!order) {
     return <Screen><EmptyState title="Order not found" actionLabel="My orders" onAction={() => navigation.navigate('OrderHistory')} /></Screen>;
@@ -53,12 +59,22 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       )}
 
       <Text style={styles.h}>ITEMS</Text>
-      {order.items.map(i => (
+      {order.items.map((i, n) => (
         <View key={`${i.productId}${i.color}${i.size}`} style={styles.item}>
           <SmartImage uri={i.image} label={i.title} style={styles.thumb} />
           <View style={styles.itemText}>
             <Text style={typography.body}>{i.title}</Text>
             <Text style={styles.sub}>{i.color} · {i.size} · Qty {i.quantity}</Text>
+            {collected && order.items.findIndex(x => x.productId === i.productId) === n && (
+              <Pressable
+                onPress={() => navigation.navigate('WriteReview', { productId: i.productId, title: i.title })}
+                hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel={`${reviewed.includes(i.productId) ? 'Edit your review of' : 'Write a review of'} ${i.title}`}
+              >
+                <Text style={styles.review}>{reviewed.includes(i.productId) ? 'Edit your review' : 'Write a review'}</Text>
+              </Pressable>
+            )}
           </View>
           <Text style={typography.body}>{formatPrice(i.unitPrice * i.quantity)}</Text>
         </View>
@@ -92,6 +108,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   tTextOn: { color: colors.text, fontWeight: '600' },
   itemText: { flex: 1, marginLeft: 12 },
+  review: { ...typography.caption, color: colors.primary, fontWeight: '600', marginTop: 6, textDecorationLine: 'underline' },
   cancel: { marginTop: 20 },
   status: { ...typography.label, marginTop: 4 },
   sub: { ...typography.caption, color: colors.textSecondary },

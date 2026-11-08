@@ -12,6 +12,7 @@ import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
 import OrderConfirmationScreen from '../screens/Checkout/OrderConfirmationScreen';
 import OrderDetailsScreen from '../screens/Orders/OrderDetailsScreen';
 import OrderHistoryScreen from '../screens/Orders/OrderHistoryScreen';
+import WriteReviewScreen from '../screens/Orders/WriteReviewScreen';
 import ProductDetailsScreen from '../screens/Shop/ProductDetailsScreen';
 import ProductListScreen from '../screens/Shop/ProductListScreen';
 import SearchScreen from '../screens/Shop/SearchScreen';
@@ -49,6 +50,7 @@ export const RootNavigator: React.FC = () => {
       <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: 'My Orders' }} />
       <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} options={{ title: 'Order' }} />
+      <Stack.Screen name="WriteReview" component={WriteReviewScreen} options={{ title: 'Review' }} />
       <Stack.Screen name="PersonalInfo" component={PersonalInfoScreen} options={{ title: 'Personal Information' }} />
       <Stack.Screen name="Addresses" component={AddressesScreen} options={{ title: 'Addresses' }} />
       <Stack.Screen name="AddressForm" component={AddressFormScreen} options={({ route }) => ({ title: route.params?.addressId ? 'Edit address' : 'New address' })} />

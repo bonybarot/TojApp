@@ -187,7 +187,7 @@ it is written. Grouped by the phase that needs it.
 
 | ID | Title | State |
 |---|---|---|
-| ADR-0028 | Wishlist and reviews: data model, and how a review is bound to a verified purchase | PROPOSED — reviews cannot precede order lines |
+| ADR-0028 | Wishlist and reviews: data model, and how a review is bound to a verified purchase | [Accepted 2026-11-08](0028-reviews.md) |
 
 ### Before major UI implementation (D-15 puts this first in time)
 
@@ -321,6 +321,7 @@ Then add a row to §7 and a line in [../releases/changelog.md](../releases/chang
 | 0030 | [Backend in a separate repository](0030-separate-backend-repository.md) | 2026-11-05 | Accepted |
 | 0006 | [Secure token storage on the device](0006-secure-token-storage.md) | 2026-11-08 | Accepted |
 | 0031 | [App integration with the toj-backend API](0031-app-api-integration.md) | 2026-11-05 | Accepted |
+| 0028 | [Product reviews bound to a verified purchase](0028-reviews.md) | 2026-11-08 | Accepted |
 
 Note: ADR-0011 (money) is new; the planning table in §3 did not list it separately.
 

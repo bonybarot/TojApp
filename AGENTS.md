@@ -25,7 +25,7 @@ On branch `feature/api-integration` the app **calls the local `toj-backend` API*
 | Styling | `StyleSheet.create` + `src/utils/theme.ts` tokens. No inline styles (ESLint-enforced) |
 | Data | Local API via `src/api/client.ts` (fetch; tokens in Keychain/Keystore, ADR-0006). Fixtures `products.ts`, `categories.ts`, `orders.ts`, `stores.ts` for tests |
 | Money | Integer paise, INR; format via `utils/format.ts` |
-| Backend | Separate repo `toj-backend` (`../toj-backend`), NestJS 12, Prisma 7, PostgreSQL 17, Node 24: catalogue, OTP auth, cart, wishlist, addresses, pickup orders, admin (branch `feature/backend-core`). Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
+| Backend | Separate repo `toj-backend` (`../toj-backend`), NestJS 12, Prisma 7, PostgreSQL 17, Node 24: catalogue, OTP auth, cart, wishlist, addresses, pickup orders, reviews ([ADR-0028](docs/decisions/0028-reviews.md)), admin (branch `feature/backend-core`). Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
 | Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts` + `__tests__/productRefresh.test.ts` + `__tests__/sessionRestore.test.ts`; 14 tests pass |
 | tsc / ESLint | 0 errors / 0 warnings |

@@ -24,8 +24,8 @@ baseline commit. Screen-by-screen detail and verification results live in
 | Styling | `StyleSheet.create` + tokens in `src/utils/theme.ts`; no inline styles (ESLint) |
 | Data | Local `toj-backend` API (`src/api/client.ts`, base URL `src/config/env.ts`) per [ADR-0031](decisions/0031-app-api-integration.md). Fixtures in `src/data/` remain for tests and pre-load defaults |
 | Money | Integer paise, INR (`₹`, Indian grouping) via `utils/format.ts` |
-| Backend | Separate repository `toj-backend` (`../toj-backend`, [ADR-0030](decisions/0030-separate-backend-repository.md)): Day-1 foundation (NestJS 12, Prisma 7, Postgres 17, Node 24). Catalogue, OTP auth, cart, wishlist, addresses, pickup checkout, orders, admin (branch `feature/backend-core`). The app calls it. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
-| Real SMS OTP, payment, guest-bag persistence, push, reviews | NOT IMPLEMENTED. OTP is a fixed demo code on the server; payment is simulated |
+| Backend | Separate repository `toj-backend` (`../toj-backend`, [ADR-0030](decisions/0030-separate-backend-repository.md)): Day-1 foundation (NestJS 12, Prisma 7, Postgres 17, Node 24). Catalogue, OTP auth, cart, wishlist, addresses, pickup checkout, orders, reviews, admin (branch `feature/backend-core`). The app calls it. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
+| Real SMS OTP, payment, push | NOT IMPLEMENTED. OTP is a fixed demo code on the server; payment is simulated |
 | Quality gates | `npx tsc --noEmit` 0 errors; `npm run lint` 0 errors/warnings; `npm test` 6 suites, 14 tests pass |
 
 ## Source layout
