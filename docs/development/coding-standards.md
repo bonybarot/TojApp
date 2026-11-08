@@ -56,7 +56,7 @@ trailing newline), `src/screens/auth/Login.tsx`, and double-quoted strings in
 | Navigators live in `src/navigation/<Name>.tsx` | 7 files |
 | Stores live in `src/store/<name>Store.ts` | 4 files |
 | Mock data lives in `src/data/<name>.ts` | 6 files |
-| Screen folders are **PascalCase** (`Home/`, `Cart/`, `Orders/`, `User/`, `Categories/`, `History/`) — except `auth/` | `src/screens/auth/` is the one lowercase folder |
+| Screen folders are **PascalCase** (`Account/`, `Auth/`, `Cart/`, `Checkout/`, `Home/`, `Orders/`, `Profile/`, `Shop/`) | Git tracked `auth/` lowercase until 2026-11-08 while imports said `Auth/`; renamed so case-sensitive clones resolve |
 | Components are named exports | `export const ProductCard` |
 | Screens are default exports | `export default HomeScreen` |
 | Stores are named exports | `export const useCartStore` |
