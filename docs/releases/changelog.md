@@ -29,6 +29,7 @@
 - Addresses and AddressForm screens and `addressStore`: unreachable with pickup-only checkout; backend API unchanged.
 
 ### Fixed
+- Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
 - Settings → Reset demo data gave no feedback; it now confirms, or says the server could not be reached.
