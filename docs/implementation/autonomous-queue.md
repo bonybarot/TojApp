@@ -66,6 +66,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A28 After order: Back goes to My Orders
 - [x] A29 App display name TOJ
 - [x] A30 Unbranded shoe and coat images
+- [x] A31 One photo per garment; Tank Top renamed Crew Neck Tee
 
 ## Blocked: needs owner
 
@@ -107,3 +108,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A28: "View order" after checkout replaced the confirmation, so Back landed on the emptied Bag/Home. Now resets to Account tab > My Orders > Order. Android verified (TOJ-1026)
 - 2026-11-08 A29: home-screen name was "TojApp"; now "TOJ" (`CFBundleDisplayName`, Android `app_name`, `app.json` displayName). Verified built Info.plist and `aapt` label
 - 2026-11-08 A30: shoe tile and shoe products showed Nike logos, Wool Coat a woman. Swapped seed + fixture images for unbranded ones; re-seeded; checked Shop > Shoes on Android.
+- 2026-11-08 A31: several products showed another product's photo (Chinos = sweatpants, Bomber = leather jacket, Joggers = chinos, Jeans = Levi's). Gave each its own; Tops/Bottoms tiles changed; product 13 renamed Crew Neck Tee to match its photo. Checked Home on Android.
