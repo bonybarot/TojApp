@@ -7,8 +7,10 @@
 - `src/api/client.ts`, `src/config/env.ts`; [ADR-0031](../decisions/0031-app-api-integration.md).
 - Session survives a cold start: tokens in Keychain/Keystore via `react-native-keychain` 10.0.0, restored with `GET /me` at launch; wiped on logout and session loss ([ADR-0006](../decisions/0006-secure-token-storage.md), `__tests__/sessionRestore.test.ts`).
 - Android release signing reads the upload key from `TOJ_UPLOAD_*` gradle properties (BUILD-01 config; falls back to the debug key for local builds).
+- Guest bag survives a cold start (Keychain service `toj.guestBag`, ADR-0006 amendment); wiped once a session exists.
 
 ### Changed
+- Bag tab screen-reader label says "1 item", not "1 items".
 - Catalogue, auth (OTP request/verify, needsProfile, logout), cart, wishlist, addresses, orders come from `toj-backend`. Guest cart and wishlist merge at sign-in.
 - Checkout pickup-only (Q-2) with idempotency key; delivery fee removed; payment `PAY_AT_STORE` / `CARD_SIMULATED`.
 - Prices in paise, shown as `₹` with Indian grouping. Order statuses `READY_FOR_PICKUP`, `COLLECTED`.

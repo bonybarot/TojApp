@@ -71,7 +71,7 @@ Same journey as iOS: guest adds Classic White T-Shirt (White, M), "Sign in to ch
 - `SceneDelegate` in `AppDelegate.swift` starts React Native in the scene window.
 
 ## Limitations
-- Guest bag is lost on cold start (only session tokens are kept, ADR-0006).
+- Guest wishlist hearts are lost on cold start (the guest bag is kept, ADR-0006 amendment).
 - Real Android upload key not generated (build reads `TOJ_UPLOAD_*`; owner generates the key).
 - OTP is the fixed demo code `123456`; no SMS.
 - Catalogue is filtered on device; ceiling 50 products.
