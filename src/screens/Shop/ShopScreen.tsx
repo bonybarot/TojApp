@@ -11,10 +11,16 @@ import { colors, typography, FONT_CAP } from '../../utils/theme';
 const ShopScreen: React.FC = () => {
   const nav = useRootNavigation();
   const categories = useProductStore(s => s.categories);
+  const products = useProductStore(s => s.products);
+  // Own images for the two virtual tiles, so they don't repeat a category tile.
+  const used = new Set(categories.map(c => c.image));
+  const fresh = products.filter(p => !used.has(p.image));
+  const saleImage = (fresh.find(p => p.compareAtPrice) ?? products.find(p => p.compareAtPrice))?.image;
+  const allImage = fresh.find(p => p.image !== saleImage)?.image;
   const cols = useGridColumns();
   const tiles: Category[] = [
-    { id: 'all', title: 'All products', image: categories[0]?.image ?? '' },
-    { id: 'sale', title: 'Sale', image: categories[2]?.image ?? '' },
+    { id: 'all', title: 'All products', image: allImage ?? categories[0]?.image ?? '' },
+    { id: 'sale', title: 'Sale', image: saleImage ?? categories[2]?.image ?? '' },
     ...categories,
   ];
   const open = (id: string) => {
