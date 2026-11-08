@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { useEffect } from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { navigationRef } from './src/navigation/ref';
 import { RootNavigator } from './src/navigation/RootNavigator';
@@ -9,13 +9,15 @@ import { useUserStore } from './src/store/userStore';
 
 // Light theme only for now; status bar is always dark-content.
 function App() {
+  const { fontScale } = useWindowDimensions();
   useEffect(() => {
     useUserStore.getState().restore();
   }, []);
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" />
-      <NavigationContainer ref={navigationRef}>
+      {/* Text size changed while open: iOS keeps stale text layout, so remount on the same screens. */}
+      <NavigationContainer key={fontScale} ref={navigationRef} initialState={navigationRef.current?.getRootState()}>
         <RootNavigator />
       </NavigationContainer>
     </SafeAreaProvider>

@@ -47,6 +47,7 @@
 - My Orders no longer flashes "No orders yet" while loading, and long orders show "+N" (A38).
 - A saved guest bag no longer shows as empty while the catalogue loads (A39).
 - Android no longer crashes after a font size or language change, or when restored from the background (A40).
+- iOS lays text out again when the text size is changed while the app is open, staying on the same screen (A41).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
