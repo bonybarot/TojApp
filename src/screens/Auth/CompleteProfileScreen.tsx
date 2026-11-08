@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -15,11 +15,17 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
   const [name, setName] = useState('');
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
+  // Two quick taps would spend the one-time code twice; the second shows a bogus error.
+  const inFlight = useRef(false);
   const submit = async () => {
+    if (inFlight.current) {
+      return;
+    }
     if (name.trim().length < 2) {
       setError('Enter your name.');
       return;
     }
+    inFlight.current = true;
     setBusy(true);
     try {
       const { phone, code, redirect } = route.params;
@@ -28,6 +34,7 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
     } catch (e) {
       setError((e as Error).message);
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };

@@ -120,6 +120,9 @@ export const useCartStore = create<CartStore>((set, get) => {
       }
       throw e;
     }
+    if (!hasSession()) {
+      return; // signed out meanwhile: the account bag must not land in the guest bag
+    }
     unmerged = false;
     merging = null; // the re-applied taps below must sync
     const after = get().lines;
@@ -194,8 +197,8 @@ export const useCartStore = create<CartStore>((set, get) => {
       }
       const mine = latest;
       const c = await api<ServerCart>('/me/cart');
-      if (mine !== latest) {
-        return; // A tap meanwhile: its own answer is newer.
+      if (mine !== latest || !hasSession()) {
+        return; // A tap meanwhile (its own answer is newer), or signed out.
       }
       // Keep an unread notice: the Bag's own focus refresh comes back clean.
       set({ lines: fromServer(c), notice: noticeOf(c) ?? get().notice });
