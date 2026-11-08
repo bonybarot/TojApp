@@ -9,7 +9,7 @@ import { SmartImage } from '../../components/SmartImage';
 import { ProductGridSkeleton } from '../../components/Skeleton';
 import { ErrorState } from '../../components/States';
 import { usePull, useRootNavigation } from '../../hooks';
-import { useProductStore } from '../../store/productStore';
+import { reloadProducts, useProductStore } from '../../store/productStore';
 import { colors, FONT_CAP, typography } from '../../utils/theme';
 
 const HomeScreen: React.FC = () => {
@@ -17,7 +17,7 @@ const HomeScreen: React.FC = () => {
   // Square on phones; capped so tablets keep the categories above the fold.
   const heroHeight = Math.min(useWindowDimensions().width - 32, 420);
   const { products, categories, status, loadProducts } = useProductStore();
-  const pull = usePull(loadProducts);
+  const pull = usePull(reloadProducts);
   const hero = products.find(p => p.tag === 'New') ?? products[0];
   const newIn = products.filter(p => p.tag === 'New' || p.tag === 'Bestseller').slice(0, 8);
   const sale = products.filter(p => p.compareAtPrice).slice(0, 8);

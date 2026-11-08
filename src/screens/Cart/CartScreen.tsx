@@ -8,7 +8,7 @@ import { SmartImage } from '../../components/SmartImage';
 import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { usePull, useRootNavigation } from '../../hooks';
 import { useCartStore } from '../../store/cartStore';
-import { useProductStore } from '../../store/productStore';
+import { reloadProducts, useProductStore } from '../../store/productStore';
 import { useUserStore } from '../../store/userStore';
 import { detailLines, pickupBlockers, subtotalOf } from '../../utils/cart';
 import { formatPrice } from '../../utils/format';
@@ -16,7 +16,7 @@ import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 // Pull: fresh prices and stock; signed in, the server bag too.
 const reloadBag = () =>
-  Promise.all([useProductStore.getState().loadProducts(), useUserStore.getState().isLoggedIn && useCartStore.getState().refresh()]);
+  Promise.all([reloadProducts(), useUserStore.getState().isLoggedIn && useCartStore.getState().refresh()]);
 
 const CartScreen: React.FC = () => {
   const nav = useRootNavigation();

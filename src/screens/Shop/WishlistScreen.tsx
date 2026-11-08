@@ -4,12 +4,12 @@ import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { ProductGrid } from '../../components/ProductGrid';
 import { Screen } from '../../components/Screen';
 import { usePull, useRootNavigation } from '../../hooks';
-import { useProductStore } from '../../store/productStore';
+import { reloadProducts, useProductStore } from '../../store/productStore';
 import { useUserStore } from '../../store/userStore';
 import { useWishlistStore } from '../../store/wishlistStore';
 
 const reloadWishlist = () =>
-  Promise.all([useProductStore.getState().loadProducts(), useUserStore.getState().isLoggedIn && useWishlistStore.getState().refresh()]);
+  Promise.all([reloadProducts(), useUserStore.getState().isLoggedIn && useWishlistStore.getState().refresh()]);
 
 const WishlistScreen: React.FC = () => {
   const nav = useRootNavigation();
