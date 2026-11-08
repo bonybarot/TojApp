@@ -73,6 +73,8 @@ const CheckoutScreen: React.FC = () => {
         expectedTotal: subtotal,
       });
       useCartStore.getState().clearCart();
+      // The order took stock: refresh it so product pages do not offer what was just bought.
+      useProductStore.getState().loadProducts();
       nav.reset({ index: 1, routes: [{ name: 'Tabs' }, { name: 'OrderConfirmation', params: { orderId: id } }] });
     } catch (e) {
       if (e instanceof ApiError && STALE_BAG.includes(e.code)) {
