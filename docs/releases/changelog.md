@@ -21,7 +21,13 @@
 - Prices in paise, shown as `₹` with Indian grouping. Order statuses `READY_FOR_PICKUP`, `COLLECTED`.
 - `ios/Podfile`: `fmt` and `RCT-Folly` pods built as C++17 so they compile with Xcode 26.4+ clang.
 
+### Removed
+- Unused packages `nativewind`, `@react-navigation/drawer`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets`, `@react-native/new-app-screen` and the Reanimated babel plugin ([ADR-0032](../decisions/0032-remove-unused-app-code.md)).
+- Addresses and AddressForm screens and `addressStore`: unreachable with pickup-only checkout; backend API unchanged.
+
 ### Fixed
+- Bag quantities doubled when Fast Refresh re-ran session restore while signed in; `restore()` now returns early when already signed in.
+- Product-card wishlist heart was unreachable by VoiceOver/TalkBack (nested in the card button); the card now offers "Add to wishlist" as an accessibility action.
 - API down: Search and Wishlist showed "no results" and "empty"; they now show loading or an error with Try again. Addresses reloads when opened, shows an error with retry, and a failed delete says so.
 - A saved session left unused by an offline launch now resumes once the catalogue loads again (no relaunch needed).
 - Largest text sizes (iOS Dynamic Type, Android font scale): headings, prices, labels, buttons and tab labels are capped at 1.4× (`FONT_CAP` in `utils/theme.ts`; tabs 1.2×) so they no longer clip or overlap; icon glyphs no longer scale out of their circles; body text still scales fully.

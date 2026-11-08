@@ -21,8 +21,6 @@ export type RootStackParamList = {
   OrderDetails: { orderId: string };
   WriteReview: { productId: string; title: string };
   PersonalInfo: undefined;
-  Addresses: { selecting?: boolean } | undefined;
-  AddressForm: { addressId?: string } | undefined;
   Support: undefined;
   Settings: undefined;
   Login: { redirect?: AuthRedirect } | undefined;

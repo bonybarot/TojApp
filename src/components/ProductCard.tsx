@@ -22,6 +22,9 @@ export const ProductCard: React.FC<Props> = ({ product, onPress }) => {
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${product.title}${soldOut ? ', sold out' : ''}`}
+      // The heart inside an accessible card is unreachable by screen readers; offer it as an action.
+      accessibilityActions={[{ name: 'wishlist', label: `${liked ? 'Remove from' : 'Add to'} wishlist` }]}
+      onAccessibilityAction={() => toggle(product.id)}
     >
       <View>
         <SmartImage uri={product.image} label={product.title} style={styles.image} />

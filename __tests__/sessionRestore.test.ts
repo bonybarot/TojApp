@@ -84,3 +84,10 @@ test('offline at start: the saved session resumes once the catalogue loads again
   await new Promise<void>(r => setTimeout(r, 10));
   expect(useUserStore.getState().isLoggedIn).toBe(true);
 });
+
+test('restore while already signed in does nothing (no second bag merge)', async () => {
+  await Keychain.setGenericPassword('toj', JSON.stringify(saved), STORE);
+  useUserStore.setState({ user: { id: 'c1', name: 'Ravi', phone: '9000000123' }, isLoggedIn: true });
+  await useUserStore.getState().restore();
+  expect(fetchMock).not.toHaveBeenCalled();
+});

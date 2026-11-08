@@ -3,7 +3,6 @@ import { create } from 'zustand';
 import { api, currentRefreshToken, hasSession, setSessionLostHandler, setTokens, storedTokens, Tokens } from '../api/client';
 import { navigationRef } from '../navigation/ref';
 import { User } from '../types';
-import { useAddressStore } from './addressStore';
 import { restoreGuestBag, useCartStore } from './cartStore';
 import { useOrderStore } from './orderStore';
 import { useProductStore } from './productStore';
@@ -34,7 +33,6 @@ const loadAccountData = () =>
   Promise.allSettled([
     useCartStore.getState().mergeIntoServer(),
     useWishlistStore.getState().mergeIntoServer(),
-    useAddressStore.getState().load(),
     useOrderStore.getState().load(),
   ]);
 
@@ -42,7 +40,6 @@ const clearAccountData = () => {
   useCartStore.getState().clearCart();
   useWishlistStore.getState().clear();
   useOrderStore.getState().reset();
-  useAddressStore.getState().reset();
 };
 
 export const useUserStore = create<UserState>(set => ({
@@ -76,6 +73,10 @@ export const useUserStore = create<UserState>(set => ({
     clearAccountData();
   },
   restore: async () => {
+    // Already signed in (e.g. Fast Refresh re-ran App): a second merge would add the server bag to itself.
+    if (useUserStore.getState().isLoggedIn) {
+      return;
+    }
     const t = await storedTokens();
     if (!t) {
       return restoreGuest();
