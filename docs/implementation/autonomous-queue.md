@@ -67,6 +67,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A29 App display name TOJ
 - [x] A30 Unbranded shoe and coat images
 - [x] A31 One photo per garment; Tank Top renamed Crew Neck Tee
+- [x] A32 Help FAQ uses the server pickup store and hours
 
 ## Blocked: needs owner
 
@@ -109,3 +110,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A29: home-screen name was "TojApp"; now "TOJ" (`CFBundleDisplayName`, Android `app_name`, `app.json` displayName). Verified built Info.plist and `aapt` label
 - 2026-11-08 A30: shoe tile and shoe products showed Nike logos, Wool Coat a woman. Swapped seed + fixture images for unbranded ones; re-seeded; checked Shop > Shoes on Android.
 - 2026-11-08 A31: several products showed another product's photo (Chinos = sweatpants, Bomber = leather jacket, Joggers = chinos, Jeans = Levi's). Gave each its own; Tops/Bottoms tiles changed; product 13 renamed Crew Neck Tee to match its photo. Checked Home on Android.
+- 2026-11-08 A32: Help & Support FAQ had a hard-coded store and no hours answer. It now reads name, address and hours from the server pickup store. Checked on iOS.

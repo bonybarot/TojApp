@@ -38,6 +38,7 @@
 - The app is named "TOJ" on the home screen (A29).
 - Shoe and coat photos no longer show other brands' logos or womenswear (A30).
 - Each product shows its own photo; "Tank Top" is now "Crew Neck Tee" (A31).
+- Help & Support shows the pickup store, address and opening hours from the server (A32).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
