@@ -6,7 +6,7 @@ import { useProductStore } from '../src/store/productStore';
 const mockPending: ((qty: number) => void)[] = [];
 jest.mock('../src/api/client', () => ({
   hasSession: () => true,
-  api: () => new Promise(resolve => mockPending.push(qty => resolve({ lines: [{ ...mockLine, quantity: qty }] }))),
+  api: () => new Promise(resolve => mockPending.push(qty => resolve(qty ? { lines: [{ ...mockLine, quantity: qty }] } : { lines: [], warnings: [{ code: 'UNAVAILABLE' }] }))),
 }));
 
 const p = { ...products[0], stock: { 'Navy|L': 10 }, variants: [{ id: 'v1', sku: 's', color: 'Navy', size: 'L', stock: 10 }] };
@@ -25,4 +25,16 @@ test('an older server answer does not undo a newer tap', async () => {
   await flush();
   expect(useCartStore.getState().lines[0].quantity).toBe(3);
   expect(mockPending).toHaveLength(3); // prices match: no catalogue reload
+});
+
+test('a sold-out line the server dropped leaves a notice that a clean refresh keeps', async () => {
+  const refresh = useCartStore.getState().refresh();
+  mockPending.at(-1)!(0);
+  await refresh;
+  expect(useCartStore.getState().lines).toHaveLength(0);
+  expect(useCartStore.getState().notice).toMatch(/sold out/);
+  const again = useCartStore.getState().refresh();
+  mockPending.at(-1)!(1);
+  await again;
+  expect(useCartStore.getState().notice).toMatch(/sold out/);
 });

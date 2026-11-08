@@ -10,10 +10,13 @@ export type AddResult = 'added' | 'limit' | 'unavailable';
 /** GET/PUT /me/cart response (subset the app uses). */
 interface ServerCart {
   lines: { variantId: string; productId: string; color: string; size: string; quantity: number; unitPrice: number }[];
+  warnings?: { code: 'QUANTITY_CLAMPED' | 'UNAVAILABLE' }[];
 }
 
 interface CartStore {
   lines: CartLine[];
+  /** Set when the server removed sold-out lines or cut quantities to stock; the Bag shows it once. */
+  notice: string | null;
   addToCart: (productId: string, color: string, size: string, qty?: number) => AddResult;
   setQuantity: (lineId: string, quantity: number) => void;
   removeLine: (lineId: string) => void;
@@ -38,6 +41,14 @@ const fromServer = (c: ServerCart): CartLine[] => {
     ps.loadProducts().catch(() => {});
   }
   return c.lines.map(l => ({ lineId: keyOf(l), productId: l.productId, color: l.color, size: l.size, quantity: l.quantity }));
+};
+
+const noticeOf = (c: ServerCart): string | null => {
+  const w = c.warnings ?? [];
+  if (w.some(x => x.code === 'UNAVAILABLE')) {
+    return 'Some items sold out and were removed from your bag.';
+  }
+  return w.length ? 'Some quantities were reduced to the stock available.' : null;
 };
 
 const maxFor = (l: { productId: string; color: string; size: string }): number => {
@@ -73,6 +84,7 @@ export const useCartStore = create<CartStore>((set, get) => {
 
   return {
     lines: [],
+    notice: null,
     addToCart: (productId, color, size, qty = 1) => {
       const max = maxFor({ productId, color, size });
       if (max <= 0) {
@@ -120,10 +132,12 @@ export const useCartStore = create<CartStore>((set, get) => {
       const c = items.length
         ? await api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
         : await api<ServerCart>('/me/cart');
-      set({ lines: fromServer(c) });
+      set({ lines: fromServer(c), notice: noticeOf(c) });
     },
     refresh: async () => {
-      set({ lines: fromServer(await api<ServerCart>('/me/cart')) });
+      const c = await api<ServerCart>('/me/cart');
+      // Keep an unread notice: the Bag's own focus refresh comes back clean.
+      set({ lines: fromServer(c), notice: noticeOf(c) ?? get().notice });
     },
   };
 });
