@@ -11,7 +11,7 @@ import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { CANCELLABLE, useOrderStore } from '../../store/orderStore';
 import { useProductStore } from '../../store/productStore';
-import { formatDate, formatPrice } from '../../utils/format';
+import { formatDate, formatDateTime, formatPrice } from '../../utils/format';
 import { PAYMENT_LABEL, STATUS_COLOR, STATUS_LABEL, timelineFor } from '../../utils/orderStatus';
 import { colors, typography, FONT_CAP, LINK_SLOP } from '../../utils/theme';
 
@@ -53,6 +53,11 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const cancelled = order.status === 'CANCELLED';
   const steps = timelineFor(order.fulfilment);
   const step = steps.indexOf(order.status);
+  // Latest time each status was reached (older servers send no timeline).
+  const at = (s: string) => order.timeline?.filter(t => t.status === s).pop()?.at;
+  const cancelledAt = at('CANCELLED');
+  const paid =
+    order.paymentStatus === 'PAID' ? 'Paid' : order.paymentStatus === 'REFUNDED' ? 'Refunded' : cancelled ? null : 'Due at pickup';
   const confirmCancel = () =>
     Alert.alert('Cancel order', `Cancel ${order.id}?`, [
       { text: 'Keep order', style: 'cancel' },
@@ -67,6 +72,11 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       <Text style={typography.h1} maxFontSizeMultiplier={FONT_CAP}>{order.id}</Text>
       <Text maxFontSizeMultiplier={FONT_CAP} style={[styles.status, { color: STATUS_COLOR[order.status] }]}>{STATUS_LABEL[order.status].toUpperCase()}</Text>
       <Text style={styles.sub}>Placed {formatDate(order.placedAt)}</Text>
+      {cancelled && (
+        <Text style={styles.sub}>
+          Cancelled{cancelledAt ? ` ${formatDateTime(cancelledAt)}` : ''}{order.cancelReason ? `: ${order.cancelReason}` : ''}
+        </Text>
+      )}
 
       {!cancelled && (
         <View style={styles.timeline}>
@@ -74,6 +84,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <View key={s} style={styles.tRow}>
               <View style={[styles.dot, i <= step && styles.dotOn]} />
               <Text style={[styles.tText, i <= step && styles.tTextOn]}>{STATUS_LABEL[s]}</Text>
+              {i <= step && at(s) && <Text style={styles.tTime}>{formatDateTime(at(s)!)}</Text>}
             </View>
           ))}
         </View>
@@ -120,7 +131,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       ) : null}
 
       <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>PAYMENT</Text>
-      <Text style={typography.body}>{PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod}</Text>
+      <Text style={typography.body}>{PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod}{paid ? ` · ${paid}` : ''}</Text>
 
       <View style={styles.totals}>
         <View style={styles.row}><Text style={styles.sub}>Subtotal</Text><Text style={typography.body}>{formatPrice(order.subtotal)}</Text></View>
@@ -147,7 +158,8 @@ const styles = StyleSheet.create({
   tRow: { flexDirection: 'row', alignItems: 'center', minHeight: 30 },
   dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.border, marginRight: 12 },
   dotOn: { backgroundColor: colors.primary },
-  tText: { ...typography.body, color: colors.textSecondary },
+  tText: { ...typography.body, color: colors.textSecondary, flex: 1 },
+  tTime: { ...typography.caption, color: colors.textSecondary },
   item: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   thumb: { width: 52, height: 64, borderRadius: 6 },
   totals: { marginTop: 24, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border, paddingTop: 12, gap: 6 },

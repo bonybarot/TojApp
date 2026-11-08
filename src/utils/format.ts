@@ -15,6 +15,9 @@ export const formatDate = (iso: string): string =>
     year: 'numeric',
   });
 
+export const formatDateTime = (iso: string): string =>
+  new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+
 // Pasted or autofilled "+91 98765 43210" / "098765 43210": drop the prefix, not the last digits.
 export const localPhone = (t: string) => {
   const d = t.replace(/\D/g, '');
