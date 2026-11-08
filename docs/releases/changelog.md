@@ -66,6 +66,7 @@
 - Editing a review: Delete waits for a save in progress; Home shows a message instead of loading forever when the store is empty; Reset demo data also clears hearts added on another device (A58).
 - Sign in: typing a number on iOS no longer scrambles digits; pasting +91 numbers still works (A59).
 - API: admin sessions expire and can be logged out; parallel checkouts cannot create duplicate orders; OTP limits hold under parallel requests; null address fields return 400 (B15).
+- Checkout: two customers checking out the same items at the same moment no longer risk a server error; a double-tapped Cancel no longer shows an error (backend B17).
 - Bag: a sign-in that retries after a dropped connection no longer doubles the guest bag (A60, B16).
 - Account: signing out while data loads no longer leaks the old account's orders or hearts; rapid heart taps stay in sync with the server; product and order pages show loading or retry instead of "not found" while offline (A61).
 - API: out-of-range price filters return 400 instead of 500; size and colour filters match the same in-stock variant; wishlist merge no longer loses new items near the cap (B14).
