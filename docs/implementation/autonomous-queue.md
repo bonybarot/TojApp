@@ -105,6 +105,17 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 ## Blocked: needs owner
 
 - Store identifiers: iOS bundle ID is still the template `org.reactjs.native.example.TojApp` (Android `com.tojapp`). The final reverse-domain ID depends on the company domain and cannot change after store release. Changing it now also signs every simulator out once (Keychain is per bundle ID).
+- Open orders per customer: no cap today (a customer can hold many PLACED pickup orders that reserve stock). Needs a business limit.
+- Review moderation: admin can only hard-delete a review (no audit row, no hide, no moderation queue). Policy needed before reviews go public.
+- Signed-out or disabled customers keep a valid access token until it expires (15 min); admins are now checked on every request (B18). Customer disabling has no flow yet.
+- OTP abuse: no per-phone lockout across clients and no SMS-pumping guard. Matters only once real SMS is approved.
+- An order idempotency key replayed with a different body returns the stored order (standard practice; a 422 on mismatch is the stricter option).
+- Search matches the whole phrase as one substring ("white shirt" finds nothing for "shirt white"). Tokenised search is a product choice (D-12 deferred search).
+- Paging: public reviews show the newest 20; admin inventory and the customer's own reviews are unpaged. Fine at single-store scale.
+- Admin login: per-client throttle only, no per-account lockout. Admin product is not v1 (D-5).
+- Verified purchase counts `COLLECTED` orders only; add `DELIVERED` if delivery ships (Q-2 is pickup-only).
+- Backend: `pg` warns that concurrent `client.query()` goes away in pg 9; upgrade the Prisma adapter before bumping pg.
+- iPhone SE (small screen) walk-through needs the owner to grant simulator access to the TojSE device.
 
 ## Log
 
