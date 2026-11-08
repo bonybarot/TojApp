@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -31,14 +31,16 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
     return () => clearTimeout(t);
   }, [wait]);
 
+  const inFlight = useRef(false);
   const verify = async (c = code) => {
-    if (busy) {
+    if (inFlight.current) {
       return;
     }
     if (c.length !== 6) {
       setError('Enter the 6-digit code.');
       return;
     }
+    inFlight.current = true;
     setBusy(true);
     try {
       const r = await useUserStore.getState().verifyOtp(phone, c);
@@ -50,6 +52,7 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
     } catch (e) {
       setError((e as Error).message);
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };

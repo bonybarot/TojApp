@@ -33,7 +33,7 @@ const SearchScreen: React.FC = () => {
       />
       {searching && status === 'error' && products.length === 0 ? (
         <ErrorState onRetry={loadProducts} />
-      ) : searching && products.length === 0 ? (
+      ) : searching && products.length === 0 && status !== 'ready' ? (
         <LoadingState />
       ) : searching ? (
         <ProductGrid
