@@ -47,7 +47,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     s.products.find(p => p.id === route.params.productId),
   );
   const addToCart = useCartStore(s => s.addToCart);
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  // Square on tall phones; capped on short screens so title, price and sizes show above the fold.
+  const imageHeight = Math.min(width, height * 0.45);
   const [color, setColor] = useState<string>('');
   const [size, setSize] = useState<string | null>(null);
   const [page, setPage] = useState(0);
@@ -171,7 +173,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <SmartImage
               uri={item}
               label={product.title}
-              style={[styles.image, { width }]}
+              style={{ width, height: imageHeight }}
             />
           )}
         />
@@ -258,7 +260,6 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  image: { aspectRatio: 1 },
   heart: {
     position: 'absolute',
     top: 12,

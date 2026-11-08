@@ -145,3 +145,8 @@ Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 1
 - Fixed: card hearts had the same screen-reader label on every product; the label now names the product.
 - iOS: guest adds Classic White T-Shirt (M), "Sign in to checkout", 9876543210 / 123456, returns to Checkout with the guest line merged into the account bag (quantities add), places TOJ-1017 (then cancelled through admin).
 - Once this session the Android app was found signed out with no revoked session and no process restart; not reproduced (the next session held over 4 minutes with refresh rotations). Most likely a Metro reload during git operations.
+
+## Small screen and foreground catalogue (2026-11-08, Android + iOS)
+- Android at 360x640 dp (`wm size 1080x1920`): Home, Shop, All products, Bag fine; product details hid title and price under the square image. Fixed: image capped at 45% of window height.
+- iPhone SE (3rd gen, iOS 27.2) simulator: Home layout fine. Deeper walk not done: `idb` taps and `describe-all` fail on iOS 27, and the control tool needs a grant for that device.
+- Found: the foreground refresh never ran for guests. Metro's default inline requires load `userStore` (which registers the `AppState` listener) only when a screen first uses it; signed-in sessions had always loaded it, so the earlier verification passed. Fixed with an eager import in `App.tsx`; foreground now also reloads the catalogue. Verified on Android: price set to 309900 while backgrounded, list shows ₹3,099 on resume. iOS runs the same JS; not re-verified on iOS after the fix.

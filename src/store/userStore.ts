@@ -6,6 +6,7 @@ import { User } from '../types';
 import { useAddressStore } from './addressStore';
 import { useCartStore } from './cartStore';
 import { useOrderStore } from './orderStore';
+import { useProductStore } from './productStore';
 import { useWishlistStore } from './wishlistStore';
 
 interface VerifyOk extends Tokens {
@@ -81,8 +82,11 @@ setSessionLostHandler(() => {
   Alert.alert('Signed out', 'Your session has ended. Please sign in again.');
 });
 
-// Back in the foreground: account data may have changed on another device.
+// Back in the foreground: prices and stock may have changed; account data may have changed on another device.
 AppState.addEventListener('change', state => {
+  if (state === 'active') {
+    useProductStore.getState().loadProducts();
+  }
   if (state === 'active' && useUserStore.getState().isLoggedIn) {
     Promise.allSettled([
       useCartStore.getState().refresh(),
