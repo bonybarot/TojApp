@@ -30,6 +30,6 @@ const styles = StyleSheet.create({
   image: { width: '100%' },
   tall: { aspectRatio: 3 / 4 },
   wide: { aspectRatio: 16 / 9 },
-  scrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.28)' },
+  scrim: { ...StyleSheet.absoluteFillObject, experimental_backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%)' },
   title: { position: 'absolute', left: 14, right: 14, bottom: 12, color: colors.onPrimary, ...typography.label, fontSize: 13 },
 });
