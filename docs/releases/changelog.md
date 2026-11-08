@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- Product page no longer shows "Added" when the stock limit stopped the add; switching colour clears a size sold out in that colour; resending a code within the cooldown opens the code screen; an expired code at sign-up says so; Android buttons no longer announce "busy" after loading (A65).
 - Order details: each reached step shows its time, a cancelled order shows when (and why) it was cancelled, and payment shows Paid / Refunded / Due at pickup (A64)
 - App: a render crash shows "Something went wrong / Try again" instead of a blank screen; Try again remounts navigation (A64)
 - Bag: a quantity change that fails offline now shows the bag as the server last confirmed it, with the "Could not update" notice, instead of the unsaved quantity (A63)

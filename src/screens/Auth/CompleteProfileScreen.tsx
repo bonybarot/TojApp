@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useRef, useState } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Alert, Text, StyleSheet } from 'react-native';
+import { ApiError } from '../../api/client';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Screen } from '../../components/Screen';
@@ -32,6 +33,12 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
       await useUserStore.getState().verifyOtp(phone, code, name.trim());
       finishAuth(navigation, redirect);
     } catch (e) {
+      // Code expired or used up: retrying here cannot work, so go back to the code screen.
+      if (e instanceof ApiError && e.code === 'OTP_INVALID') {
+        Alert.alert('Code expired', 'Request a new code to create your account.');
+        navigation.goBack();
+        return;
+      }
       setError((e as Error).message);
     } finally {
       inFlight.current = false;
