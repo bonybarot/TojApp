@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { myReviews } from '../../api/reviews';
 import { Button } from '../../components/Button';
+import { usePull } from '../../hooks';
 import { Screen } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
 import { EmptyState } from '../../components/States';
@@ -23,6 +24,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const id = route.params.orderId;
   const [reviewed, setReviewed] = useState<string[]>([]);
   const collected = order?.status === 'COLLECTED';
+  const pull = usePull(useCallback(() => useOrderStore.getState().refreshOne(id), [id]));
   useFocusEffect(
     useCallback(() => {
       useOrderStore.getState().refreshOne(id).catch(() => {});
@@ -44,7 +46,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     ]);
 
   return (
-    <Screen scroll padded>
+    <Screen scroll padded pull={pull}>
       <Text style={typography.h1} maxFontSizeMultiplier={FONT_CAP}>{order.id}</Text>
       <Text maxFontSizeMultiplier={FONT_CAP} style={[styles.status, { color: STATUS_COLOR[order.status] }]}>{STATUS_LABEL[order.status].toUpperCase()}</Text>
       <Text style={styles.sub}>Placed {formatDate(order.placedAt)}</Text>

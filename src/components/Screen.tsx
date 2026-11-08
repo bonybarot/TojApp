@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   View,
@@ -16,6 +17,8 @@ interface Props {
   padded?: boolean;
   /** Lets a screen scroll itself, e.g. to a field that needs attention. */
   scrollRef?: React.RefObject<ScrollView | null>;
+  /** Pull-to-refresh for a scroll screen (from `usePull`). */
+  pull?: { refreshing: boolean; onRefresh: () => void };
 }
 
 /** Common screen shell: safe area, optional scroll + keyboard handling, sticky footer. */
@@ -26,6 +29,7 @@ export const Screen: React.FC<Props> = ({
   footer,
   padded,
   scrollRef,
+  pull,
 }) => {
   // KAV compares its parent-relative frame with the window-absolute keyboard top,
   // so offset it by where its parent sits on screen (below any stack header).
@@ -54,6 +58,7 @@ export const Screen: React.FC<Props> = ({
             contentContainerStyle={padded && styles.padded}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
+            refreshControl={pull && <RefreshControl {...pull} />}
           >
             {children}
           </ScrollView>
