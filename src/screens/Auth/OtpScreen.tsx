@@ -31,18 +31,21 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
     return () => clearTimeout(t);
   }, [wait]);
 
-  const verify = async () => {
-    if (code.length !== 6) {
+  const verify = async (c = code) => {
+    if (busy) {
+      return;
+    }
+    if (c.length !== 6) {
       setError('Enter the 6-digit code.');
       return;
     }
     setBusy(true);
     try {
-      const r = await useUserStore.getState().verifyOtp(phone, code);
+      const r = await useUserStore.getState().verifyOtp(phone, c);
       if (r === 'ok') {
         finishAuth(navigation, redirect);
       } else {
-        navigation.navigate('CompleteProfile', { phone, code, redirect });
+        navigation.navigate('CompleteProfile', { phone, code: c, redirect });
       }
     } catch (e) {
       setError((e as Error).message);
@@ -63,16 +66,21 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
       <Input
         label="6-digit code"
         value={code}
-        onChangeText={t => { setCode(t.replace(/\D/g, '').slice(0, 6)); setError(undefined); }}
+        onChangeText={t => {
+          const c = t.replace(/\D/g, '').slice(0, 6);
+          setCode(c);
+          setError(undefined);
+          if (c.length === 6 && code.length < 6) { verify(c); } // autofill or last digit submits
+        }}
         keyboardType="number-pad"
         maxLength={6}
         autoComplete="sms-otp"
         textContentType="oneTimeCode"
-        onSubmitEditing={verify}
+        onSubmitEditing={() => verify()}
         error={error}
         autoFocus
       />
-      <Button title="Verify" onPress={verify} loading={busy} />
+      <Button title="Verify" onPress={() => verify()} loading={busy} />
       <Pressable onPress={resend} disabled={wait > 0} hitSlop={8} accessibilityRole="button" accessibilityState={{ disabled: wait > 0 }} style={styles.resend}>
         <Text style={wait > 0 ? styles.waiting : styles.link}>
           {wait > 0 ? `${resent ? 'Code resent. ' : ''}Resend in ${wait}s` : 'Resend code'}
