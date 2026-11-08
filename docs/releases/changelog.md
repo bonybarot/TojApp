@@ -34,6 +34,8 @@
 - Product details: "Add to bag" without a size now scrolls to the size picker so the "Please select a size" hint is visible (A25).
 - Home hero and category tiles: photos keep their real colours; a bottom gradient keeps the label legible (A26).
 - Order details: pull down to refresh the status (A27).
+- After placing an order, Back from the order goes to My Orders (A28).
+- The app is named "TOJ" on the home screen (A29).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
