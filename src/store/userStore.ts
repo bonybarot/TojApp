@@ -7,7 +7,7 @@ import { useAddressStore } from './addressStore';
 import { restoreGuestBag, useCartStore } from './cartStore';
 import { useOrderStore } from './orderStore';
 import { useProductStore } from './productStore';
-import { useWishlistStore } from './wishlistStore';
+import { restoreGuestWishlist, useWishlistStore } from './wishlistStore';
 
 interface VerifyOk extends Tokens {
   customer: { id: string; name: string; phone: string };
@@ -26,6 +26,7 @@ interface UserState {
   restore: () => Promise<void>;
 }
 
+const restoreGuest = () => Promise.all([restoreGuestBag(), restoreGuestWishlist()]).then(() => {});
 /** The API stores +91XXXXXXXXXX; the app shows and edits the 10-digit number. */
 const toUser = (c: VerifyOk['customer']): User => ({ id: c.id, name: c.name, phone: c.phone.slice(-10) });
 
@@ -77,7 +78,7 @@ export const useUserStore = create<UserState>(set => ({
   restore: async () => {
     const t = await storedTokens();
     if (!t) {
-      return restoreGuestBag();
+      return restoreGuest();
     }
     setTokens(t, false);
     try {
@@ -87,7 +88,7 @@ export const useUserStore = create<UserState>(set => ({
       if (hasSession()) {
         setTokens(null, false);
       }
-      return restoreGuestBag();
+      return restoreGuest();
     }
     await loadAccountData();
   },

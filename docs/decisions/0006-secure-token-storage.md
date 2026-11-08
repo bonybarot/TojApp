@@ -10,7 +10,7 @@ Tokens lived in memory only, so every cold start signed the customer out. A shop
 - Access and refresh token are stored with **`react-native-keychain` 10.0.0** (iOS Keychain, Android Keystore-backed), service `toj.session`, accessibility `AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY` (no iCloud sync, no restore onto another phone).
 - Written on sign-in and on every refresh; wiped on logout and when the server rejects the refresh (session lost).
 - App start (`userStore.restore`): read tokens, call `GET /me`. Success: signed in, account data loads. 401 + failed refresh: cleared. Network failure: stays guest for this run, tokens kept for the next launch.
-- Cart and wishlist of a signed-in customer live on the server. The guest bag is kept on the device (amendment below).
+- Cart and wishlist of a signed-in customer live on the server. The guest bag and wishlist are kept on the device (amendment below).
 
 ## Alternatives rejected
 - **AsyncStorage**: plain-text on disk; never for credentials (security-architecture.md).
@@ -20,7 +20,7 @@ Tokens lived in memory only, so every cold start signed the customer out. A shop
 ## Consequences
 - One native dependency (pod `RNKeychain`, Android autolinked). Jest uses `__mocks__/react-native-keychain.ts`.
 - Test: `__tests__/sessionRestore.test.ts` (resume, offline start, logout wipe).
-- Guest bag persistence: see the amendment below.
+- Guest bag and wishlist persistence: see the amendment below.
 
 ## Amendment 2026-11-08: guest bag
 
@@ -29,4 +29,4 @@ Tokens lived in memory only, so every cold start signed the customer out. A shop
 - Loaded at start only when no session is restored and the bag is still empty.
 - Why the Keychain and not AsyncStorage: `react-native-keychain` is already installed, so no new native dependency or rebuild. Ceiling: it is a secure store used as a small key-value store; move to AsyncStorage if more non-secret device state appears.
 - Restored lines are not re-clamped to stock on start; the server clamps them at sign-in merge, and Checkout requires sign-in (D-8).
-- Guest wishlist hearts are still memory-only.
+- Guest wishlist hearts follow the same rules under service `toj.guestWishlist` (product ids). Both go through `src/store/guestCopy.ts`.

@@ -1,7 +1,7 @@
-import * as Keychain from 'react-native-keychain';
 import { create } from 'zustand';
 import { api, hasSession } from '../api/client';
 import { CartLine } from '../types';
+import { keepForGuest } from './guestCopy';
 import { stockFor } from '../utils/catalogue';
 import { useProductStore, variantIdFor } from './productStore';
 
@@ -128,25 +128,7 @@ export const useCartStore = create<CartStore>((set, get) => {
   };
 });
 
-// ADR-0006 amendment: the guest bag survives a cold start. Signed in, the server cart is the copy.
-// ponytail: Keychain as a small key-value store; move to AsyncStorage if more non-secret device state appears.
-const BAG = { service: 'toj.guestBag', accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY };
-useCartStore.subscribe(s => {
-  (hasSession() || !s.lines.length
-    ? Keychain.resetGenericPassword(BAG)
-    : Keychain.setGenericPassword('toj', JSON.stringify(s.lines), BAG)
-  ).catch(() => {});
-});
-
-/** App start as a guest: bring back the bag from the last run (unless something was added meanwhile). */
-export const restoreGuestBag = async () => {
-  const c = await Keychain.getGenericPassword(BAG).catch(() => false as const);
-  try {
-    if (c && !hasSession() && !useCartStore.getState().lines.length) {
-      useCartStore.setState({ lines: JSON.parse(c.password) as CartLine[] });
-    }
-  } catch {}
-};
+export const restoreGuestBag = keepForGuest(useCartStore, 'lines', 'toj.guestBag');
 
 export const selectCartCount = (s: CartStore): number =>
   s.lines.reduce((n, l) => n + l.quantity, 0);
