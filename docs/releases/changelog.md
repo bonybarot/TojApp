@@ -11,6 +11,7 @@
 - Guest bag survives a cold start (Keychain service `toj.guestBag`, ADR-0006 amendment); wiped once a session exists. Guest wishlist hearts too (`toj.guestWishlist`).
 - Product reviews ([ADR-0028](../decisions/0028-reviews.md)): REVIEWS section on product details; "Write a review" on collected orders; `WriteReview` screen; `src/api/reviews.ts`.
 - Product details shows the star average and review count under the price (above the fold).
+- Order details: tapping an item's image or title opens its product.
 
 ### Changed
 - Bag tab screen-reader label says "1 item", not "1 items".
@@ -26,6 +27,7 @@
 - Returning to the foreground did nothing until a screen using the account store had opened (guests on Home, Shop): Metro's inline requires deferred `userStore` and its `AppState` listener. `App.tsx` now imports it eagerly. Foreground return also reloads the catalogue (prices, stock), quietly: no skeleton, and a failed refresh keeps the shown data (`__tests__/productRefresh.test.ts`). Verified on Android as guest: price changed while backgrounded shows on resume.
 - Product details on short screens (360x640 dp): the square image pushed title and price below the fold. The image is now capped at 45% of window height.
 - My Orders reloads each time it comes into view, so a status the store changed while order details were open shows on return.
+- My Orders jumped to the top on return from order details (iOS): the focus reload drove the pull-to-refresh spinner. The spinner now shows only for a user pull.
 - Bag reloads the catalogue when the server cart reports a changed unit price, so the bag no longer shows a stale price.
 - Items without store pickup could be added to the bag but never ordered. Product details now disables "Add to bag" for them; the bag marks them and disables Checkout.
 - Checkout kept stale stock after the server rejected an order (`INSUFFICIENT_STOCK`, `PRICE_CHANGED`, `VARIANT_UNAVAILABLE`, `PICKUP_NOT_AVAILABLE`). It now reloads the catalogue and the clamped server cart and asks the customer to review. Verified on Android (TOJ-1009).

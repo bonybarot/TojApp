@@ -61,9 +61,15 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       <Text style={styles.h}>ITEMS</Text>
       {order.items.map((i, n) => (
         <View key={`${i.productId}${i.color}${i.size}`} style={styles.item}>
-          <SmartImage uri={i.image} label={i.title} style={styles.thumb} />
+          <Pressable
+            onPress={() => navigation.navigate('ProductDetails', { productId: i.productId })}
+            accessibilityRole="link"
+            accessibilityLabel={`View ${i.title}`}
+          >
+            <SmartImage uri={i.image} label={i.title} style={styles.thumb} />
+          </Pressable>
           <View style={styles.itemText}>
-            <Text style={typography.body}>{i.title}</Text>
+            <Text style={typography.body} onPress={() => navigation.navigate('ProductDetails', { productId: i.productId })}>{i.title}</Text>
             <Text style={styles.sub}>{i.color} · {i.size} · Qty {i.quantity}</Text>
             {collected && order.items.findIndex(x => x.productId === i.productId) === n && (
               <Pressable
