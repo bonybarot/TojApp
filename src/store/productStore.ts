@@ -16,7 +16,8 @@ interface ProductState {
   categories: Category[];
   pickup: PickupLocation;
   status: LoadStatus;
-  loadProducts: () => Promise<void>;
+  /** Resolves false when the request failed (never rejects). */
+  loadProducts: () => Promise<boolean>;
 }
 
 /**
@@ -33,7 +34,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
   status: 'idle',
   loadProducts: async () => {
     if (busy) {
-      return;
+      return true;
     }
     busy = true;
     // A refresh (catalogue already shown) stays quiet: no skeleton flash, and a failure keeps the old data.
@@ -53,15 +54,25 @@ export const useProductStore = create<ProductState>((set, get) => ({
         pickup: pickups[0] ?? get().pickup,
         status: 'ready',
       });
+      return true;
     } catch {
       if (!quiet) {
         set({ status: 'error' });
       }
+      return false;
     } finally {
       busy = false;
     }
   },
 }));
+
+/** For pull-to-refresh: rejects on failure so the pull can say so. */
+export const reloadProducts = () =>
+  useProductStore.getState().loadProducts().then(ok => {
+    if (!ok) {
+      throw new Error('Could not refresh');
+    }
+  });
 
 /** Variant id for a colour/size, needed by cart and order endpoints. */
 export const variantIdFor = (productId: string, color: string, size: string): string | undefined =>
