@@ -76,9 +76,13 @@ export const useCartStore = create<CartStore>((set, get) => {
       quantity > 0
         ? api<ServerCart>(`/me/cart/items/${vid}`, { method: 'PUT', body: { quantity: Math.min(quantity, 20) } })
         : api<ServerCart>(`/me/cart/items/${vid}`, { method: 'DELETE' });
+    const adopt = (c: ServerCart) => mine === latest && set({ lines: fromServer(c) });
     req
-      .catch(() => api<ServerCart>('/me/cart'))
-      .then(c => mine === latest && set({ lines: fromServer(c) }))
+      .then(adopt, () => {
+        // Failed change: say so, then fall back to the server's bag (if reachable; else the focus refresh fixes it).
+        set({ notice: 'Could not update your bag. Check your connection and try again.' });
+        return api<ServerCart>('/me/cart').then(adopt);
+      })
       .catch(() => {});
   };
 
