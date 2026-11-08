@@ -21,6 +21,7 @@ const reloadBag = () =>
 const CartScreen: React.FC = () => {
   const nav = useRootNavigation();
   const lines = useCartStore(s => s.lines);
+  const notice = useCartStore(s => s.notice);
   const { setQuantity, removeLine } = useCartStore.getState();
   const isLoggedIn = useUserStore(s => s.isLoggedIn);
   const pull = usePull(reloadBag);
@@ -30,11 +31,16 @@ const CartScreen: React.FC = () => {
       if (isLoggedIn) {
         useCartStore.getState().refresh().catch(() => {});
       }
+      // Seen once is enough.
+      return () => useCartStore.setState({ notice: null });
     }, [isLoggedIn]),
   );
   const detailed = detailLines(lines);
   const subtotal = subtotalOf(detailed);
-  const blocked = pickupBlockers(detailed).length > 0;
+  const noPickup = pickupBlockers(detailed).length > 0;
+  // Guest bag: lines are not re-checked by the server until sign-in.
+  const soldOut = detailed.some(d => d.maxQuantity === 0);
+  const blocked = noPickup || soldOut;
 
   const confirmRemove = (id: string, title: string) =>
     Alert.alert('Remove item', `Remove ${title} from your bag?`, [
@@ -48,6 +54,7 @@ const CartScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
       <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Bag</Text>
+      {notice && <Text style={styles.notice} accessibilityRole="alert">{notice}</Text>}
       {detailed.length === 0 ? (
         <EmptyState
           title="Your bag is empty"
@@ -84,7 +91,11 @@ const CartScreen: React.FC = () => {
                       <Text style={styles.remove}>Remove</Text>
                     </Pressable>
                   </View>
-                  {d.line.quantity >= d.maxQuantity && <Text style={styles.limit}>Max available quantity</Text>}
+                  {d.maxQuantity === 0 ? (
+                    <Text style={styles.blocked}>Sold out</Text>
+                  ) : (
+                    d.line.quantity >= d.maxQuantity && <Text style={styles.limit}>Max available quantity</Text>
+                  )}
                   {!d.product.pickupAvailable && <Text style={styles.blocked}>Not available for store pickup</Text>}
                 </View>
               </View>
@@ -97,10 +108,13 @@ const CartScreen: React.FC = () => {
               <Text style={styles.sumText}>Free</Text>
             </View>
             <View style={[styles.row, styles.totalRow]}><Text style={styles.total} maxFontSizeMultiplier={FONT_CAP}>Total</Text><Text style={styles.total} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(subtotal)}</Text></View>
-            {blocked && (
+            {noPickup && (
               <Text style={styles.blocked} accessibilityRole="alert">
                 Orders are store pickup only. Remove items not available for pickup to check out.
               </Text>
+            )}
+            {soldOut && (
+              <Text style={styles.blocked} accessibilityRole="alert">Remove sold-out items to check out.</Text>
             )}
             <Button title={isLoggedIn ? 'Checkout' : 'Sign in to checkout'} onPress={checkout} disabled={blocked} style={styles.checkout} />
           </View>
@@ -124,6 +138,7 @@ const styles = StyleSheet.create({
   price: { ...typography.body, marginTop: 4 },
   actions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 },
   remove: { ...typography.caption, color: colors.textSecondary, textDecorationLine: 'underline' },
+  notice: { ...typography.caption, color: colors.warning, paddingHorizontal: 16, paddingTop: 6 },
   limit: { ...typography.caption, color: colors.warning, marginTop: 4 },
   blocked: { ...typography.caption, color: colors.error, marginTop: 4 },
   summary: { padding: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },

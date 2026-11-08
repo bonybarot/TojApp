@@ -12,7 +12,7 @@ Tabs (bottom): **Home**, **Shop**, **Bag**, **Account**.
 |---|---|
 | Discovery | Home (hero, category rail, New & popular, On sale), Shop (All products, Sale, categories), ProductList (sort, size, in-stock, pickup filters), Search, Wishlist |
 | Product | ProductDetails (image pager, colour/size, per-variant stock, per-product pickup note, star summary, reviews, wishlist heart, add to bag) |
-| Bag | Bag (quantity stepper with stock cap, remove with confirmation, totals, empty state) |
+| Bag | Bag (quantity stepper with stock cap, remove with confirmation, sold-out lines and removal notice, totals, empty state) |
 | Auth (demo OTP) | Login (phone), Otp, CompleteProfile (new accounts) |
 | Checkout | Checkout (pickup location, payment, summary), OrderConfirmation (pickup address and hours) |
 | Orders | OrderHistory, OrderDetails (timeline, pickup address and hours, cancel with confirmation, items open the product), WriteReview |
@@ -41,7 +41,7 @@ Root native-stack (`src/navigation/RootNavigator.tsx`) containing the tab naviga
 - Jest: `transformIgnorePatterns` allows React Navigation ESM.
 
 ## Verification (actual, 2026-11-08)
-- `npx tsc --noEmit`: 0 errors. `npm run lint`: 0 errors, 0 warnings. `npx jest`: 6 suites, 16 tests pass.
+- `npx tsc --noEmit`: 0 errors. `npm run lint`: 0 errors, 0 warnings. `npx jest`: 6 suites, 17 tests pass.
 - iOS (iPhone 17 simulator): full journey walked 2026-10-31; reviews, large text and offline resume walked 2026-11-08.
 - Android (Pixel_9_Pro emulator), 2026-11-08: Home, category list with sort (price high to low) and size XL filter (matches API stock), search (results and no results), wishlist remove (server row gone), checkout and place order (TOJ-1021), order details, cancel (server status CANCELLED), Help & Support, Settings, pull to refresh on Home and Bag, offline launch and resume.
 
