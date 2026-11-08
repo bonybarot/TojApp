@@ -31,7 +31,17 @@ const OrderConfirmationScreen: React.FC<Props> = ({ route, navigation }) => {
           <DemoBanner text="Demo order: nothing was charged. Track pickup status in My Orders." />
         </View>
       </View>
-      <Button title="View order" onPress={() => navigation.replace('OrderDetails', { orderId: route.params.orderId })} />
+      <Button title="View order" onPress={() =>
+          // Back from the order goes to My Orders, not to an emptied Bag.
+          navigation.reset({
+            index: 2,
+            routes: [
+              { name: 'Tabs', params: { screen: 'Profile' } },
+              { name: 'OrderHistory' },
+              { name: 'OrderDetails', params: { orderId: route.params.orderId } },
+            ],
+          })
+        } />
       <Button title="Continue shopping" variant="ghost" onPress={() => navigation.navigate('Tabs', { screen: 'Home' })} />
     </Screen>
   );

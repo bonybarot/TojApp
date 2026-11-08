@@ -63,6 +63,8 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A25 PDP: size error scrolls to size picker
 - [x] A26 Gradient scrims keep photo colours
 - [x] A27 Order details: pull to refresh
+- [x] A28 After order: Back goes to My Orders
+- [x] A29 App display name TOJ
 
 ## Blocked: needs owner
 
@@ -101,3 +103,5 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A25: tapping Add to bag without a size showed the hint below the fold on short screens; PDP now scrolls to the SIZE row. iOS verified (iPhone 17)
 - 2026-11-08 A26: Home hero and category tiles used a flat 30-45% black overlay that greyed whole photos; now a bottom gradient (`experimental_backgroundImage`) behind the label only. Verified iOS (iPhone 17) and Android (Pixel 9 Pro)
 - 2026-11-08 A27: Order details only refreshed on focus, so a status change while open (store confirms, collects) stayed stale and still offered Cancel. `Screen` takes a `pull` prop (RefreshControl); Order details uses it. Android verified: admin CONFIRMED TOJ-1025, pull showed it. Also walked guest bag, sign-in redirect to Checkout, order, collect, review post/edit on Android
+- 2026-11-08 A28: "View order" after checkout replaced the confirmation, so Back landed on the emptied Bag/Home. Now resets to Account tab > My Orders > Order. Android verified (TOJ-1026)
+- 2026-11-08 A29: home-screen name was "TojApp"; now "TOJ" (`CFBundleDisplayName`, Android `app_name`, `app.json` displayName). Verified built Info.plist and `aapt` label
