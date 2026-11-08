@@ -70,6 +70,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A32 Help FAQ uses the server pickup store and hours
 - [x] A33 Name inputs capped at the server's 60 characters
 - [x] A34 OTP code submits itself on the sixth digit
+- [x] A35 App stays light when the phone is in dark mode
 
 ## Blocked: needs owner
 
@@ -115,3 +116,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A32: Help & Support FAQ had a hard-coded store and no hours answer. It now reads name, address and hours from the server pickup store. Checked on iOS.
 - 2026-11-08 A33: a name over 60 characters got the server's generic "Request validation failed". Name inputs (sign-up, Personal Information) now stop at 60. Personal Information save checked on iOS and against PATCH /me.
 - 2026-11-08 A34: the code screen waited for a Verify tap even after six digits or an SMS autofill. It now submits when the sixth digit arrives (once per entry; Verify still works). New-account sign-up checked on Android.
+- 2026-11-08 A35: the app has no dark palette, but native alerts and pickers followed the phone's dark mode, giving dark dialogs over light screens. Android theme is now `Theme.AppCompat.Light.NoActionBar` and iOS `UIUserInterfaceStyle` is `Light`. Checked with the emulator in night mode.
