@@ -123,7 +123,8 @@ const styles = StyleSheet.create({
   brand: { ...typography.display, color: colors.text },
   hero: { marginHorizontal: 16, borderRadius: 12, overflow: 'hidden' },
   heroImg: { width: '100%' },
-  heroScrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.25)' },
+  // Gradient only behind the text, so the photo keeps its real colours.
+  heroScrim: { ...StyleSheet.absoluteFillObject, experimental_backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 100%)' },
   heroText: { position: 'absolute', left: 20, right: 20, bottom: 24 },
   heroKicker: { ...typography.label, color: colors.onPrimary },
   heroTitle: { ...typography.h1, color: colors.onPrimary, marginVertical: 6 },
