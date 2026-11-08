@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api } from '../api/client';
+import { api, hasSession } from '../api/client';
 import { Order } from '../types';
 
 export interface PlaceOrderInput {
@@ -27,7 +27,7 @@ export const CANCELLABLE: Order['status'][] = ['PLACED', 'CONFIRMED'];
 const upsert = (orders: Order[], o: Order) =>
   orders.some(x => x.id === o.id) ? orders.map(x => (x.id === o.id ? o : x)) : [o, ...orders];
 
-// Overlapping loads (focus + pull): only the newest answer is adopted.
+// Overlapping loads (focus + pull): only the newest answer is adopted. reset() bumps it too.
 let loads = 0;
 
 export const useOrderStore = create<OrderState>((set, get) => ({
@@ -59,7 +59,9 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       headers: { 'Idempotency-Key': idempotencyKey },
       body: { fulfilment: 'PICKUP', ...body },
     });
-    set({ orders: upsert(get().orders, order) });
+    if (hasSession()) {
+      set({ orders: upsert(get().orders, order) });
+    }
     return order.id;
   },
   cancelOrder: async id => {
@@ -68,11 +70,19 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       get().refreshOne(id).catch(() => {});
       throw e;
     });
-    set({ orders: upsert(get().orders, order) });
+    if (hasSession()) {
+      set({ orders: upsert(get().orders, order) });
+    }
   },
   refreshOne: async id => {
     const order = await api<Order>(`/orders/${id}`);
-    set({ orders: upsert(get().orders, order) });
+    // Answered after sign-out: another account's order must not reappear.
+    if (hasSession()) {
+      set({ orders: upsert(get().orders, order) });
+    }
   },
-  reset: () => set({ orders: [], status: 'idle' }),
+  reset: () => {
+    loads++; // a load still in flight belongs to the signed-out account
+    set({ orders: [], status: 'idle' });
+  },
 }));

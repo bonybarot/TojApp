@@ -2,7 +2,9 @@ import { useOrderStore } from '../src/store/orderStore';
 
 // Server: cancel is refused (store already packed it); GET returns the packed order.
 let mockList: (items: unknown[]) => void = () => {};
+let mockSession = true;
 jest.mock('../src/api/client', () => ({
+  hasSession: () => mockSession,
   api: (path: string) =>
     path.startsWith('/orders?')
       ? new Promise(r => (mockList = items => r({ items })))
@@ -50,4 +52,16 @@ test('of two overlapping list loads, the older answer does not override the newe
   mockList([{ id: 'TOJ-1', status: 'CANCELLED' }]);
   await second;
   expect(useOrderStore.getState().orders[0].status).toBe('CANCELLED');
+});
+
+test('a list or order answered after sign-out does not reappear', async () => {
+  useOrderStore.setState({ orders: [] });
+  const load = useOrderStore.getState().load();
+  const one = useOrderStore.getState().refreshOne('TOJ-1');
+  mockSession = false;
+  useOrderStore.getState().reset();
+  mockList([{ id: 'TOJ-9', status: 'PLACED' }]);
+  await Promise.all([load, one]);
+  expect(useOrderStore.getState()).toMatchObject({ orders: [], status: 'idle' });
+  mockSession = true;
 });

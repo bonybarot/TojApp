@@ -7,7 +7,7 @@ import { Button } from '../../components/Button';
 import { usePull } from '../../hooks';
 import { Screen } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
-import { EmptyState } from '../../components/States';
+import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { CANCELLABLE, useOrderStore } from '../../store/orderStore';
 import { useProductStore } from '../../store/productStore';
@@ -24,16 +24,29 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const id = route.params.orderId;
   const [reviewed, setReviewed] = useState<string[]>([]);
   const [cancelling, setCancelling] = useState(false);
+  // Not in the store yet (list still loading or failed): fetch it before saying "not found".
+  const [fetched, setFetched] = useState<'loading' | 'error' | 'done'>('loading');
+  const fetchOne = useCallback(
+    () =>
+      useOrderStore.getState().refreshOne(id).then(
+        () => setFetched('done'),
+        (e: { status?: number }) => setFetched(e.status === 404 ? 'done' : 'error'),
+      ),
+    [id],
+  );
   const collected = order?.status === 'COLLECTED';
   const pull = usePull(useCallback(() => useOrderStore.getState().refreshOne(id), [id]));
   useFocusEffect(
     useCallback(() => {
-      useOrderStore.getState().refreshOne(id).catch(() => {});
+      fetchOne();
       if (collected) {
         myReviews().then(l => setReviewed(l.map(r => r.productId)), () => {});
       }
-    }, [id, collected]),
+    }, [fetchOne, collected]),
   );
+  if (!order && fetched !== 'done') {
+    return <Screen>{fetched === 'error' ? <ErrorState onRetry={() => { setFetched('loading'); fetchOne(); }} /> : <LoadingState />}</Screen>;
+  }
   if (!order) {
     return <Screen><EmptyState title="Order not found" actionLabel="My orders" onAction={() => navigation.navigate('OrderHistory')} /></Screen>;
   }

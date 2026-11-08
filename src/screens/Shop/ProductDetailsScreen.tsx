@@ -15,7 +15,7 @@ import { Chip } from '../../components/Chip';
 import { Price } from '../../components/Price';
 import { Screen, StickyFooter } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
-import { EmptyState } from '../../components/States';
+import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { Rating } from '../../types';
 import { useCartStore } from '../../store/cartStore';
@@ -82,6 +82,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   );
   const addToCart = useCartStore(s => s.addToCart);
   const pickup = useProductStore(s => s.pickup);
+  const status = useProductStore(s => s.status);
   const { width, height } = useWindowDimensions();
   // Square on tall phones; capped on short screens so title, price and sizes show above the fold.
   const imageHeight = Math.min(width, height * 0.45);
@@ -126,6 +127,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     ? reviews.average === null ? null : { average: reviews.average, count: reviews.count }
     : product?.rating;
 
+  // Catalogue still loading or failed (cold start offline, deep in My Orders): not a missing product.
+  if (!product && status !== 'ready') {
+    return <Screen>{status === 'error' ? <ErrorState onRetry={useProductStore.getState().loadProducts} /> : <LoadingState />}</Screen>;
+  }
   if (!product) {
     return (
       <Screen>

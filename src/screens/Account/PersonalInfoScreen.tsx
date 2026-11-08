@@ -14,6 +14,7 @@ const PersonalInfoScreen: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const save = () => {
     if (name.trim().length < 2) { setError('Enter your name.'); return; }
+    setError(undefined); // a retry that succeeds must not leave the old error showing
     setBusy(true);
     useUserStore.getState().updateName(name.trim())
       .then(() => setSaved(true), (e: Error) => setError(e.message))
