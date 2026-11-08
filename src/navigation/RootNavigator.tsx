@@ -1,7 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
-import AddressFormScreen from '../screens/Account/AddressFormScreen';
-import AddressesScreen from '../screens/Account/AddressesScreen';
 import PersonalInfoScreen from '../screens/Account/PersonalInfoScreen';
 import SettingsScreen from '../screens/Account/SettingsScreen';
 import SupportScreen from '../screens/Account/SupportScreen';
@@ -52,8 +50,6 @@ export const RootNavigator: React.FC = () => {
       <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} options={{ title: 'Order' }} />
       <Stack.Screen name="WriteReview" component={WriteReviewScreen} options={{ title: 'Review' }} />
       <Stack.Screen name="PersonalInfo" component={PersonalInfoScreen} options={{ title: 'Personal Information' }} />
-      <Stack.Screen name="Addresses" component={AddressesScreen} options={{ title: 'Addresses' }} />
-      <Stack.Screen name="AddressForm" component={AddressFormScreen} options={({ route }) => ({ title: route.params?.addressId ? 'Edit address' : 'New address' })} />
       <Stack.Screen name="Support" component={SupportScreen} options={{ title: 'Help & Support' }} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ title: '', presentation: 'modal' }} />

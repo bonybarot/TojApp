@@ -20,13 +20,13 @@ baseline commit. Screen-by-screen detail and verification results live in
 | Platform | React Native 0.82.1, React 19.1.1, iOS + Android |
 | Language | TypeScript 5.8 (`strict`); all source is `.ts`/`.tsx` |
 | Navigation | React Navigation v7: root native-stack + bottom tabs (Home, Shop, Bag, Account). No drawer |
-| State | Zustand 4.5: cart, user, wishlist, address, order, product. Session tokens in Keychain/Keystore (ADR-0006); server is source of truth when signed in |
+| State | Zustand 4.5: cart, user, wishlist, order, product. Session tokens in Keychain/Keystore (ADR-0006); server is source of truth when signed in |
 | Styling | `StyleSheet.create` + tokens in `src/utils/theme.ts`; no inline styles (ESLint) |
 | Data | Local `toj-backend` API (`src/api/client.ts`, base URL `src/config/env.ts`) per [ADR-0031](decisions/0031-app-api-integration.md). Fixtures in `src/data/` remain for tests and offline category fallback |
 | Money | Integer paise, INR (`₹`, Indian grouping) via `utils/format.ts` |
 | Backend | Separate repository `toj-backend` (`../toj-backend`, [ADR-0030](decisions/0030-separate-backend-repository.md)): Day-1 foundation (NestJS 12, Prisma 7, Postgres 17, Node 24). Catalogue, OTP auth, cart, wishlist, addresses, pickup checkout, orders, reviews, admin (branch `feature/backend-core`). The app calls it. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Real SMS OTP, payment, push | NOT IMPLEMENTED. OTP is a fixed demo code on the server; payment is simulated |
-| Quality gates | `npx tsc --noEmit` 0 errors; `npm run lint` 0 errors/warnings; `npm test` 6 suites, 15 tests pass |
+| Quality gates | `npx tsc --noEmit` 0 errors; `npm run lint` 0 errors/warnings; `npm test` 6 suites, 16 tests pass |
 
 ## Source layout
 
@@ -60,8 +60,7 @@ __tests__/                   App render test, business-logic tests
 ## Known issues and gaps
 
 - Android `release` uses the upload key when `TOJ_UPLOAD_*` gradle properties are set, else the debug keystore; the real key is not generated.
-- `nativewind` and `@react-navigation/drawer` are installed but unused. Whether to remove them is
-  UNKNOWN / undecided.
+- Unused packages (nativewind, drawer, gesture-handler, reanimated, worklets) removed 2026-11-08 ([ADR-0032](decisions/0032-remove-unused-app-code.md)).
 - Search, filters, sort and sale rails exist although D-12 deferred them; flagged for product review.
 - VoiceOver/TalkBack not run. Large text checked (iOS AX5, Android 1.3) on main screens 2026-11-08.
 - A revoked session stays usable until its access token expires (JWT guard does not check the session table).
