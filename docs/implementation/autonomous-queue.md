@@ -68,6 +68,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A30 Unbranded shoe and coat images
 - [x] A31 One photo per garment; Tank Top renamed Crew Neck Tee
 - [x] A32 Help FAQ uses the server pickup store and hours
+- [x] A33 Name inputs capped at the server's 60 characters
 
 ## Blocked: needs owner
 
@@ -111,3 +112,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A30: shoe tile and shoe products showed Nike logos, Wool Coat a woman. Swapped seed + fixture images for unbranded ones; re-seeded; checked Shop > Shoes on Android.
 - 2026-11-08 A31: several products showed another product's photo (Chinos = sweatpants, Bomber = leather jacket, Joggers = chinos, Jeans = Levi's). Gave each its own; Tops/Bottoms tiles changed; product 13 renamed Crew Neck Tee to match its photo. Checked Home on Android.
 - 2026-11-08 A32: Help & Support FAQ had a hard-coded store and no hours answer. It now reads name, address and hours from the server pickup store. Checked on iOS.
+- 2026-11-08 A33: a name over 60 characters got the server's generic "Request validation failed". Name inputs (sign-up, Personal Information) now stop at 60. Personal Information save checked on iOS and against PATCH /me.

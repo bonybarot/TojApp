@@ -21,7 +21,7 @@ const PersonalInfoScreen: React.FC = () => {
   };
   return (
     <Screen scroll padded>
-      <Input label="Name" value={name} onChangeText={t => { setName(t); setError(undefined); setSaved(false); }} error={error} autoCapitalize="words" />
+      <Input label="Name" value={name} onChangeText={t => { setName(t); setError(undefined); setSaved(false); }} error={error} autoCapitalize="words" maxLength={60} />
       <Input label="Mobile number" value={user ? `+91 ${user.phone}` : ''} editable={false} />
       <Text style={styles.note}>Your mobile number is your sign-in and cannot be changed here.</Text>
       <Button title="Save changes" onPress={save} loading={busy} disabled={name.trim() === user?.name} />
