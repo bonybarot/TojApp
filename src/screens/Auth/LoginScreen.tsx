@@ -45,7 +45,8 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
       <Input
         label="Mobile number"
         value={phone}
-        onChangeText={t => { setPhone(localPhone(t)); setError(undefined); }}
+        // Paste/autofill (several chars at once) may carry +91; typed keys only drop non-digits, so the caret never jumps.
+        onChangeText={t => { setPhone(t.length - phone.length > 1 ? localPhone(t) : t.replace(/\D/g, '').slice(0, 10)); setError(undefined); }}
         keyboardType="number-pad"
         maxLength={16}
         placeholder="10-digit number"
