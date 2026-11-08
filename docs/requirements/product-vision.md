@@ -234,6 +234,11 @@ seller onboarding, commission model, payout model.
 > This supersedes the earlier "Should Have — catalogue search" placement in
 > [product-requirements.md](product-requirements.md) §6.
 
+> **Amended 2026-10-31 (owner decision Q-7, `toj-backend/docs/DECISIONS.md`).** Search,
+> filters, sort and sale rails were already built in the UI; the owner chose to **keep them,
+> server-backed**, still flagged for product review. Coupons / promotions stay deferred. The
+> table above is the original 2026-09-03 decision, kept as the record.
+
 ---
 
 ## 8. Customer profile — DECIDED
