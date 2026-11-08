@@ -3,15 +3,19 @@ import React, { useCallback } from 'react';
 import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { ProductGrid } from '../../components/ProductGrid';
 import { Screen } from '../../components/Screen';
-import { useRootNavigation } from '../../hooks';
+import { usePull, useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
 import { useUserStore } from '../../store/userStore';
 import { useWishlistStore } from '../../store/wishlistStore';
+
+const reloadWishlist = () =>
+  Promise.all([useProductStore.getState().loadProducts(), useUserStore.getState().isLoggedIn && useWishlistStore.getState().refresh()]);
 
 const WishlistScreen: React.FC = () => {
   const nav = useRootNavigation();
   const ids = useWishlistStore(s => s.ids);
   const isLoggedIn = useUserStore(s => s.isLoggedIn);
+  const pull = usePull(reloadWishlist);
   useFocusEffect(
     useCallback(() => {
       if (isLoggedIn) {
@@ -34,6 +38,7 @@ const WishlistScreen: React.FC = () => {
     <Screen>
       <ProductGrid
         data={data}
+        {...pull}
         empty={
           <EmptyState
             title="Your wishlist is empty"

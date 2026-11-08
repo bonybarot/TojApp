@@ -46,6 +46,10 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A10 Large text: Android font scale 1.3 and iOS largest Dynamic Type on Home, PDP, Bag, Checkout, Order details; fix clipping
 - [x] A11 Pass over every screen for empty, loading and API-down states; fix gaps
 - [x] A12 Sweep `docs/` for stale statements (test counts, NOT IMPLEMENTED lists); refresh `overnight-report.md`
+- [x] A13 Android: API-down states (offline launch, search, resume)
+- [x] B12 Revoked sessions in the JWT guard: decided no (backend B-31)
+- [x] B13 pg concurrent-query warning: upstream adapter, recorded (backend B-32)
+- [x] A14 Pull-to-refresh on Home, Bag, Wishlist
 
 ## Blocked: needs owner
 
@@ -72,3 +76,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 B11 admin `DELETE /admin/reviews/:id` (backend `85f021e`). A9 iOS: write 4★, edit 5★, delete; API and PDP agree each step. Fixed: order items open product details; My Orders kept its scroll position on return (focus reload no longer drives the iOS pull-to-refresh spinner)
 - 2026-11-08 A11: Search and Wishlist show loading/error instead of "no results"/"empty" before the catalogue arrives; Addresses reloads on focus, shows an error with retry, delete failure alerts. Offline launch with a saved session resumes it once the catalogue loads again (iOS verified: API down, guest; API up, Try again, signed in)
 - 2026-11-08 A12: current-state refreshed (signing, offline resume, large text, revoked-session note); overnight report gets a current summary and A9-A11; test counts 15 everywhere
+- 2026-11-08 A13 Android: offline launch shows Home error, Search shows error not "no results", Try again resumes the session. B12/B13 recorded as backend B-31/B-32 (`92c9085`). A14: `usePull` hook; Home, Bag, Wishlist pull to refresh; Android Home and Bag spinner checked
