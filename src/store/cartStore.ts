@@ -146,3 +146,14 @@ export const restoreGuestBag = keepForGuest(useCartStore, 'lines', 'toj.guestBag
 
 export const selectCartCount = (s: CartStore): number =>
   s.lines.reduce((n, l) => n + l.quantity, 0);
+
+// Guest bag: drop lines whose product left the catalogue (the server does this for signed-in bags),
+// so the tab badge never counts items the Bag cannot show.
+// ponytail: assumes the whole catalogue is loaded (<=50, productStore); check page.total when paging lands.
+useProductStore.subscribe(({ status, products }) => {
+  const { lines } = useCartStore.getState();
+  const keep = lines.filter(l => products.some(p => p.id === l.productId));
+  if (status === 'ready' && !hasSession() && keep.length < lines.length) {
+    useCartStore.setState({ lines: keep, notice: 'Some items are no longer available and were removed from your bag.' });
+  }
+});
