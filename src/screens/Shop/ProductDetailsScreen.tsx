@@ -169,14 +169,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       setMsg({ text: 'This size is currently unavailable.', ok: false });
       return;
     }
-    setMsg(
-      r === 'limit'
-        ? {
-            text: 'You have the maximum available quantity in your bag.',
-            ok: false,
-          }
-        : null,
-    );
+    if (r === 'limit') {
+      // Nothing was added: no "Added" button.
+      setMsg({ text: 'You have the maximum available quantity in your bag.', ok: false });
+      return;
+    }
+    setMsg(null);
     setAdded(true);
     if (timer.current) { clearTimeout(timer.current); }
     timer.current = setTimeout(() => setAdded(false), 1800);
@@ -257,6 +255,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               key={c.name}
               onPress={() => {
                 setColor(c.name);
+                // The chosen size is sold out in this colour: drop it so the customer picks again.
+                if (size && stockFor(product, c.name, size) === 0) {
+                  setSize(null);
+                }
                 setMsg(null);
               }}
               accessibilityRole="button"

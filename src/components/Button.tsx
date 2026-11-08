@@ -23,6 +23,8 @@ export const Button: React.FC<Props> = ({
   return (
     <Pressable
       accessibilityRole="button"
+      // Android writes "busy" into the content description and never restores it without a label.
+      accessibilityLabel={title}
       accessibilityState={{ disabled: !!inactive, busy: !!loading }}
       disabled={inactive}
       onPress={onPress}

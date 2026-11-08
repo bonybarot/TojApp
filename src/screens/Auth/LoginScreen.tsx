@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Screen } from '../../components/Screen';
+import { ApiError } from '../../api/client';
 import { DemoBanner } from '../../components/States';
 import { DEMO_OTP } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
@@ -32,6 +33,12 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
       await useUserStore.getState().requestOtp(phone);
       navigation.navigate('Otp', { phone, redirect: route.params?.redirect });
     } catch (e) {
+      // Back from the code screen within the resend cooldown: the code already sent still works.
+      const wait = e instanceof ApiError && e.status === 429 ? (e.details as { retryAfter?: number })?.retryAfter : undefined;
+      if (wait !== undefined && wait <= 30) {
+        navigation.navigate('Otp', { phone, redirect: route.params?.redirect });
+        return;
+      }
       setError((e as Error).message);
     } finally {
       inFlight.current = false;
