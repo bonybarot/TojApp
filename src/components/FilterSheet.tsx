@@ -36,7 +36,7 @@ interface Props {
 
 export const FilterSheet: React.FC<Props> = ({ visible, value, sizeOptions, onChange, onClose }) => (
   <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-    <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close filters" />
+    <Pressable style={styles.backdrop} onPress={onClose} accessibilityRole="button" accessibilityLabel="Close filters" />
     <View style={styles.sheet}>
       <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Sort & filter</Text>
       <ScrollView>

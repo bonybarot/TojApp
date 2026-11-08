@@ -76,7 +76,7 @@ const CartScreen: React.FC = () => {
             contentContainerStyle={styles.list}
             renderItem={({ item: d }) => (
               <View style={styles.line}>
-                <Pressable onPress={() => nav.navigate('ProductDetails', { productId: d.product.id })}>
+                <Pressable onPress={() => nav.navigate('ProductDetails', { productId: d.product.id })} accessibilityRole="link" accessibilityLabel={`View ${d.product.title}`}>
                   <SmartImage uri={d.product.image} label={d.product.title} style={styles.img} />
                 </Pressable>
                 <View style={styles.info}>

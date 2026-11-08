@@ -53,11 +53,14 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
       setBusy(false);
     }
   };
-  const resend = () =>
+  const [sending, setSending] = useState(false);
+  const resend = () => {
+    setSending(true);
     useUserStore.getState().requestOtp(phone).then(
       () => { setResent(true); setWait(COOLDOWN_S); },
       (e: Error) => setError(e.message),
-    );
+    ).finally(() => setSending(false));
+  };
 
   return (
     <Screen scroll padded>
@@ -81,7 +84,7 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
         autoFocus
       />
       <Button title="Verify" onPress={() => verify()} loading={busy} />
-      <Pressable onPress={resend} disabled={wait > 0} hitSlop={8} accessibilityRole="button" accessibilityState={{ disabled: wait > 0 }} style={styles.resend}>
+      <Pressable onPress={resend} disabled={wait > 0 || sending} hitSlop={8} accessibilityRole="button" accessibilityState={{ disabled: wait > 0 || sending }} style={styles.resend}>
         <Text style={wait > 0 ? styles.waiting : styles.link}>
           {wait > 0 ? `${resent ? 'Code resent. ' : ''}Resend in ${wait}s` : 'Resend code'}
         </Text>
