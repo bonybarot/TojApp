@@ -22,10 +22,15 @@ export interface Tokens {
 // This-device-only: never synced to iCloud or restored onto another phone.
 const STORE = { service: 'toj.session', accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY };
 let tokens: Tokens | null = null;
+/** Bumped when a session ends, so answers to its in-flight requests are dropped. */
+let sessionEpoch = 0;
 let onSessionLost: () => void = () => {};
 
 /** `persist: false` changes only the in-memory session (e.g. offline at start: keep the stored one). */
 export const setTokens = (t: Tokens | null, persist = true) => {
+  if (!t) {
+    sessionEpoch++;
+  }
   tokens = t;
   if (persist) {
     (t
@@ -59,6 +64,7 @@ async function raw<T>(path: string, o: Options = {}): Promise<T> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), API_TIMEOUT_MS);
   let res: Response;
+  let json: any;
   try {
     res = await fetch(`${API_BASE_URL}${path}`, {
       method: o.method ?? 'GET',
@@ -71,6 +77,13 @@ async function raw<T>(path: string, o: Options = {}): Promise<T> {
       body: o.body !== undefined ? JSON.stringify(o.body) : undefined,
       signal: ctrl.signal,
     });
+    // Inside the timeout too: headers can arrive and the body then stall.
+    json = res.status === 204 ? undefined : await res.json().catch(() => {
+      if (ctrl.signal.aborted) {
+        throw new Error('timeout');
+      }
+      return null;
+    });
   } catch {
     throw new ApiError(0, 'NETWORK', 'Cannot reach the TOJ server. Check your connection.');
   } finally {
@@ -79,7 +92,6 @@ async function raw<T>(path: string, o: Options = {}): Promise<T> {
   if (res.status === 204) {
     return undefined as T;
   }
-  const json = await res.json().catch(() => null);
   if (!res.ok) {
     const e = json?.error;
     throw new ApiError(res.status, e?.code ?? 'INTERNAL', e?.message ?? 'Something went wrong.', e?.details);
@@ -98,8 +110,8 @@ const refresh = (): Promise<boolean> => {
             setTokens({ accessToken: t.accessToken, refreshToken: t.refreshToken });
             return true;
           },
-          // Unreachable server is not a lost session: rethrow so the caller shows a network error.
-          e => (e instanceof ApiError && e.status === 0 ? Promise.reject(e) : false),
+          // Only a rejected refresh token ends the session; unreachable or 5xx/429 is a server problem: rethrow.
+          e => (e instanceof ApiError && (e.status === 401 || e.status === 403) ? false : Promise.reject(e)),
         )
       : Promise.resolve(false)
     ).finally(() => {
@@ -110,6 +122,17 @@ const refresh = (): Promise<boolean> => {
 };
 
 export async function api<T>(path: string, o: Options = {}): Promise<T> {
+  const epoch = sessionEpoch;
+  const signedIn = tokens !== null;
+  const out = await call<T>(path, o);
+  // Signed out (or session lost) meanwhile: the old account's answer must not reach the guest state.
+  if (signedIn && epoch !== sessionEpoch) {
+    throw new ApiError(0, 'SESSION_ENDED', 'You were signed out.');
+  }
+  return out;
+}
+
+async function call<T>(path: string, o: Options): Promise<T> {
   try {
     return await raw<T>(path, o);
   } catch (e) {
@@ -118,6 +141,10 @@ export async function api<T>(path: string, o: Options = {}): Promise<T> {
     }
     if (await refresh()) {
       return raw<T>(path, o);
+    }
+    // Concurrent 401s share one failed refresh: only the first ends the session.
+    if (!tokens) {
+      throw e;
     }
     setTokens(null);
     onSessionLost();

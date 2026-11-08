@@ -18,9 +18,9 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
     const on = !get().ids.includes(id);
     set(s => ({ ids: on ? [...s.ids, id] : s.ids.filter(x => x !== id) }));
     if (hasSession()) {
-      api(`/me/wishlist/${id}`, { method: on ? 'PUT' : 'DELETE' }).catch(() =>
-        // Roll back so the heart reflects the server.
-        set(s => ({ ids: on ? s.ids.filter(x => x !== id) : [...s.ids, id] })),
+      api(`/me/wishlist/${id}`, { method: on ? 'PUT' : 'DELETE' }).catch(
+        // Roll back so the heart reflects the server (not after sign-out: the guest list is separate).
+        () => hasSession() && set(s => ({ ids: on ? s.ids.filter(x => x !== id) : [...s.ids, id] })),
       );
     }
   },

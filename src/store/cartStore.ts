@@ -79,6 +79,9 @@ export const useCartStore = create<CartStore>((set, get) => {
     const adopt = (c: ServerCart) => mine === latest && set({ lines: fromServer(c) });
     req
       .then(adopt, () => {
+        if (!hasSession()) {
+          return; // Signed out meanwhile: nothing to report or re-adopt.
+        }
         // Failed change: say so, then fall back to the server's bag (if reachable; else the focus refresh fixes it).
         set({ notice: 'Could not update your bag. Check your connection and try again.' });
         return api<ServerCart>('/me/cart').then(adopt);
