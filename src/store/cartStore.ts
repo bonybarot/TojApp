@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api, ApiError, hasSession } from '../api/client';
+import { api, ApiError, hasSession, uuid } from '../api/client';
 import { CartLine } from '../types';
 import { keepForGuest } from './guestCopy';
 import { stockFor } from '../utils/catalogue';
@@ -65,6 +65,8 @@ export const useCartStore = create<CartStore>((set, get) => {
   let latest = 0;
   // Sign-in merge failed: the local lines are the guest bag, not yet on the server.
   let unmerged = false;
+  // One key per guest bag, reused by retries: a merge that landed but timed out is not added twice.
+  let mergeKey = '';
   // The server ADDS merged quantities, so only one merge may be in flight, and no PUT beside it.
   let merging: Promise<void> | null = null;
   const sync = (l: CartLine, quantity: number) => {
@@ -100,17 +102,19 @@ export const useCartStore = create<CartStore>((set, get) => {
       const variantId = variantIdFor(l.productId, l.color, l.size);
       return variantId ? [{ variantId, quantity: Math.min(l.quantity, 20) }] : [];
     });
+    if (!unmerged) {
+      mergeKey = uuid();
+    }
     let c: ServerCart;
     try {
       c = await (items.length
-        ? api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
+        ? api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items }, headers: { 'Idempotency-Key': mergeKey } })
         : api<ServerCart>('/me/cart'));
     } catch (e) {
       // Retry later only what may pass later (offline, 5xx, 429); not after sign-out, not a rejected payload.
       const retry = e instanceof ApiError && (e.code === 'NETWORK' || e.status >= 500 || e.status === 429);
       if (retry && hasSession()) {
         // Keep the guest lines on screen; the next refresh (Bag focus, foreground) retries the merge.
-        // ponytail: a merge that landed but timed out is added twice on retry (server clamps to stock / 20); add an Idempotency-Key if seen.
         unmerged = true;
         set({ notice: 'Could not add your bag to your account yet. Check your connection.' });
       }
