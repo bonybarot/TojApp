@@ -16,7 +16,6 @@ import { Price } from '../../components/Price';
 import { Screen, StickyFooter } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
 import { EmptyState } from '../../components/States';
-import { PICKUP_STORE } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
 import { Rating } from '../../types';
 import { useCartStore } from '../../store/cartStore';
@@ -82,6 +81,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     s.products.find(p => p.id === route.params.productId),
   );
   const addToCart = useCartStore(s => s.addToCart);
+  const pickup = useProductStore(s => s.pickup);
   const { width, height } = useWindowDimensions();
   // Square on tall phones; capped on short screens so title, price and sizes show above the fold.
   const imageHeight = Math.min(width, height * 0.45);
@@ -293,7 +293,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={styles.boxTitle} maxFontSizeMultiplier={FONT_CAP}>Store pickup</Text>
           <Text style={styles.boxText}>
             {product.pickupAvailable
-              ? `Available at ${PICKUP_STORE.name}, ${PICKUP_STORE.address}.`
+              ? `Available at ${pickup.name}, ${pickup.address}.`
               : 'Not available for this item. Orders are store pickup only for now, so it cannot be ordered yet. Save it to your wishlist.'}
           </Text>
         </View>

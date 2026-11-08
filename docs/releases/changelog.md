@@ -43,6 +43,7 @@
 - The sign-in code submits itself when the sixth digit is entered (A34).
 - The app stays light when the phone uses dark mode, so system dialogs match the screens (A35).
 - TOJ app icon on iOS and Android, replacing the stock icon (A36).
+- The product page names the pickup store from the server (A37).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
