@@ -33,3 +33,12 @@ test('a failed sign-in merge keeps the guest bag, says so, and retries on the ne
   await useCartStore.getState().refresh();
   expect(mockCalls.at(-1)!.path).toBe('/me/cart');
 });
+
+test('a refresh while the sign-in merge is in flight does not merge again', async () => {
+  mockCalls.length = 0;
+  useCartStore.setState({ lines: [{ lineId: `${p.id}|Navy|L`, productId: p.id, color: 'Navy', size: 'L', quantity: 1 }] });
+  const merge = useCartStore.getState().mergeIntoServer();
+  const refresh = useCartStore.getState().refresh();
+  await Promise.all([merge, refresh]);
+  expect(mockCalls.map(c => c.path)).toEqual(['/me/cart/merge', '/me/cart']);
+});

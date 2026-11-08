@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import { create } from 'zustand';
 import { api, hasSession } from '../api/client';
 import { keepForGuest } from './guestCopy';
@@ -20,7 +21,12 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
     if (hasSession()) {
       api(`/me/wishlist/${id}`, { method: on ? 'PUT' : 'DELETE' }).catch(
         // Roll back so the heart reflects the server (not after sign-out: the guest list is separate).
-        () => hasSession() && set(s => ({ ids: on ? s.ids.filter(x => x !== id) : [...s.ids, id] })),
+        () => {
+          if (hasSession()) {
+            set(s => ({ ids: on ? s.ids.filter(x => x !== id) : [...s.ids, id] }));
+            Alert.alert('Wishlist not updated', 'Check your connection and try again.');
+          }
+        },
       );
     }
   },
