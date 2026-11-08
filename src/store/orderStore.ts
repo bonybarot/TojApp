@@ -27,20 +27,29 @@ export const CANCELLABLE: Order['status'][] = ['PLACED', 'CONFIRMED'];
 const upsert = (orders: Order[], o: Order) =>
   orders.some(x => x.id === o.id) ? orders.map(x => (x.id === o.id ? o : x)) : [o, ...orders];
 
+// Overlapping loads (focus + pull): only the newest answer is adopted.
+let loads = 0;
+
 export const useOrderStore = create<OrderState>((set, get) => ({
   orders: [],
   status: 'idle',
   load: async () => {
     set({ status: 'loading' });
+    const mine = ++loads;
     try {
       // ponytail: first 50 orders only; add paging when a customer has more.
       const before = get().orders;
       const page = await api<{ items: Order[] }>('/orders?limit=50');
+      if (mine !== loads) {
+        return;
+      }
       // Placed or cancelled while the list loaded: that answer is newer than the list.
       const changed = get().orders.filter(o => !before.includes(o));
       set({ orders: changed.reduce(upsert, page.items), status: 'ready' });
     } catch (e) {
-      set({ status: 'error' });
+      if (mine === loads) {
+        set({ status: 'error' });
+      }
       throw e;
     }
   },

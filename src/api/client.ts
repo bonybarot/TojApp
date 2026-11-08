@@ -104,9 +104,14 @@ let refreshing: Promise<boolean> | null = null;
 const refresh = (): Promise<boolean> => {
   if (!refreshing) {
     const rt = tokens?.refreshToken;
+    const epoch = sessionEpoch;
     refreshing = (rt
       ? raw<Tokens>('/auth/refresh', { method: 'POST', body: { refreshToken: rt } }).then(
           t => {
+            // Logged out while renewing: do not bring the old session back.
+            if (epoch !== sessionEpoch) {
+              return false;
+            }
             setTokens({ accessToken: t.accessToken, refreshToken: t.refreshToken });
             return true;
           },
@@ -142,7 +147,7 @@ async function call<T>(path: string, o: Options): Promise<T> {
     if (await refresh()) {
       return raw<T>(path, o);
     }
-    // Concurrent 401s share one failed refresh: only the first ends the session.
+    // Concurrent 401s share one failed refresh (or a logout meanwhile): only the first ends the session.
     if (!tokens) {
       throw e;
     }

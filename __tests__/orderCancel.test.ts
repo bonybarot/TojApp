@@ -12,8 +12,12 @@ jest.mock('../src/api/client', () => ({
 }));
 
 test('a refused cancel shows the real status', async () => {
-  useOrderStore.setState({ orders: [{ id: 'TOJ-1', status: 'PLACED' } as never] });
-  await expect(useOrderStore.getState().cancelOrder('TOJ-1')).rejects.toThrow('no longer');
+  useOrderStore.setState({
+    orders: [{ id: 'TOJ-1', status: 'PLACED' } as never],
+  });
+  await expect(useOrderStore.getState().cancelOrder('TOJ-1')).rejects.toThrow(
+    'no longer',
+  );
   await new Promise<void>(r => setTimeout(r, 0));
   expect(useOrderStore.getState().orders[0].status).toBe('PACKED');
 });
@@ -21,8 +25,29 @@ test('a refused cancel shows the real status', async () => {
 test('an order placed while the list loads is not dropped by the older list', async () => {
   useOrderStore.setState({ orders: [] });
   const load = useOrderStore.getState().load();
-  await useOrderStore.getState().placeOrder({ pickupLocationId: 'p', paymentMethod: 'PAY_AT_STORE', idempotencyKey: 'k', expectedTotal: 1 });
+  await useOrderStore
+    .getState()
+    .placeOrder({
+      pickupLocationId: 'p',
+      paymentMethod: 'PAY_AT_STORE',
+      idempotencyKey: 'k',
+      expectedTotal: 1,
+    });
   mockList([{ id: 'TOJ-0', status: 'COMPLETED' }]);
   await load;
-  expect(useOrderStore.getState().orders.map(o => o.id)).toEqual(['TOJ-1', 'TOJ-0']);
+  expect(useOrderStore.getState().orders.map(o => o.id)).toEqual([
+    'TOJ-1',
+    'TOJ-0',
+  ]);
+});
+
+test('of two overlapping list loads, the older answer does not override the newer one', async () => {
+  const first = useOrderStore.getState().load();
+  const answerFirst = mockList;
+  const second = useOrderStore.getState().load();
+  answerFirst([{ id: 'TOJ-1', status: 'PLACED' }]); // older load answers first
+  await first;
+  mockList([{ id: 'TOJ-1', status: 'CANCELLED' }]);
+  await second;
+  expect(useOrderStore.getState().orders[0].status).toBe('CANCELLED');
 });
