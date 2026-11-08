@@ -51,6 +51,7 @@
 - Writing a review can no longer overwrite an existing one when it fails to load. Ratings on product cards update after a review. Cancel order and Resend code cannot be sent twice (A42).
 - A guest bag removes items that are no longer sold and says so, so the Bag badge matches the Bag (A43).
 - Pull-to-refresh tells you when it could not reach the server (A44).
+- The Bag tells you when a change could not be saved (A45).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
