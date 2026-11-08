@@ -1,4 +1,4 @@
-import { useProductStore } from '../src/store/productStore';
+import { reloadProducts, useProductStore } from '../src/store/productStore';
 
 let mockFail = false;
 jest.mock('../src/api/client', () => ({
@@ -19,4 +19,12 @@ test('a catalogue refresh is quiet: keeps old data on failure, adopts new prices
   expect(useProductStore.getState().status).toBe('ready'); // no skeleton flash
   await p;
   expect(useProductStore.getState().products[0].price).toBe(299900);
+});
+
+test('a pull during a background load shares its outcome (a failed load fails the pull too)', async () => {
+  mockFail = true;
+  const background = useProductStore.getState().loadProducts();
+  await expect(reloadProducts()).rejects.toThrow();
+  expect(await background).toBe(false);
+  mockFail = false;
 });
