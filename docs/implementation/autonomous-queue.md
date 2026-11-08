@@ -62,6 +62,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A24 Shop: All products / Sale tiles get their own images
 - [x] A25 PDP: size error scrolls to size picker
 - [x] A26 Gradient scrims keep photo colours
+- [x] A27 Order details: pull to refresh
 
 ## Blocked: needs owner
 
@@ -99,3 +100,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A24: Shop 'All products' and 'Sale' tiles reused Tops/Outerwear images; now pick product images not used by any category (sale tile from a discounted product). iOS: reset-demo confirm + 'Demo data cleared' alert verified; Shop grid shows 7 distinct tiles
 - 2026-11-08 A25: tapping Add to bag without a size showed the hint below the fold on short screens; PDP now scrolls to the SIZE row. iOS verified (iPhone 17)
 - 2026-11-08 A26: Home hero and category tiles used a flat 30-45% black overlay that greyed whole photos; now a bottom gradient (`experimental_backgroundImage`) behind the label only. Verified iOS (iPhone 17) and Android (Pixel 9 Pro)
+- 2026-11-08 A27: Order details only refreshed on focus, so a status change while open (store confirms, collects) stayed stale and still offered Cancel. `Screen` takes a `pull` prop (RefreshControl); Order details uses it. Android verified: admin CONFIRMED TOJ-1025, pull showed it. Also walked guest bag, sign-in redirect to Checkout, order, collect, review post/edit on Android
