@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../components/Button';
 import { QuantityStepper } from '../../components/QuantityStepper';
 import { SmartImage } from '../../components/SmartImage';
-import { EmptyState } from '../../components/States';
+import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { usePull, useRootNavigation } from '../../hooks';
 import { useCartStore } from '../../store/cartStore';
 import { useProductStore } from '../../store/productStore';
@@ -35,6 +35,9 @@ const CartScreen: React.FC = () => {
       return () => useCartStore.setState({ notice: null });
     }, [isLoggedIn]),
   );
+  // Subscribed so the bag re-renders when the catalogue arrives (detailLines reads it once).
+  const products = useProductStore(s => s.products);
+  const status = useProductStore(s => s.status);
   const detailed = detailLines(lines);
   const subtotal = subtotalOf(detailed);
   const noPickup = pickupBlockers(detailed).length > 0;
@@ -55,7 +58,9 @@ const CartScreen: React.FC = () => {
     <SafeAreaView style={styles.root} edges={['top']}>
       <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Bag</Text>
       {notice && <Text style={styles.notice} accessibilityRole="alert">{notice}</Text>}
-      {detailed.length === 0 ? (
+      {lines.length > 0 && products.length === 0 ? (
+        status === 'error' ? <ErrorState onRetry={useProductStore.getState().loadProducts} /> : <LoadingState />
+      ) : detailed.length === 0 ? (
         <EmptyState
           title="Your bag is empty"
           message="Add something you love and it will show up here."
