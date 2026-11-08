@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { EmptyState } from '../../components/States';
+import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { ProductGrid } from '../../components/ProductGrid';
 import { Screen } from '../../components/Screen';
 import { useRootNavigation } from '../../hooks';
@@ -12,6 +12,8 @@ const SearchScreen: React.FC = () => {
   const nav = useRootNavigation();
   const products = useProductStore(s => s.products);
   const categories = useProductStore(s => s.categories);
+  const status = useProductStore(s => s.status);
+  const loadProducts = useProductStore(s => s.loadProducts);
   const [q, setQ] = useState('');
   const results = useMemo(() => searchProducts(products, q), [products, q]);
   const searching = q.trim().length > 0;
@@ -29,7 +31,11 @@ const SearchScreen: React.FC = () => {
         accessibilityLabel="Search products"
         style={styles.input}
       />
-      {searching ? (
+      {searching && status === 'error' && products.length === 0 ? (
+        <ErrorState onRetry={loadProducts} />
+      ) : searching && products.length === 0 ? (
+        <LoadingState />
+      ) : searching ? (
         <ProductGrid
           data={results}
           empty={<EmptyState title="No results" message={`Nothing matched “${q.trim()}”. Try a different word.`} />}

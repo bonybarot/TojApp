@@ -1,9 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { Screen, StickyFooter } from '../../components/Screen';
-import { EmptyState } from '../../components/States';
+import { EmptyState, ErrorState } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { useAddressStore } from '../../store/addressStore';
 import { borderRadius, colors, typography } from '../../utils/theme';
@@ -13,10 +14,15 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Addresses'>;
 const AddressesScreen: React.FC<Props> = ({ navigation, route }) => {
   const selecting = route.params?.selecting;
   const { addresses, selectedId, select, remove } = useAddressStore();
+  const [failed, setFailed] = useState(false);
+  const reload = useCallback(() => {
+    useAddressStore.getState().load().then(() => setFailed(false), () => setFailed(true));
+  }, []);
+  useFocusEffect(reload);
   const confirmRemove = (id: string) =>
     Alert.alert('Delete address', 'Remove this address?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => remove(id) },
+      { text: 'Delete', style: 'destructive', onPress: () => { remove(id).catch((e: Error) => Alert.alert('Could not delete', e.message)); } },
     ]);
   return (
     <Screen footer={<StickyFooter><Button title="Add new address" onPress={() => navigation.navigate('AddressForm', {})} /></StickyFooter>}>
@@ -24,7 +30,7 @@ const AddressesScreen: React.FC<Props> = ({ navigation, route }) => {
         data={addresses}
         keyExtractor={a => a.id}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={<EmptyState title="No saved addresses" message="Add one to use at checkout." />}
+        ListEmptyComponent={failed ? <ErrorState onRetry={reload} /> : <EmptyState title="No saved addresses" message="Add one to use at checkout." />}
         renderItem={({ item: a }) => (
           <Pressable
             style={[styles.card, selecting && a.id === selectedId && styles.on]}
