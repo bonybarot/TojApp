@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
@@ -6,23 +6,33 @@ import { resetDemoData } from '../../store/resetDemo';
 import { colors, typography } from '../../utils/theme';
 
 // Only functional settings (D-13): the one real action is clearing local demo data.
-const SettingsScreen: React.FC = () => (
+const SettingsScreen: React.FC = () => {
+  const [busy, setBusy] = useState(false); // a second reset while server deletes run would race them
+  const reset = () => {
+    setBusy(true);
+    resetDemoData()
+      .then(ok => Alert.alert(ok ? 'Demo data cleared' : 'Could not reach the demo server', ok ? 'Your bag and wishlist are empty.' : 'Some items may come back. Try again when online.'))
+      .finally(() => setBusy(false));
+  };
+  return (
   <Screen padded>
     <Text style={typography.h3}>Demo data</Text>
     <Text style={styles.sub}>Clears your bag and wishlist (also on the demo server when signed in). Orders are kept.</Text>
     <Button
       title="Reset demo data"
       variant="secondary"
+      loading={busy}
       onPress={() =>
         Alert.alert('Reset demo data', 'This cannot be undone.', [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Reset', style: 'destructive', onPress: () => { resetDemoData().then(ok => Alert.alert(ok ? 'Demo data cleared' : 'Could not reach the demo server', ok ? 'Your bag and wishlist are empty.' : 'Some items may come back. Try again when online.')); } },
+          { text: 'Reset', style: 'destructive', onPress: reset },
         ])
       }
     />
     <Text style={styles.ver}>TOJ demo build · local demo server</Text>
   </Screen>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   sub: { ...typography.body, color: colors.textSecondary, marginVertical: 8, marginBottom: 16 },
