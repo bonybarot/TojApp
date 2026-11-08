@@ -2,7 +2,8 @@ import { products } from '../src/data/products';
 import { useCartStore } from '../src/store/cartStore';
 import { useProductStore } from '../src/store/productStore';
 
-const mockCalls: { path: string; body?: any }[] = [];
+const mockCalls: { path: string; body?: any; key?: string }[] = [];
+let mockN = 0;
 let mockFail = true;
 let mockHold: Promise<void> = Promise.resolve();
 jest.mock('../src/api/client', () => {
@@ -18,8 +19,9 @@ jest.mock('../src/api/client', () => {
   return {
     ApiError,
     hasSession: () => true,
-    api: async (path: string, o: { body?: any } = {}) => {
-      mockCalls.push({ path, body: o.body });
+    uuid: () => `key-${++mockN}`,
+    api: async (path: string, o: { body?: any; headers?: Record<string, string> } = {}) => {
+      mockCalls.push({ path, body: o.body, key: o.headers?.['Idempotency-Key'] });
       await mockHold;
       if (mockFail) {
         throw new ApiError(0, 'NETWORK');
@@ -74,7 +76,9 @@ test('a failed sign-in merge keeps the guest bag, says so, and retries on the ne
   expect(mockCalls.at(-1)).toEqual({
     path: '/me/cart/merge',
     body: { items: [{ variantId: 'v1', quantity: 3 }] },
+    key: mockCalls[0].key, // the retry reuses the key: a merge that landed is not added twice
   });
+  expect(mockCalls[0].key).toBeTruthy();
   expect(useCartStore.getState().lines[0].quantity).toBe(3);
   await useCartStore.getState().refresh();
   expect(mockCalls.at(-1)!.path).toBe('/me/cart');
