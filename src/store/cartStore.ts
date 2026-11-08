@@ -63,8 +63,11 @@ export const useCartStore = create<CartStore>((set, get) => {
    */
   // Rapid taps send several requests; adopting an older answer would undo newer taps.
   let latest = 0;
+  // Sign-in merge failed: the local lines are the guest bag, not yet on the server.
+  let unmerged = false;
   const sync = (l: CartLine, quantity: number) => {
-    if (!hasSession()) {
+    // Unmerged: edits stay local and ride in the retried merge (the server adds merged quantities).
+    if (!hasSession() || unmerged) {
       return;
     }
     const vid = variantIdFor(l.productId, l.color, l.size);
@@ -130,18 +133,32 @@ export const useCartStore = create<CartStore>((set, get) => {
         sync(line, 0);
       }
     },
-    clearCart: () => set({ lines: [] }),
+    clearCart: () => {
+      unmerged = false;
+      set({ lines: [] });
+    },
     mergeIntoServer: async () => {
+      unmerged = true;
       const items = get().lines.flatMap(l => {
         const variantId = variantIdFor(l.productId, l.color, l.size);
         return variantId ? [{ variantId, quantity: Math.min(l.quantity, 20) }] : [];
       });
-      const c = items.length
-        ? await api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
-        : await api<ServerCart>('/me/cart');
+      const c = await (items.length
+        ? api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
+        : api<ServerCart>('/me/cart')
+      ).catch(e => {
+        // Keep the guest lines on screen; the next refresh (Bag focus, foreground) retries the merge.
+        // ponytail: a merge that landed but timed out is added twice on retry (server clamps to stock / 20); add an Idempotency-Key if seen.
+        set({ notice: 'Could not add your bag to your account yet. Check your connection.' });
+        throw e;
+      });
+      unmerged = false;
       set({ lines: fromServer(c), notice: noticeOf(c) });
     },
     refresh: async () => {
+      if (unmerged) {
+        return get().mergeIntoServer();
+      }
       const c = await api<ServerCart>('/me/cart');
       // Keep an unread notice: the Bag's own focus refresh comes back clean.
       set({ lines: fromServer(c), notice: noticeOf(c) ?? get().notice });
