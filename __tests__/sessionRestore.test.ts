@@ -1,5 +1,6 @@
 import * as Keychain from 'react-native-keychain';
-import { hasSession, storedTokens } from '../src/api/client';
+import { hasSession, setTokens, storedTokens } from '../src/api/client';
+import { restoreGuestBag, useCartStore } from '../src/store/cartStore';
 import { useUserStore } from '../src/store/userStore';
 
 const STORE = { service: 'toj.session' };
@@ -38,4 +39,22 @@ test('logout wipes the saved session', async () => {
   await useUserStore.getState().logout();
   await new Promise<void>(r => setTimeout(r, 0));
   expect(await storedTokens()).toBeNull();
+});
+
+test('guest bag survives a cold start; signing in moves it to the server and wipes the device copy', async () => {
+  const BAG = { service: 'toj.guestBag' };
+  const line = { lineId: 'p1|Black|M', productId: 'p1', color: 'Black', size: 'M', quantity: 2 };
+  useCartStore.setState({ lines: [line] });
+  await new Promise<void>(r => setTimeout(r, 0));
+  const kept = await Keychain.getGenericPassword(BAG);
+  useCartStore.setState({ lines: [] }); // a fresh process starts with an empty bag
+  await new Promise<void>(r => setTimeout(r, 0));
+  await Keychain.setGenericPassword('toj', kept ? kept.password : '', BAG);
+  await restoreGuestBag();
+  expect(useCartStore.getState().lines).toEqual([line]);
+  setTokens(saved, false);
+  useCartStore.setState({ lines: [line] });
+  await new Promise<void>(r => setTimeout(r, 0));
+  expect(await Keychain.getGenericPassword(BAG)).toBe(false);
+  setTokens(null, false);
 });

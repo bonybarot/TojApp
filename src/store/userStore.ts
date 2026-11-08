@@ -4,7 +4,7 @@ import { api, currentRefreshToken, hasSession, setSessionLostHandler, setTokens,
 import { navigationRef } from '../navigation/ref';
 import { User } from '../types';
 import { useAddressStore } from './addressStore';
-import { useCartStore } from './cartStore';
+import { restoreGuestBag, useCartStore } from './cartStore';
 import { useOrderStore } from './orderStore';
 import { useProductStore } from './productStore';
 import { useWishlistStore } from './wishlistStore';
@@ -77,7 +77,7 @@ export const useUserStore = create<UserState>(set => ({
   restore: async () => {
     const t = await storedTokens();
     if (!t) {
-      return;
+      return restoreGuestBag();
     }
     setTokens(t, false);
     try {
@@ -87,7 +87,7 @@ export const useUserStore = create<UserState>(set => ({
       if (hasSession()) {
         setTokens(null, false);
       }
-      return;
+      return restoreGuestBag();
     }
     await loadAccountData();
   },

@@ -35,7 +35,7 @@ export const MainTabs: React.FC = () => {
         component={CartScreen}
         options={{
           tabBarLabel: label(count > 0 ? `Bag · ${count}` : 'Bag'),
-          tabBarAccessibilityLabel: count > 0 ? `Bag, ${count} items` : 'Bag',
+          tabBarAccessibilityLabel: count > 0 ? `Bag, ${count} ${count === 1 ? 'item' : 'items'}` : 'Bag',
         }}
       />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: label('Account') }} />

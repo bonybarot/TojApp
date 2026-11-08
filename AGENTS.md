@@ -27,7 +27,7 @@ On branch `feature/api-integration` the app **calls the local `toj-backend` API*
 | Money | Integer paise, INR; format via `utils/format.ts` |
 | Backend | Separate repo `toj-backend` (`../toj-backend`), NestJS 12, Prisma 7, PostgreSQL 17, Node 24: catalogue, OTP auth, cart, wishlist, addresses, pickup orders, admin (branch `feature/backend-core`). Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
-| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts` + `__tests__/productRefresh.test.ts` + `__tests__/sessionRestore.test.ts`; 12 tests pass |
+| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts` + `__tests__/productRefresh.test.ts` + `__tests__/sessionRestore.test.ts`; 13 tests pass |
 | tsc / ESLint | 0 errors / 0 warnings |
 
 Screen inventory, navigation and mock behaviour:
@@ -142,7 +142,7 @@ not made silently inside code.
   line does not support it.
 - **Checkout is pickup-only** (Q-2). Placing an order creates it on the local server
   (`TOJ-1005…`); nothing is charged. Orders can be cancelled while placed/confirmed.
-- **Session survives a cold start** (tokens in Keychain/Keystore, ADR-0006); logout wipes them. Orders, addresses, signed-in cart and
+- **Session survives a cold start** (tokens in Keychain/Keystore, ADR-0006); logout wipes them. The guest bag is kept on the device too (ADR-0006 amendment). Orders, addresses, signed-in cart and
   wishlist live on the server. Settings → "Reset demo data" clears the bag and wishlist (on the server too when signed in).
 - **Search, filters, sort and sale rails exist** although D-12 deferred them; they were built
   per the UI brief and are flagged for product review.
@@ -156,7 +156,7 @@ not made silently inside code.
 | The API is deployed | It is not. It runs locally only (`../toj-backend`); hosting is not approved. Images are remote Unsplash URLs |
 | Authentication is real | PARTIAL. Server-side OTP + JWT, but the OTP is a fixed demo code and no SMS is sent |
 | Checkout takes payment | It does not. Orders are created on the local server; payment is `PAY_AT_STORE` or `CARD_SIMULATED` |
-| Persistence exists | Server-side only (Postgres). On the device only the session tokens (Keychain/Keystore, ADR-0006); a guest bag is lost on cold start |
+| Persistence exists | Server-side only (Postgres). On the device only the session tokens and the guest bag (Keychain/Keystore, ADR-0006) |
 | Release signing is production-ready | PARTIAL. `release` uses the upload key when `TOJ_UPLOAD_*` gradle properties are set, else the debug keystore; the real key is not generated yet |
 | VoiceOver / TalkBack tested | NOT TESTED. Labels, roles and 44pt targets exist in code and were inspected via the iOS accessibility tree only |
 | A future architecture has been chosen | **Proposed, not approved.** Architecture is `PROPOSED` and gated on unwritten ADRs ([`docs/decisions/README.md`](docs/decisions/README.md)) |
@@ -201,7 +201,7 @@ npm run android      # build + run Android
 npm run ios          # build + run iOS (requires pod install first)
 npm run lint         # eslint .            → 0 errors, 0 warnings
 npx tsc --noEmit     # type check          → 0 errors
-npm test             # jest                → 6 suites, 12 tests pass
+npm test             # jest                → 6 suites, 13 tests pass
 ```
 
 Full detail: [`docs/development/setup.md`](docs/development/setup.md)
