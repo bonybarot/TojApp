@@ -159,7 +159,11 @@ export const useCartStore = create<CartStore>((set, get) => {
       if (unmerged) {
         return get().mergeIntoServer();
       }
+      const mine = latest;
       const c = await api<ServerCart>('/me/cart');
+      if (mine !== latest) {
+        return; // A tap meanwhile: its own answer is newer.
+      }
       // Keep an unread notice: the Bag's own focus refresh comes back clean.
       set({ lines: fromServer(c), notice: noticeOf(c) ?? get().notice });
     },

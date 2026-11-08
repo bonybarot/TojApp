@@ -34,8 +34,11 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     set({ status: 'loading' });
     try {
       // ponytail: first 50 orders only; add paging when a customer has more.
+      const before = get().orders;
       const page = await api<{ items: Order[] }>('/orders?limit=50');
-      set({ orders: page.items, status: 'ready' });
+      // Placed or cancelled while the list loaded: that answer is newer than the list.
+      const changed = get().orders.filter(o => !before.includes(o));
+      set({ orders: changed.reduce(upsert, page.items), status: 'ready' });
     } catch (e) {
       set({ status: 'error' });
       throw e;
