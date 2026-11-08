@@ -64,6 +64,7 @@
 - After placing an order, product pages show the updated stock (A56).
 - Pasting or autofilling a +91 mobile number on sign-in keeps the right 10 digits; double taps on Send code / Verify send once (A57).
 - Editing a review: Delete waits for a save in progress; Home shows a message instead of loading forever when the store is empty; Reset demo data also clears hearts added on another device (A58).
+- Sign in: typing a number on iOS no longer scrambles digits; pasting +91 numbers still works (A59).
 - API: out-of-range price filters return 400 instead of 500; size and colour filters match the same in-stock variant; wishlist merge no longer loses new items near the cap (B14).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
