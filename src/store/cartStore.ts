@@ -138,7 +138,6 @@ export const useCartStore = create<CartStore>((set, get) => {
       set({ lines: [] });
     },
     mergeIntoServer: async () => {
-      unmerged = true;
       const items = get().lines.flatMap(l => {
         const variantId = variantIdFor(l.productId, l.color, l.size);
         return variantId ? [{ variantId, quantity: Math.min(l.quantity, 20) }] : [];
@@ -147,6 +146,7 @@ export const useCartStore = create<CartStore>((set, get) => {
         ? api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
         : api<ServerCart>('/me/cart')
       ).catch(e => {
+        unmerged = true;
         // Keep the guest lines on screen; the next refresh (Bag focus, foreground) retries the merge.
         // ponytail: a merge that landed but timed out is added twice on retry (server clamps to stock / 20); add an Idempotency-Key if seen.
         set({ notice: 'Could not add your bag to your account yet. Check your connection.' });

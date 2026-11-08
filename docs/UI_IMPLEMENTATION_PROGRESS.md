@@ -41,7 +41,7 @@ Root native-stack (`src/navigation/RootNavigator.tsx`) containing the tab naviga
 - Jest: `transformIgnorePatterns` allows React Navigation ESM.
 
 ## Verification (actual, 2026-11-08)
-- `npx tsc --noEmit`: 0 errors. `npm run lint`: 0 errors, 0 warnings. `npx jest`: 9 suites, 23 tests pass.
+- `npx tsc --noEmit`: 0 errors. `npm run lint`: 0 errors, 0 warnings. `npx jest`: 9 suites, 24 tests pass.
 - iOS (iPhone 17 simulator): full journey walked 2026-10-31; reviews, large text and offline resume walked 2026-11-08.
 - Android (Pixel_9_Pro emulator), 2026-11-08: Home, category list with sort (price high to low) and size XL filter (matches API stock), search (results and no results), wishlist remove (server row gone), checkout and place order (TOJ-1021), order details, cancel (server status CANCELLED), Help & Support, Settings, pull to refresh on Home and Bag, offline launch and resume.
 

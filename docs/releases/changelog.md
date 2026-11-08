@@ -56,6 +56,7 @@
 - Bag line shows `Black · One size` instead of `Size One size` (A47).
 - A server error while renewing the session no longer signs you out; several expired calls show one "Signed out" alert; answers from a signed-out session are discarded (A48, A49).
 - If your bag cannot be moved to your account at sign-in, the Bag says so, keeps your items and tries again next time you open it (A50).
+- Signing in from the Bag no longer doubles the quantities in your bag; a wishlist heart that could not be saved now tells you (A51).
 - Read-only inputs (Personal Information mobile number) looked editable; `Input` with `editable={false}` now uses the surface background and secondary text.
 - iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
