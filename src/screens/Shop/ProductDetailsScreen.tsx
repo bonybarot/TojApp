@@ -45,11 +45,14 @@ const HeartButton: React.FC<{ productId: string }> = ({ productId }) => {
 };
 
 /** ADR-0028. Read-only here; customers write from a collected order. */
-const Reviews: React.FC<{ productId: string }> = ({ productId }) => {
-  const [r, setR] = useState<ProductReviews | null>(null);
-  useEffect(() => {
-    productReviews(productId).then(setR, () => setR(null));
-  }, [productId]);
+const plural = (n: number) => `${n} ${n === 1 ? 'review' : 'reviews'}`;
+const Summary: React.FC<{ r: ProductReviews & { average: number } }> = ({ r }) => (
+  <Text style={styles.rSummary} accessibilityLabel={`Rated ${r.average} out of 5 from ${plural(r.count)}`}>
+    <Text style={styles.rStars}>{stars(r.average)}</Text>  {r.average.toFixed(1)} · {plural(r.count)}
+  </Text>
+);
+
+const Reviews: React.FC<{ r: ProductReviews | null }> = ({ r }) => {
   if (!r) {
     return null;
   }
@@ -59,9 +62,7 @@ const Reviews: React.FC<{ productId: string }> = ({ productId }) => {
       {r.average === null ? (
         <Text style={styles.boxText}>No reviews yet. Customers who collect this item can review it from My Orders.</Text>
       ) : (
-        <Text style={styles.rSummary} accessibilityLabel={`Rated ${r.average} out of 5 from ${r.count} ${r.count === 1 ? 'review' : 'reviews'}`}>
-          <Text style={styles.rStars}>{stars(r.average)}</Text>  {r.average.toFixed(1)} · {r.count} {r.count === 1 ? 'review' : 'reviews'}
-        </Text>
+        <Summary r={{ ...r, average: r.average }} />
       )}
       {r.items.map(x => (
         <View key={x.id} style={styles.review} accessible accessibilityLabel={`${x.rating} out of 5 by ${x.author}. ${x.body}`}>
@@ -87,6 +88,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [page, setPage] = useState(0);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [added, setAdded] = useState(false);
+  const [reviews, setReviews] = useState<ProductReviews | null>(null);
+  useEffect(() => {
+    productReviews(route.params.productId).then(setReviews, () => setReviews(null));
+  }, [route.params.productId]);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
@@ -224,6 +229,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         )}
         <Text style={styles.title}>{product.title}</Text>
         <Price product={product} large />
+        {reviews?.average != null && <Summary r={{ ...reviews, average: reviews.average }} />}
 
         <Text style={styles.label}>COLOUR — {color.toUpperCase()}</Text>
         <View style={styles.row}>
@@ -286,7 +292,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             • {d}
           </Text>
         ))}
-        <Reviews productId={product.id} />
+        <Reviews r={reviews} />
       </View>
     </Screen>
   );
