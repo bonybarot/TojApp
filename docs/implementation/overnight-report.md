@@ -71,18 +71,19 @@ Same journey as iOS: guest adds Classic White T-Shirt (White, M), "Sign in to ch
 - `SceneDelegate` in `AppDelegate.swift` starts React Native in the scene window.
 
 ## Limitations
-- Cold start signs out (no device persistence, not approved).
+- Guest bag is lost on cold start (only session tokens are kept, ADR-0006).
+- Real Android upload key not generated (build reads `TOJ_UPLOAD_*`; owner generates the key).
 - OTP is the fixed demo code `123456`; no SMS.
 - Catalogue is filtered on device; ceiling 50 products.
 - Historical seed orders TOJ-1001..1004 include delivery orders that predate pickup-only.
 
 ## Needs owner decision (Level 3)
-1. Device persistence of the session token (Keychain) so a cold start keeps the user signed in.
-2. Search, filters, sort and sale rails exist although D-12 deferred them: keep or hide.
-3. Merge `feature/backend-core` and `feature/api-integration` (not done: merges need owner authorisation).
+1. Session persistence: decided by the agent under the owner's 2026-11-08 delegation, ADR-0006 Accepted (Keychain/Keystore).
+2. Search, filters, sort and sale rails: kept. Q-7 (approved 2026-10-31) supersedes D-12 for these.
+3. Feature branches are merged into `integration/v1` (owner authorised new merge branches, 2026-11-07). `main` stays untouched until the owner merges it.
 
 ## Next milestone
-Owner decisions above (session persistence, D-12 rails, merging the two feature branches).
+Generate the real Android upload key; merge `integration/v1` into `main` when the owner is ready.
 
 ## Android flow testing (2026-11-05 08:50 IST, Pixel 9 Pro emulator)
 New account (9000000123, name validation), empty states, profile edit, wishlist sync, low-stock clamp, guest-cart merge into a non-empty server cart, stale stock at checkout, cancel restock. Two bugs fixed:

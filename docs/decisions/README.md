@@ -152,7 +152,7 @@ it is written. Grouped by the phase that needs it.
 | ID | Title | State |
 |---|---|---|
 | ADR-0005 | Local storage engine (MMKV recommended) and key versioning | PROPOSED |
-| ADR-0006 | Secure token storage: Keychain / Keystore, never plain storage | PROPOSED |
+| ADR-0006 | Secure token storage: Keychain / Keystore, never plain storage | Accepted 2026-11-08 ([0006](0006-secure-token-storage.md)) |
 
 ### Before Phase 4
 
@@ -319,6 +319,7 @@ Then add a row to §7 and a line in [../releases/changelog.md](../releases/chang
 | 0022 | [Product variants and the inventory model](0022-variants-and-inventory.md) | 2026-10-31 | Accepted |
 | 0026 | [Store pickup](0026-store-pickup.md) | 2026-10-31 | Accepted |
 | 0030 | [Backend in a separate repository](0030-separate-backend-repository.md) | 2026-11-05 | Accepted |
+| 0006 | [Secure token storage on the device](0006-secure-token-storage.md) | 2026-11-08 | Accepted |
 | 0031 | [App integration with the toj-backend API](0031-app-api-integration.md) | 2026-11-05 | Accepted |
 
 Note: ADR-0011 (money) is new; the planning table in §3 did not list it separately.

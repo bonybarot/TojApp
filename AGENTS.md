@@ -23,11 +23,11 @@ On branch `feature/api-integration` the app **calls the local `toj-backend` API*
 | Navigation | React Navigation v7: root native-stack + bottom tabs (Home, Shop, Bag, Account). No drawer |
 | State | Zustand 4.5.2, stores: cart, user, wishlist, address, order, product. No persistence |
 | Styling | `StyleSheet.create` + `src/utils/theme.ts` tokens. No inline styles (ESLint-enforced) |
-| Data | Local API via `src/api/client.ts` (fetch, in-memory tokens). Fixtures `products.ts`, `categories.ts`, `orders.ts`, `stores.ts` for tests |
+| Data | Local API via `src/api/client.ts` (fetch; tokens in Keychain/Keystore, ADR-0006). Fixtures `products.ts`, `categories.ts`, `orders.ts`, `stores.ts` for tests |
 | Money | Integer paise, INR; format via `utils/format.ts` |
 | Backend | Separate repo `toj-backend` (`../toj-backend`), NestJS 12, Prisma 7, PostgreSQL 17, Node 24: catalogue, OTP auth, cart, wishlist, addresses, pickup orders, admin (branch `feature/backend-core`). Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
-| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts` + `__tests__/productRefresh.test.ts`; 9 tests pass |
+| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts` + `__tests__/productRefresh.test.ts` + `__tests__/sessionRestore.test.ts`; 12 tests pass |
 | tsc / ESLint | 0 errors / 0 warnings |
 
 Screen inventory, navigation and mock behaviour:
@@ -84,7 +84,7 @@ seller/admin and persistence are not. The planning set that follows from these d
 (INR, integer paise, pickup-only demo checkout), Q-5 (customer cancel only from PLACED and
 CONFIRMED; CANCELLED terminal; no refund integration), Q-7 (keep search/filters/sort/sale,
 server-backed) and Q-8. ADRs 0007-0013, 0020, 0022, 0026 are Accepted. Still NOT approved:
-payment gateway, real SMS OTP, device persistence, seller/admin products, production hosting
+payment gateway, real SMS OTP, seller/admin products, production hosting
 and deployment. Do not begin those.
 
 ---
@@ -142,7 +142,7 @@ not made silently inside code.
   line does not support it.
 - **Checkout is pickup-only** (Q-2). Placing an order creates it on the local server
   (`TOJ-1005…`); nothing is charged. Orders can be cancelled while placed/confirmed.
-- **Session is in memory only**: a cold start signs out. Orders, addresses, signed-in cart and
+- **Session survives a cold start** (tokens in Keychain/Keystore, ADR-0006); logout wipes them. Orders, addresses, signed-in cart and
   wishlist live on the server. Settings → "Reset demo data" clears the bag and wishlist (on the server too when signed in).
 - **Search, filters, sort and sale rails exist** although D-12 deferred them; they were built
   per the UI brief and are flagged for product review.
@@ -156,8 +156,8 @@ not made silently inside code.
 | The API is deployed | It is not. It runs locally only (`../toj-backend`); hosting is not approved. Images are remote Unsplash URLs |
 | Authentication is real | PARTIAL. Server-side OTP + JWT, but the OTP is a fixed demo code and no SMS is sent |
 | Checkout takes payment | It does not. Orders are created on the local server; payment is `PAY_AT_STORE` or `CARD_SIMULATED` |
-| Persistence exists | Server-side only (Postgres). The app keeps nothing on the device; tokens are in memory |
-| Release signing is production-ready | KNOWN ISSUE. Android `release` uses the committed debug keystore (`android/app/build.gradle`) |
+| Persistence exists | Server-side only (Postgres). On the device only the session tokens (Keychain/Keystore, ADR-0006); a guest bag is lost on cold start |
+| Release signing is production-ready | PARTIAL. `release` uses the upload key when `TOJ_UPLOAD_*` gradle properties are set, else the debug keystore; the real key is not generated yet |
 | VoiceOver / TalkBack tested | NOT TESTED. Labels, roles and 44pt targets exist in code and were inspected via the iOS accessibility tree only |
 | A future architecture has been chosen | **Proposed, not approved.** Architecture is `PROPOSED` and gated on unwritten ADRs ([`docs/decisions/README.md`](docs/decisions/README.md)) |
 | Planning documents describe working code | Everything under `docs/requirements/`, `docs/architecture/`, `docs/implementation/` is a plan |
@@ -201,7 +201,7 @@ npm run android      # build + run Android
 npm run ios          # build + run iOS (requires pod install first)
 npm run lint         # eslint .            → 0 errors, 0 warnings
 npx tsc --noEmit     # type check          → 0 errors
-npm test             # jest                → 5 suites, 9 tests pass
+npm test             # jest                → 6 suites, 12 tests pass
 ```
 
 Full detail: [`docs/development/setup.md`](docs/development/setup.md)
@@ -254,7 +254,7 @@ Swagger: `/api/docs` (non-production). Details: `toj-backend/docs/LOCAL_DEVELOPM
 ## 8. Before you change anything
 
 1. The UI layer is implemented against mock data. The backend is approved and in progress
-   (§1a). Payment, real SMS OTP and device persistence are **not** approved; do not start
+   (§1a). Payment and real SMS OTP are **not** approved; do not start
    them until their ADRs exist.
 2. If you believe something must change, write it down — an issue, an ADR, a note on the
    relevant page — rather than changing it.

@@ -1,3 +1,4 @@
+import * as Keychain from 'react-native-keychain';
 import { API_BASE_URL, API_TIMEOUT_MS } from '../config/env';
 
 /** Mirrors the backend envelope `{error:{code,message,details,requestId}}`. */
@@ -17,12 +18,30 @@ export interface Tokens {
   refreshToken: string;
 }
 
-// Tokens live in memory only (no device persistence is approved): a cold start signs out.
+// ADR-0006: tokens are kept in the Keychain / Keystore so a cold start keeps the session.
+// This-device-only: never synced to iCloud or restored onto another phone.
+const STORE = { service: 'toj.session', accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY };
 let tokens: Tokens | null = null;
 let onSessionLost: () => void = () => {};
 
-export const setTokens = (t: Tokens | null) => {
+/** `persist: false` changes only the in-memory session (e.g. offline at start: keep the stored one). */
+export const setTokens = (t: Tokens | null, persist = true) => {
   tokens = t;
+  if (persist) {
+    (t
+      ? Keychain.setGenericPassword('toj', JSON.stringify(t), STORE)
+      : Keychain.resetGenericPassword(STORE)
+    ).catch(() => {});
+  }
+};
+/** Session saved by a previous launch, or null. */
+export const storedTokens = async (): Promise<Tokens | null> => {
+  const c = await Keychain.getGenericPassword(STORE).catch(() => false as const);
+  try {
+    return c ? (JSON.parse(c.password) as Tokens) : null;
+  } catch {
+    return null;
+  }
 };
 export const hasSession = () => tokens !== null;
 export const currentRefreshToken = () => tokens?.refreshToken ?? null;
@@ -76,7 +95,7 @@ const refresh = (): Promise<boolean> => {
     refreshing = (rt
       ? raw<Tokens>('/auth/refresh', { method: 'POST', body: { refreshToken: rt } }).then(
           t => {
-            tokens = { accessToken: t.accessToken, refreshToken: t.refreshToken };
+            setTokens({ accessToken: t.accessToken, refreshToken: t.refreshToken });
             return true;
           },
           // Unreachable server is not a lost session: rethrow so the caller shows a network error.
@@ -100,7 +119,7 @@ export async function api<T>(path: string, o: Options = {}): Promise<T> {
     if (await refresh()) {
       return raw<T>(path, o);
     }
-    tokens = null;
+    setTokens(null);
     onSessionLost();
     throw e;
   }
