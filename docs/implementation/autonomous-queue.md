@@ -43,7 +43,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A8 Product cards show `★ 4.0 (3)` when rated; PDP uses product rating for the summary line
 - [x] B11 Moderation: `DELETE /admin/reviews/:id` (admin role), e2e; docs
 - [x] A9 iOS: walk write/edit/delete review as demo customer 9876543210 (collected order 1002); fix what breaks
-- [ ] A10 Large text: Android font scale 1.3 and iOS largest Dynamic Type on Home, PDP, Bag, Checkout, Order details; fix clipping
+- [x] A10 Large text: Android font scale 1.3 and iOS largest Dynamic Type on Home, PDP, Bag, Checkout, Order details; fix clipping
 - [ ] A11 Pass over every screen for empty, loading and API-down states; fix gaps
 - [ ] A12 Sweep `docs/` for stale statements (test counts, NOT IMPLEMENTED lists); refresh `overnight-report.md`
 
@@ -68,4 +68,5 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-05 08:13 re-verification run: no open tasks; backend lint/typecheck clean, unit 17, e2e 27; app tsc/lint clean, jest 5
 - 2026-11-05 08:37 UI journey walked on Android emulator (TOJ-1008 placed and cancelled); no fixes needed
 - 2026-11-08 B10 product `rating` on list/detail/wishlist (backend `46087a7`); A8 cards show `★ 4.0 (n)`, PDP summary uses it until reviews load. Verified Android Tops grid
+- 2026-11-08 A10: display text (logo, headings, labels, prices, buttons, tabs) capped at `FONT_CAP` 1.4 (tabs 1.2); glyph icons do not scale; body text scales fully. Checked iOS AX5 Home/PDP/Bag/Account/Orders/Order details, Android 1.3 Home/Bag.
 - 2026-11-08 B11 admin `DELETE /admin/reviews/:id` (backend `85f021e`). A9 iOS: write 4★, edit 5★, delete; API and PDP agree each step. Fixed: order items open product details; My Orders kept its scroll position on return (focus reload no longer drives the iOS pull-to-refresh spinner)

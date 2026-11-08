@@ -8,7 +8,7 @@ import { DemoBanner } from '../../components/States';
 import { DEMO_OTP } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
 import { useUserStore } from '../../store/userStore';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -33,7 +33,7 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
   };
   return (
     <Screen scroll padded edges={['bottom']}>
-      <Text style={styles.title} accessibilityRole="header">Sign in or create account</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Sign in or create account</Text>
       <Text style={styles.sub}>We will send a one-time code to your mobile number.</Text>
       <Input
         label="Mobile number"

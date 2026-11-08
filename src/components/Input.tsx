@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
-import { borderRadius, colors, typography } from '../utils/theme';
+import { borderRadius, colors, typography, FONT_CAP } from '../utils/theme';
 
 interface Props extends TextInputProps {
   label: string;
@@ -9,7 +9,7 @@ interface Props extends TextInputProps {
 
 export const Input: React.FC<Props> = ({ label, error, style, ...rest }) => (
   <View style={styles.wrap}>
-    <Text style={styles.label}>{label.toUpperCase()}</Text>
+    <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>{label.toUpperCase()}</Text>
     <TextInput
       accessibilityLabel={label}
       placeholderTextColor={colors.disabled}

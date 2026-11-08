@@ -10,7 +10,7 @@ import { ProductGridSkeleton } from '../../components/Skeleton';
 import { ErrorState } from '../../components/States';
 import { useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
-import { colors, typography } from '../../utils/theme';
+import { colors, FONT_CAP, typography } from '../../utils/theme';
 
 const HomeScreen: React.FC = () => {
   const nav = useRootNavigation();
@@ -24,7 +24,7 @@ const HomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
       <View style={styles.bar}>
-        <Text style={styles.brand}>TOJ</Text>
+        <Text style={styles.brand} maxFontSizeMultiplier={FONT_CAP}>TOJ</Text>
         <Pressable
           onPress={() => nav.navigate('Search')}
           hitSlop={12}
@@ -50,9 +50,9 @@ const HomeScreen: React.FC = () => {
               <SmartImage uri={hero.image} label={hero.title} style={[styles.heroImg, { height: heroHeight }]} />
               <View style={styles.heroScrim} />
               <View style={styles.heroText}>
-                <Text style={styles.heroKicker}>NEW SEASON</Text>
-                <Text style={styles.heroTitle}>{hero.title}</Text>
-                <Text style={styles.heroCta}>SHOP NOW</Text>
+                <Text style={styles.heroKicker} maxFontSizeMultiplier={FONT_CAP}>NEW SEASON</Text>
+                <Text style={styles.heroTitle} maxFontSizeMultiplier={FONT_CAP} numberOfLines={2}>{hero.title}</Text>
+                <Text style={styles.heroCta} maxFontSizeMultiplier={FONT_CAP}>SHOP NOW</Text>
               </View>
             </Pressable>
 

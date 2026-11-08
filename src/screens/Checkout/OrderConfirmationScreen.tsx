@@ -7,7 +7,7 @@ import { DemoBanner } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { useOrderStore } from '../../store/orderStore';
 import { formatPrice } from '../../utils/format';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderConfirmation'>;
 
@@ -17,7 +17,7 @@ const OrderConfirmationScreen: React.FC<Props> = ({ route, navigation }) => {
     <Screen edges={['top', 'bottom']} padded>
       <View style={styles.center}>
         <View style={styles.tick}><Text style={styles.tickText}>✓</Text></View>
-        <Text style={styles.title} accessibilityRole="header">Demo order placed</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Demo order placed</Text>
         <Text style={styles.sub}>
           Order {route.params.orderId}
           {order ? ` · ${formatPrice(order.total)} · ${order.fulfilment === 'pickup' ? 'Store pickup' : 'Delivery'}` : ''}

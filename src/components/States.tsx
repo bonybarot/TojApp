@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { colors, typography } from '../utils/theme';
+import { colors, typography, FONT_CAP } from '../utils/theme';
 import { Button } from './Button';
 
 interface StateProps {
@@ -12,7 +12,7 @@ interface StateProps {
 
 export const EmptyState: React.FC<StateProps> = ({ title, message, actionLabel, onAction }) => (
   <View style={styles.wrap}>
-    <Text style={styles.title}>{title}</Text>
+    <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP}>{title}</Text>
     {!!message && <Text style={styles.msg}>{message}</Text>}
     {!!actionLabel && !!onAction && (
       <Button title={actionLabel} onPress={onAction} style={styles.btn} />
