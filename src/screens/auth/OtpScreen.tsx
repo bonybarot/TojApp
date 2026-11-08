@@ -55,6 +55,9 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
         onChangeText={t => { setCode(t.replace(/\D/g, '').slice(0, 6)); setError(undefined); }}
         keyboardType="number-pad"
         maxLength={6}
+        autoComplete="sms-otp"
+        textContentType="oneTimeCode"
+        onSubmitEditing={verify}
         error={error}
         autoFocus
       />

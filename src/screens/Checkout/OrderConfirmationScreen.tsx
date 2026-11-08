@@ -23,7 +23,7 @@ const OrderConfirmationScreen: React.FC<Props> = ({ route, navigation }) => {
           {order ? ` · ${formatPrice(order.total)} · ${order.fulfilment === 'pickup' ? 'Store pickup' : 'Delivery'}` : ''}
         </Text>
         <View style={styles.banner}>
-          <DemoBanner text="This was a simulated order. Nothing was charged and no order was sent to a store." />
+          <DemoBanner text="Demo order: nothing was charged. Track pickup status in My Orders." />
         </View>
       </View>
       <Button title="View order" onPress={() => navigation.replace('OrderDetails', { orderId: route.params.orderId })} />
