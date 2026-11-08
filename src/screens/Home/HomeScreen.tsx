@@ -7,7 +7,7 @@ import { ProductCard } from '../../components/ProductCard';
 import { SectionHeader } from '../../components/SectionHeader';
 import { SmartImage } from '../../components/SmartImage';
 import { ProductGridSkeleton } from '../../components/Skeleton';
-import { ErrorState } from '../../components/States';
+import { EmptyState, ErrorState } from '../../components/States';
 import { usePull, useRootNavigation } from '../../hooks';
 import { reloadProducts, useProductStore } from '../../store/productStore';
 import { colors, FONT_CAP, typography } from '../../utils/theme';
@@ -38,8 +38,10 @@ const HomeScreen: React.FC = () => {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll} refreshControl={<RefreshControl {...pull} />}>
         {status === 'error' ? (
           <ErrorState onRetry={loadProducts} />
-        ) : status !== 'ready' || !hero ? (
+        ) : status !== 'ready' ? (
           <ProductGridSkeleton />
+        ) : !hero ? (
+          <EmptyState title="Nothing in store yet" message="New styles are on the way. Pull down to refresh." />
         ) : (
           <>
             <Pressable

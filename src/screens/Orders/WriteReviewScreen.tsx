@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { deleteReview, myReviews, saveReview } from '../../api/reviews';
 import { Button } from '../../components/Button';
@@ -36,21 +36,27 @@ const WriteReviewScreen: React.FC<Props> = ({ route, navigation }) => {
   }, [productId]);
   useEffect(fetchMine, [fetchMine]);
 
-  const run = (p: Promise<unknown>) => {
+  // Ref, not busy: the Delete alert's callback closes over an old render.
+  const inFlight = useRef(false);
+  const run = (call: () => Promise<unknown>) => {
+    if (inFlight.current) {
+      return;
+    }
+    inFlight.current = true;
     setBusy(true);
-    p.then(
+    call().then(
       () => {
         useProductStore.getState().loadProducts(); // fresh ★ average on cards
         navigation.goBack();
       },
-      (e: Error) => { setError(e.message); setBusy(false); },
+      (e: Error) => { inFlight.current = false; setError(e.message); setBusy(false); },
     );
   };
-  const save = () => (rating ? run(saveReview(productId, rating, body.trim())) : setError('Choose a star rating.'));
+  const save = () => (rating ? run(() => saveReview(productId, rating, body.trim())) : setError('Choose a star rating.'));
   const remove = () =>
     Alert.alert('Delete review', 'Remove your review of this item?', [
       { text: 'Keep', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => run(deleteReview(productId)) },
+      { text: 'Delete', style: 'destructive', onPress: () => run(() => deleteReview(productId)) },
     ]);
 
   if (load !== 'ready') {
@@ -89,7 +95,7 @@ const WriteReviewScreen: React.FC<Props> = ({ route, navigation }) => {
       <Text style={styles.note}>Shown with your first name. Only customers who collected this item can review it.</Text>
       {!!error && <Text style={styles.error} accessibilityRole="alert">{error}</Text>}
       <Button title={existing ? 'Update review' : 'Post review'} onPress={save} loading={busy} />
-      {existing && <Button title="Delete review" variant="secondary" onPress={remove} style={styles.delete} />}
+      {existing && <Button title="Delete review" variant="secondary" onPress={remove} disabled={busy} style={styles.delete} />}
     </Screen>
   );
 };
