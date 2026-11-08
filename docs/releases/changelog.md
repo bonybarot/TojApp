@@ -21,6 +21,8 @@
 - `ios/Podfile`: `fmt` and `RCT-Folly` pods built as C++17 so they compile with Xcode 26.4+ clang.
 
 ### Fixed
+- API down: Search and Wishlist showed "no results" and "empty"; they now show loading or an error with Try again. Addresses reloads when opened, shows an error with retry, and a failed delete says so.
+- A saved session left unused by an offline launch now resumes once the catalogue loads again (no relaunch needed).
 - Largest text sizes (iOS Dynamic Type, Android font scale): headings, prices, labels, buttons and tab labels are capped at 1.4× (`FONT_CAP` in `utils/theme.ts`; tabs 1.2×) so they no longer clip or overlap; icon glyphs no longer scale out of their circles; body text still scales fully.
 
 - Sign-in and OTP: the keyboard's submit key now sends the code / verifies (on short screens the keyboard covers the buttons). OTP field hints SMS code autofill.

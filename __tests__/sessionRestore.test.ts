@@ -71,3 +71,16 @@ test('guest wishlist survives a cold start', async () => {
   await restoreGuestWishlist();
   expect(useWishlistStore.getState().ids).toEqual(['p1']);
 });
+
+test('offline at start: the saved session resumes once the catalogue loads again', async () => {
+  const { useProductStore } = require('../src/store/productStore');
+  await Keychain.setGenericPassword('toj', JSON.stringify(saved), STORE);
+  useProductStore.setState({ status: 'error' });
+  fetchMock.mockImplementation((url: string) =>
+    reply(url.endsWith('/me') ? { id: 'c1', name: 'Ravi', phone: '+919000000123' } : url.includes('/orders') ? { items: [] } : { lines: [] }),
+  );
+  useProductStore.setState({ status: 'loading' }); // a retry passes through loading
+  useProductStore.setState({ status: 'ready' });
+  await new Promise<void>(r => setTimeout(r, 10));
+  expect(useUserStore.getState().isLoggedIn).toBe(true);
+});

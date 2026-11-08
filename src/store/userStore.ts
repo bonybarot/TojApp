@@ -118,3 +118,17 @@ AppState.addEventListener('change', state => {
     ]);
   }
 });
+
+// Offline at launch left a saved session unused: resume it once the server answers again.
+// A retry goes error → loading → ready, so remember the failure instead of comparing with prev.
+let wasOffline = false;
+useProductStore.subscribe(s => {
+  if (s.status === 'error') {
+    wasOffline = true;
+  } else if (s.status === 'ready' && wasOffline) {
+    wasOffline = false;
+    if (!useUserStore.getState().isLoggedIn) {
+      storedTokens().then(t => { if (t) { useUserStore.getState().restore(); } });
+    }
+  }
+});

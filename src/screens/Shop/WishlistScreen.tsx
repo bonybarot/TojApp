@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback } from 'react';
-import { EmptyState } from '../../components/States';
+import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { ProductGrid } from '../../components/ProductGrid';
 import { Screen } from '../../components/Screen';
 import { useRootNavigation } from '../../hooks';
@@ -20,7 +20,16 @@ const WishlistScreen: React.FC = () => {
     }, [isLoggedIn]),
   );
   const products = useProductStore(s => s.products);
+  const status = useProductStore(s => s.status);
   const data = products.filter(p => ids.includes(p.id));
+  // Saved ids but no catalogue yet: say why instead of "empty".
+  if (ids.length > 0 && products.length === 0) {
+    return (
+      <Screen>
+        {status === 'error' ? <ErrorState onRetry={useProductStore.getState().loadProducts} /> : <LoadingState />}
+      </Screen>
+    );
+  }
   return (
     <Screen>
       <ProductGrid
