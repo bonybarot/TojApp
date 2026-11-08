@@ -13,7 +13,7 @@ Tabs (bottom): **Home**, **Shop**, **Bag**, **Account**.
 | Discovery | Home (hero, category rail, New & popular, On sale), Shop (All products, Sale, categories), ProductList (sort, size, in-stock, pickup filters), Search, Wishlist |
 | Product | ProductDetails (image pager, colour/size, per-variant stock, per-product pickup note, star summary, reviews, wishlist heart, add to bag) |
 | Bag | Bag (quantity stepper with stock cap, remove with confirmation, sold-out lines and removal notice, totals, empty state) |
-| Auth (demo OTP) | Login (phone), Otp, CompleteProfile (new accounts) |
+| Auth (demo OTP) | Login (phone), Otp (resend countdown), CompleteProfile (new accounts) |
 | Checkout | Checkout (pickup location, payment, summary), OrderConfirmation (pickup address and hours) |
 | Orders | OrderHistory, OrderDetails (timeline, pickup address and hours, cancel with confirmation, items open the product), WriteReview |
 | Account | Profile, PersonalInfo, Settings (reset demo data), Support (static FAQ) |

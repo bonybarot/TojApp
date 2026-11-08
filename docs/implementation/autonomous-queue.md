@@ -55,6 +55,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A17 Unlabeled tap targets: Android scan clean; card heart exposed as a screen-reader action
 - [x] A18 Pickup address and hours on order confirmation and order details
 - [x] A19 Bag: notice for server-removed sold-out lines and clamped quantities; guest sold-out lines block checkout
+- [x] A20 OTP resend countdown (30 s, server cooldown)
 
 ## Blocked: needs owner
 
@@ -85,3 +86,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A15: removed nativewind, drawer, gesture-handler, reanimated, worklets, new-app-screen and the address screens (ADR-0032); fixed bag doubling when Fast Refresh re-ran `restore()` (test added, jest 16). A16 Android walk TOJ-1021 placed and cancelled. A17 uiautomator scan of tabs, list, PDP, orders: no unlabeled clickables; product-card wishlist heart now a custom accessibility action
 - 2026-11-08 A18: pickup address and hours on confirmation and order details (iOS TOJ-1017, Android TOJ-1022 placed and cancelled)
 - 2026-11-08 A19: cart `warnings` were ignored, so sold-out lines vanished silently. Bag notice + guest "Sold out" block; Android walked signed-in drop, guest block, merge at sign-in (stock set to 0 via psql, restored). jest 17
+- 2026-11-08 A20: OTP resend countdown; Android screenshot "Code resent. Resend in 5s", then sign-in. uiautomator dumps go stale while the timer ticks (UI never idle); use screencap there

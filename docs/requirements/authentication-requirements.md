@@ -4,7 +4,7 @@
 
 Status: **Partly DECIDED** (2026-09-03) — see the supersession notice below. The rest is PROPOSED
 Last Verified: 2026-09-03
-Source: `src/store/userStore.ts`, `src/navigation/RootNavigator.tsx`, `src/screens/auth/*`
+Source: `src/store/userStore.ts`, `src/navigation/RootNavigator.tsx`, `src/screens/Auth/*`
 
 Every section below uses the format the planning brief requires:
 **Requirement · Options · Recommendation · Reason · Trade-offs · Marketplace implications · Status.**

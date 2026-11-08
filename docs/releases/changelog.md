@@ -12,6 +12,7 @@
 - Product reviews ([ADR-0028](../decisions/0028-reviews.md)): REVIEWS section on product details; "Write a review" on collected orders; `WriteReview` screen; `src/api/reviews.ts`.
 - Product details shows the star average and review count under the price (above the fold).
 - Order details: tapping an item's image or title opens its product.
+- OTP screen: "Resend in Ns" countdown matching the server's 30-second cooldown, instead of a rate-limit error.
 - Bag says when the server removed sold-out items or reduced quantities to stock (cart `warnings`), once per visit. A guest line that sold out is marked "Sold out" and blocks checkout.
 - Order confirmation and order details show the pickup store's address and opening hours (hidden once cancelled).
 - Pull-to-refresh on Home (catalogue), Bag (prices, stock, server bag) and Wishlist; shared `usePull` hook in `src/hooks.ts` (My Orders uses it too).
@@ -28,6 +29,7 @@
 - Addresses and AddressForm screens and `addressStore`: unreachable with pickup-only checkout; backend API unchanged.
 
 ### Fixed
+- `src/screens/auth/` was tracked lowercase while imports and disk use `Auth/`; a case-sensitive clone (Linux CI) could not resolve the sign-in screens. Renamed in git.
 - Bag quantities doubled when Fast Refresh re-ran session restore while signed in; `restore()` now returns early when already signed in.
 - Product-card wishlist heart was unreachable by VoiceOver/TalkBack (nested in the card button); the card now offers "Add to wishlist" as an accessibility action.
 - API down: Search and Wishlist showed "no results" and "empty"; they now show loading or an error with Try again. Addresses reloads when opened, shows an error with retry, and a failed delete says so.
