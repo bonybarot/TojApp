@@ -29,6 +29,7 @@
 - Addresses and AddressForm screens and `addressStore`: unreachable with pickup-only checkout; backend API unchanged.
 
 ### Fixed
+- iOS launch screen showed React Native's template ("TojApp", "Powered by React Native"); it now shows the TOJ wordmark centred. Empty `NSLocationWhenInUseUsageDescription` removed from `Info.plist` (the app uses no location; App Review rejects empty usage strings).
 - Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
 - Settings → Reset demo data gave no feedback; it now confirms, or says the server could not be reached.
 - `src/screens/auth/` was tracked lowercase while imports and disk use `Auth/`; a case-sensitive clone (Linux CI) could not resolve the sign-in screens. Renamed in git.
