@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '../../components/Screen';
 import { SmartImage } from '../../components/SmartImage';
-import { EmptyState, ErrorState } from '../../components/States';
+import { EmptyState, ErrorState, LoadingState } from '../../components/States';
 import { usePull, useRootNavigation } from '../../hooks';
 import { useOrderStore } from '../../store/orderStore';
 import { formatDate, formatPrice } from '../../utils/format';
@@ -29,6 +29,14 @@ const OrderHistoryScreen: React.FC = () => {
       </Screen>
     );
   }
+  // First load: a spinner, not a flash of "No orders yet".
+  if (status !== 'ready' && orders.length === 0) {
+    return (
+      <Screen>
+        <LoadingState />
+      </Screen>
+    );
+  }
   return (
     <Screen>
       <FlatList
@@ -50,6 +58,7 @@ const OrderHistoryScreen: React.FC = () => {
               {o.items.slice(0, 4).map(i => (
                 <SmartImage key={`${i.productId}${i.color}${i.size}`} uri={i.image} label={i.title} style={styles.thumb} />
               ))}
+              {o.items.length > 4 && <Text style={styles.sub}>+{o.items.length - 4}</Text>}
               <Text style={[typography.h3, styles.total]} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(o.total)}</Text>
             </View>
           </Pressable>
