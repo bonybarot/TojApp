@@ -14,3 +14,9 @@ export const formatDate = (iso: string): string =>
     month: 'short',
     year: 'numeric',
   });
+
+// Pasted or autofilled "+91 98765 43210" / "098765 43210": drop the prefix, not the last digits.
+export const localPhone = (t: string) => {
+  const d = t.replace(/\D/g, '');
+  return (d.length > 10 ? d.replace(/^(91|0)/, '') : d).slice(0, 10);
+};

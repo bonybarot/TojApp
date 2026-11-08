@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -8,6 +8,7 @@ import { DemoBanner } from '../../components/States';
 import { DEMO_OTP } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
 import { useUserStore } from '../../store/userStore';
+import { localPhone } from '../../utils/format';
 import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
@@ -16,11 +17,16 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
   const submit = async () => {
+    if (inFlight.current) {
+      return;
+    }
     if (!/^[6-9]\d{9}$/.test(phone)) {
       setError('Enter a valid 10-digit mobile number.');
       return;
     }
+    inFlight.current = true;
     setBusy(true);
     try {
       await useUserStore.getState().requestOtp(phone);
@@ -28,6 +34,7 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
     } catch (e) {
       setError((e as Error).message);
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
@@ -38,9 +45,9 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
       <Input
         label="Mobile number"
         value={phone}
-        onChangeText={t => { setPhone(t.replace(/\D/g, '').slice(0, 10)); setError(undefined); }}
+        onChangeText={t => { setPhone(localPhone(t)); setError(undefined); }}
         keyboardType="number-pad"
-        maxLength={10}
+        maxLength={16}
         placeholder="10-digit number"
         autoComplete="tel"
         onSubmitEditing={submit}

@@ -173,6 +173,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         : null,
     );
     setAdded(true);
+    if (timer.current) { clearTimeout(timer.current); }
     timer.current = setTimeout(() => setAdded(false), 1800);
   };
 

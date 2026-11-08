@@ -3,6 +3,7 @@ import { useCartStore } from '../src/store/cartStore';
 import { useProductStore } from '../src/store/productStore';
 import { detailLines, pickupBlockers, subtotalOf } from '../src/utils/cart';
 import { stockFor } from '../src/utils/catalogue';
+import { localPhone } from '../src/utils/format';
 
 const p = products[0];
 const color = p.colors[0].name;
@@ -45,4 +46,11 @@ test('lines without store pickup block checkout', () => {
   expect(pickupBlockers(d)).toHaveLength(0);
   useProductStore.setState({ products: [{ ...p, pickupAvailable: false }] });
   expect(pickupBlockers(detailLines(useCartStore.getState().lines))).toHaveLength(1);
+});
+
+test('pasted phone numbers keep the local 10 digits', () => {
+  expect(localPhone('+91 98765 43210')).toBe('9876543210');
+  expect(localPhone('098765 43210')).toBe('9876543210');
+  expect(localPhone('98765-43210')).toBe('9876543210');
+  expect(localPhone('9876')).toBe('9876');
 });

@@ -72,28 +72,32 @@ export const useUserStore = create<UserState>(set => ({
     set({ user: null, isLoggedIn: false });
     clearAccountData();
   },
-  restore: async () => {
-    // Already signed in (e.g. Fast Refresh re-ran App): a second merge would add the server bag to itself.
-    if (useUserStore.getState().isLoggedIn) {
-      return;
-    }
-    const t = await storedTokens();
-    if (!t) {
-      return restoreGuest();
-    }
-    setTokens(t, false);
-    try {
-      set({ user: toUser(await api<VerifyOk['customer']>('/me')), isLoggedIn: true });
-    } catch {
-      // Expired or revoked: api() already cleared it. Offline: stay guest this run, keep it for the next launch.
-      if (hasSession()) {
-        setTokens(null, false);
-      }
-      return restoreGuest();
-    }
-    await loadAccountData();
-  },
+  // Single-flight: launch and the back-online listener can both call it; two merges would double the bag.
+  restore: () => (restoring ??= restoreOnce().finally(() => { restoring = null; })),
 }));
+
+let restoring: Promise<void> | null = null;
+const restoreOnce = async () => {
+  // Already signed in (e.g. Fast Refresh re-ran App): a second merge would add the server bag to itself.
+  if (useUserStore.getState().isLoggedIn) {
+    return;
+  }
+  const t = await storedTokens();
+  if (!t) {
+    return restoreGuest();
+  }
+  setTokens(t, false);
+  try {
+    useUserStore.setState({ user: toUser(await api<VerifyOk['customer']>('/me')), isLoggedIn: true });
+  } catch {
+    // Expired or revoked: api() already cleared it. Offline: stay guest this run, keep it for the next launch.
+    if (hasSession()) {
+      setTokens(null, false);
+    }
+    return restoreGuest();
+  }
+  await loadAccountData();
+};
 
 // Refresh failed (expired or revoked): drop to guest; account data stays on the server.
 setSessionLostHandler(() => {
