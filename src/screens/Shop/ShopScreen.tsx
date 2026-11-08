@@ -6,7 +6,7 @@ import { Icon } from '../../components/Icon';
 import { padGrid, useGridColumns, useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
 import { Category } from '../../types';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 const ShopScreen: React.FC = () => {
   const nav = useRootNavigation();
@@ -28,7 +28,7 @@ const ShopScreen: React.FC = () => {
   };
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
-      <Text style={styles.title} accessibilityRole="header">Shop</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Shop</Text>
       <Pressable style={styles.search} onPress={() => nav.navigate('Search')} accessibilityRole="button" accessibilityLabel="Search products">
         <Icon name="search" size={18} color={colors.textSecondary} />
         <Text style={styles.searchText}>Search TOJ</Text>

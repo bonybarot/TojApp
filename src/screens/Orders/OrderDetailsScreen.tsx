@@ -11,7 +11,7 @@ import { RootStackParamList } from '../../navigation/types';
 import { CANCELLABLE, useOrderStore } from '../../store/orderStore';
 import { formatDate, formatPrice } from '../../utils/format';
 import { PAYMENT_LABEL, STATUS_COLOR, STATUS_LABEL, timelineFor } from '../../utils/orderStatus';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 
@@ -43,8 +43,8 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <Screen scroll padded>
-      <Text style={typography.h1}>{order.id}</Text>
-      <Text style={[styles.status, { color: STATUS_COLOR[order.status] }]}>{STATUS_LABEL[order.status].toUpperCase()}</Text>
+      <Text style={typography.h1} maxFontSizeMultiplier={FONT_CAP}>{order.id}</Text>
+      <Text maxFontSizeMultiplier={FONT_CAP} style={[styles.status, { color: STATUS_COLOR[order.status] }]}>{STATUS_LABEL[order.status].toUpperCase()}</Text>
       <Text style={styles.sub}>Placed {formatDate(order.placedAt)}</Text>
 
       {!cancelled && (
@@ -58,7 +58,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       )}
 
-      <Text style={styles.h}>ITEMS</Text>
+      <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>ITEMS</Text>
       {order.items.map((i, n) => (
         <View key={`${i.productId}${i.color}${i.size}`} style={styles.item}>
           <Pressable
@@ -82,11 +82,11 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               </Pressable>
             )}
           </View>
-          <Text style={typography.body}>{formatPrice(i.unitPrice * i.quantity)}</Text>
+          <Text style={typography.body} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(i.unitPrice * i.quantity)}</Text>
         </View>
       ))}
 
-      <Text style={styles.h}>{order.fulfilment === 'pickup' ? 'PICKUP' : 'DELIVERY ADDRESS'}</Text>
+      <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>{order.fulfilment === 'pickup' ? 'PICKUP' : 'DELIVERY ADDRESS'}</Text>
       {order.fulfilment === 'pickup' ? (
         <Text style={typography.body}>{order.pickupStore}</Text>
       ) : order.address ? (
@@ -95,13 +95,13 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </Text>
       ) : null}
 
-      <Text style={styles.h}>PAYMENT</Text>
+      <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>PAYMENT</Text>
       <Text style={typography.body}>{PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod}</Text>
 
       <View style={styles.totals}>
         <View style={styles.row}><Text style={styles.sub}>Subtotal</Text><Text style={typography.body}>{formatPrice(order.subtotal)}</Text></View>
         <View style={styles.row}><Text style={styles.sub}>{order.fulfilment === 'pickup' ? 'Pickup' : 'Delivery'}</Text><Text style={typography.body}>{order.deliveryFee ? formatPrice(order.deliveryFee) : 'Free'}</Text></View>
-        <View style={styles.row}><Text style={typography.h2}>Total</Text><Text style={typography.h2}>{formatPrice(order.total)}</Text></View>
+        <View style={styles.row}><Text style={typography.h2} maxFontSizeMultiplier={FONT_CAP}>Total</Text><Text style={typography.h2} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(order.total)}</Text></View>
       </View>
 
       {CANCELLABLE.includes(order.status) && (

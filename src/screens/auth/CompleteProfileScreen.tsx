@@ -7,7 +7,7 @@ import { Screen } from '../../components/Screen';
 import { RootStackParamList } from '../../navigation/types';
 import { useUserStore } from '../../store/userStore';
 import { finishAuth } from '../../utils/authFlow';
-import { typography } from '../../utils/theme';
+import { typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteProfile'>;
 
@@ -33,7 +33,7 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
   };
   return (
     <Screen scroll padded>
-      <Text style={styles.title} accessibilityRole="header">Welcome to TOJ</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Welcome to TOJ</Text>
       <Input label="Your name" value={name} onChangeText={t => { setName(t); setError(undefined); }} error={error} autoFocus autoCapitalize="words" />
       <Button title="Create account" onPress={submit} loading={busy} />
     </Screen>

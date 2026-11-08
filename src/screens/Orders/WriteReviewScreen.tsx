@@ -6,7 +6,7 @@ import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Screen } from '../../components/Screen';
 import { RootStackParamList } from '../../navigation/types';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WriteReview'>;
 const WORDS = ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'];
@@ -41,8 +41,8 @@ const WriteReviewScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <Screen scroll padded>
-      <Text style={typography.h2}>{title}</Text>
-      <Text style={styles.label}>YOUR RATING</Text>
+      <Text style={typography.h2} maxFontSizeMultiplier={FONT_CAP}>{title}</Text>
+      <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>YOUR RATING</Text>
       <View style={styles.stars} accessibilityRole="radiogroup">
         {[1, 2, 3, 4, 5].map(n => (
           <Pressable

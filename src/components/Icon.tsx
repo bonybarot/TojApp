@@ -29,7 +29,7 @@ export const Icon: React.FC<{ name: Name; size?: number; color?: string }> = ({
       />
     );
   }
-  return <Text style={{ fontSize: size, color, lineHeight: size + 2 }}>{name === 'close' ? '×' : '✓'}</Text>;
+  return <Text allowFontScaling={false} style={{ fontSize: size, color, lineHeight: size + 2 }}>{name === 'close' ? '×' : '✓'}</Text>;
 };
 
 const styles = StyleSheet.create({

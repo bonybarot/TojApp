@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
-import { borderRadius, colors, MIN_TOUCH, typography } from '../utils/theme';
+import { borderRadius, colors, MIN_TOUCH, typography, FONT_CAP } from '../utils/theme';
 
 interface Props {
   title: string;
@@ -40,6 +40,9 @@ export const Button: React.FC<Props> = ({
         <ActivityIndicator color={variant === 'primary' ? colors.onPrimary : colors.primary} />
       ) : (
         <Text
+          maxFontSizeMultiplier={FONT_CAP}
+          numberOfLines={1}
+          adjustsFontSizeToFit
           style={[
             styles.text,
             variant === 'primary' ? { color: colors.onPrimary } : { color: colors.primary },

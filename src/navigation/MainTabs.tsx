@@ -12,7 +12,7 @@ import { TabParamList } from './types';
 const Tab = createBottomTabNavigator<TabParamList>();
 
 const label = (text: string) => ({ focused }: { focused: boolean }) => (
-  <Text style={[styles.label, focused ? styles.on : styles.off]}>{text.toUpperCase()}</Text>
+  <Text style={[styles.label, focused ? styles.on : styles.off]} maxFontSizeMultiplier={1.2} numberOfLines={1}>{text.toUpperCase()}</Text>
 );
 
 export const MainTabs: React.FC = () => {

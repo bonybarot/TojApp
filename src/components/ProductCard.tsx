@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useWishlistStore } from '../store/wishlistStore';
 import { Product } from '../types';
 import { isSoldOut } from '../utils/catalogue';
-import { colors, typography } from '../utils/theme';
+import { colors, typography, FONT_CAP } from '../utils/theme';
 import { Price } from './Price';
 import { SmartImage } from './SmartImage';
 
@@ -46,10 +46,10 @@ export const ProductCard: React.FC<Props> = ({ product, onPress }) => {
           accessibilityRole="button"
           accessibilityLabel={`${liked ? 'Remove' : 'Add'} ${product.title} ${liked ? 'from' : 'to'} wishlist`}
         >
-          <Text style={[styles.heartText, liked && { color: colors.error }]}>{liked ? '♥' : '♡'}</Text>
+          <Text allowFontScaling={false} style={[styles.heartText, liked && { color: colors.error }]}>{liked ? '♥' : '♡'}</Text>
         </Pressable>
       </View>
-      <Text style={styles.title} numberOfLines={1}>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} numberOfLines={1}>
         {product.title}
       </Text>
       <Price product={product} />

@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { Button } from './Button';
 import { Chip } from './Chip';
-import { borderRadius, colors, typography } from '../utils/theme';
+import { borderRadius, colors, typography, FONT_CAP } from '../utils/theme';
 
 export type SortKey = 'featured' | 'priceAsc' | 'priceDesc';
 
@@ -38,15 +38,15 @@ export const FilterSheet: React.FC<Props> = ({ visible, value, sizeOptions, onCh
   <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
     <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close filters" />
     <View style={styles.sheet}>
-      <Text style={styles.title} accessibilityRole="header">Sort & filter</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Sort & filter</Text>
       <ScrollView>
-        <Text style={styles.label}>SORT BY</Text>
+        <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>SORT BY</Text>
         <View style={styles.wrap}>
           {SORTS.map(s => (
             <Chip key={s.key} label={s.label} selected={value.sort === s.key} onPress={() => onChange({ ...value, sort: s.key })} />
           ))}
         </View>
-        <Text style={styles.label}>SIZE</Text>
+        <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>SIZE</Text>
         <View style={styles.wrap}>
           {sizeOptions.map(z => (
             <Chip

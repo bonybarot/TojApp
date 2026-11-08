@@ -5,7 +5,7 @@ import { Icon } from '../../components/Icon';
 import { Screen } from '../../components/Screen';
 import { useRootNavigation } from '../../hooks';
 import { useUserStore } from '../../store/userStore';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 const Row: React.FC<{ title: string; onPress: () => void }> = ({ title, onPress }) => (
   <Pressable style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
@@ -27,7 +27,7 @@ const ProfileScreen: React.FC = () => {
   if (!user) {
     return (
       <Screen edges={['top']} padded>
-        <Text style={styles.title} accessibilityRole="header">Profile</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Profile</Text>
         <Text style={styles.sub}>Browse as a guest. Sign in to check out and track orders.</Text>
         <Button title="Sign in or create account" onPress={() => nav.navigate('Login', {})} />
         <View style={styles.links}>
@@ -39,7 +39,7 @@ const ProfileScreen: React.FC = () => {
   }
   return (
     <Screen edges={['top']} scroll padded>
-      <Text style={styles.title} accessibilityRole="header">{user.name}</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">{user.name}</Text>
       <Text style={styles.sub}>+91 {user.phone}</Text>
       <Row title="Personal Information" onPress={() => nav.navigate('PersonalInfo')} />
       <Row title="My Orders" onPress={() => nav.navigate('OrderHistory')} />

@@ -21,6 +21,7 @@
 - `ios/Podfile`: `fmt` and `RCT-Folly` pods built as C++17 so they compile with Xcode 26.4+ clang.
 
 ### Fixed
+- Largest text sizes (iOS Dynamic Type, Android font scale): headings, prices, labels, buttons and tab labels are capped at 1.4× (`FONT_CAP` in `utils/theme.ts`; tabs 1.2×) so they no longer clip or overlap; icon glyphs no longer scale out of their circles; body text still scales fully.
 
 - Sign-in and OTP: the keyboard's submit key now sends the code / verifies (on short screens the keyboard covers the buttons). OTP field hints SMS code autofill.
 - Order confirmation said no order was sent to a store; orders now exist on the server. Copy now points to My Orders.

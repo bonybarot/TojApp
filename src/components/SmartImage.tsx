@@ -14,7 +14,7 @@ export const SmartImage: React.FC<Props> = ({ uri, style, label }) => {
   if (!uri || failed) {
     return (
       <View style={[styles.fallback, style as object]} accessibilityElementsHidden>
-        <Text style={styles.mark}>{(label ?? 'TOJ').slice(0, 1).toUpperCase()}</Text>
+        <Text allowFontScaling={false} style={styles.mark}>{(label ?? 'TOJ').slice(0, 1).toUpperCase()}</Text>
       </View>
     );
   }

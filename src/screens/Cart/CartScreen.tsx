@@ -11,7 +11,7 @@ import { useCartStore } from '../../store/cartStore';
 import { useUserStore } from '../../store/userStore';
 import { detailLines, pickupBlockers, subtotalOf } from '../../utils/cart';
 import { formatPrice } from '../../utils/format';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 const CartScreen: React.FC = () => {
   const nav = useRootNavigation();
@@ -41,7 +41,7 @@ const CartScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
-      <Text style={styles.title} accessibilityRole="header">Bag</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Bag</Text>
       {detailed.length === 0 ? (
         <EmptyState
           title="Your bag is empty"
@@ -63,7 +63,7 @@ const CartScreen: React.FC = () => {
                 <View style={styles.info}>
                   <Text style={styles.name} numberOfLines={2}>{d.product.title}</Text>
                   <Text style={styles.meta}>{d.line.color} · Size {d.line.size}</Text>
-                  <Text style={styles.price}>{formatPrice(d.lineTotal)}</Text>
+                  <Text style={styles.price} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(d.lineTotal)}</Text>
                   <View style={styles.actions}>
                     <QuantityStepper
                       value={d.line.quantity}
@@ -89,7 +89,7 @@ const CartScreen: React.FC = () => {
               <Text style={styles.sumText}>Store pickup</Text>
               <Text style={styles.sumText}>Free</Text>
             </View>
-            <View style={[styles.row, styles.totalRow]}><Text style={styles.total}>Total</Text><Text style={styles.total}>{formatPrice(subtotal)}</Text></View>
+            <View style={[styles.row, styles.totalRow]}><Text style={styles.total} maxFontSizeMultiplier={FONT_CAP}>Total</Text><Text style={styles.total} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(subtotal)}</Text></View>
             {blocked && (
               <Text style={styles.blocked} accessibilityRole="alert">
                 Orders are store pickup only. Remove items not available for pickup to check out.

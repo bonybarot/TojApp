@@ -2,15 +2,15 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Product } from '../types';
 import { formatPrice } from '../utils/format';
-import { colors, typography } from '../utils/theme';
+import { colors, FONT_CAP, typography } from '../utils/theme';
 
 export const Price: React.FC<{ product: Product; large?: boolean }> = ({ product, large }) => (
   <View style={styles.row}>
-    <Text style={[styles.price, large && styles.large, !!product.compareAtPrice && { color: colors.error }]}>
+    <Text maxFontSizeMultiplier={FONT_CAP} style={[styles.price, large && styles.large, !!product.compareAtPrice && { color: colors.error }]}>
       {formatPrice(product.price)}
     </Text>
     {!!product.compareAtPrice && (
-      <Text style={styles.compare}>{formatPrice(product.compareAtPrice)}</Text>
+      <Text maxFontSizeMultiplier={FONT_CAP} style={styles.compare}>{formatPrice(product.compareAtPrice)}</Text>
     )}
   </View>
 );

@@ -9,7 +9,7 @@ import { DEMO_OTP } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
 import { useUserStore } from '../../store/userStore';
 import { finishAuth } from '../../utils/authFlow';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Otp'>;
 
@@ -47,7 +47,7 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <Screen scroll padded>
-      <Text style={styles.title} accessibilityRole="header">Enter code</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Enter code</Text>
       <Text style={styles.sub}>Sent to +91 {phone} (simulated, no SMS)</Text>
       <Input
         label="6-digit code"

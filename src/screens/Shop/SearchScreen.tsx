@@ -6,7 +6,7 @@ import { Screen } from '../../components/Screen';
 import { useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
 import { searchProducts } from '../../utils/filter';
-import { borderRadius, colors, typography } from '../../utils/theme';
+import { borderRadius, colors, typography, FONT_CAP } from '../../utils/theme';
 
 const SearchScreen: React.FC = () => {
   const nav = useRootNavigation();
@@ -36,7 +36,7 @@ const SearchScreen: React.FC = () => {
         />
       ) : (
         <View style={styles.sugg}>
-          <Text style={styles.label}>POPULAR CATEGORIES</Text>
+          <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>POPULAR CATEGORIES</Text>
           <View style={styles.wrap}>
             {categories.map(c => (
               <Pressable

@@ -23,7 +23,7 @@ import { formatDate } from '../../utils/format';
 import { useProductStore } from '../../store/productStore';
 import { useWishlistStore } from '../../store/wishlistStore';
 import { isSoldOut, stockFor } from '../../utils/catalogue';
-import { colors, typography } from '../../utils/theme';
+import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductDetails'>;
 
@@ -38,7 +38,7 @@ const HeartButton: React.FC<{ productId: string }> = ({ productId }) => {
       accessibilityRole="button"
       accessibilityLabel={liked ? 'Remove from wishlist' : 'Add to wishlist'}
     >
-      <Text style={[styles.heartIcon, liked && styles.heartOn]}>
+      <Text allowFontScaling={false} style={[styles.heartIcon, liked && styles.heartOn]}>
         {liked ? '♥' : '♡'}
       </Text>
     </Pressable>
@@ -48,8 +48,8 @@ const HeartButton: React.FC<{ productId: string }> = ({ productId }) => {
 /** ADR-0028. Read-only here; customers write from a collected order. */
 const plural = (n: number) => `${n} ${n === 1 ? 'review' : 'reviews'}`;
 const Summary: React.FC<{ r: Rating }> = ({ r }) => (
-  <Text style={styles.rSummary} accessibilityLabel={`Rated ${r.average} out of 5 from ${plural(r.count)}`}>
-    <Text style={styles.rStars}>{stars(r.average)}</Text>  {r.average.toFixed(1)} · {plural(r.count)}
+  <Text style={styles.rSummary} maxFontSizeMultiplier={FONT_CAP} accessibilityLabel={`Rated ${r.average} out of 5 from ${plural(r.count)}`}>
+    <Text style={styles.rStars} maxFontSizeMultiplier={FONT_CAP}>{stars(r.average)}</Text>  {r.average.toFixed(1)} · {plural(r.count)}
   </Text>
 );
 
@@ -59,7 +59,7 @@ const Reviews: React.FC<{ r: ProductReviews | null }> = ({ r }) => {
   }
   return (
     <>
-      <Text style={styles.label}>REVIEWS</Text>
+      <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>REVIEWS</Text>
       {r.average === null ? (
         <Text style={styles.boxText}>No reviews yet. Customers who collect this item can review it from My Orders.</Text>
       ) : (
@@ -67,7 +67,7 @@ const Reviews: React.FC<{ r: ProductReviews | null }> = ({ r }) => {
       )}
       {r.items.map(x => (
         <View key={x.id} style={styles.review} accessible accessibilityLabel={`${x.rating} out of 5 by ${x.author}. ${x.body}`}>
-          <Text style={styles.rStars}>{stars(x.rating)}</Text>
+          <Text style={styles.rStars} maxFontSizeMultiplier={FONT_CAP}>{stars(x.rating)}</Text>
           {!!x.body && <Text style={styles.desc}>{x.body}</Text>}
           <Text style={styles.boxText}>{x.author} · {formatDate(x.createdAt)} · Verified purchase</Text>
         </View>
@@ -233,11 +233,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         {!!product.tag && (
           <Text style={styles.tag}>{product.tag.toUpperCase()}</Text>
         )}
-        <Text style={styles.title}>{product.title}</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP}>{product.title}</Text>
         <Price product={product} large />
         {!!rating && <Summary r={rating} />}
 
-        <Text style={styles.label}>COLOUR — {color.toUpperCase()}</Text>
+        <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>COLOUR — {color.toUpperCase()}</Text>
         <View style={styles.row}>
           {product.colors.map(c => (
             <Pressable
@@ -256,7 +256,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           ))}
         </View>
 
-        <Text style={styles.label}>SIZE</Text>
+        <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>SIZE</Text>
         <View style={styles.row}>
           {product.sizes.map(z => (
             <Chip
@@ -283,7 +283,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </Text>
 
         <View style={styles.box}>
-          <Text style={styles.boxTitle}>Store pickup</Text>
+          <Text style={styles.boxTitle} maxFontSizeMultiplier={FONT_CAP}>Store pickup</Text>
           <Text style={styles.boxText}>
             {product.pickupAvailable
               ? `Available at ${PICKUP_STORE.name}, ${PICKUP_STORE.address}.`
@@ -291,7 +291,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           </Text>
         </View>
 
-        <Text style={styles.label}>DESCRIPTION</Text>
+        <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>DESCRIPTION</Text>
         <Text style={styles.desc}>{product.description}</Text>
         {product.details.map(d => (
           <Text key={d} style={styles.desc}>

@@ -52,3 +52,5 @@ export const elevation: Record<'sm' | 'md', ViewStyle> = {
 };
 
 export const MIN_TOUCH = 44;
+// Cap for display text (logo, headings over images, tabs) so the largest Dynamic Type sizes do not clip it; body text scales freely.
+export const FONT_CAP = 1.4;

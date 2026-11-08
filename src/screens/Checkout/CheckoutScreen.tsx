@@ -11,7 +11,7 @@ import { useOrderStore } from '../../store/orderStore';
 import { useProductStore } from '../../store/productStore';
 import { detailLines, pickupBlockers, subtotalOf } from '../../utils/cart';
 import { formatPrice } from '../../utils/format';
-import { borderRadius, colors, typography } from '../../utils/theme';
+import { borderRadius, colors, typography, FONT_CAP } from '../../utils/theme';
 
 const Option: React.FC<{ title: string; sub?: string; selected: boolean; disabled?: boolean; onPress: () => void }> = ({ title, sub, selected, disabled, onPress }) => (
   <Pressable
@@ -97,7 +97,7 @@ const CheckoutScreen: React.FC = () => {
       }
     >
       <View style={styles.body}>
-        <Text style={styles.h}>PICKUP LOCATION</Text>
+        <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>PICKUP LOCATION</Text>
         <View style={styles.card}>
           <Text style={typography.h3}>{pickup.name}</Text>
           <Text style={styles.sub}>{pickup.address}</Text>
@@ -107,11 +107,11 @@ const CheckoutScreen: React.FC = () => {
           <Text style={styles.error}>Not available for pickup: {blockers.map(b => b.product.title).join(', ')}</Text>
         )}
 
-        <Text style={styles.h}>PAYMENT</Text>
+        <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>PAYMENT</Text>
         <Option title="Pay at store" selected={!card} onPress={() => setCard(false)} />
         <Option title="Card" sub="Simulated — no card details are collected or charged" selected={card} onPress={() => setCard(true)} />
 
-        <Text style={styles.h}>ORDER SUMMARY</Text>
+        <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>ORDER SUMMARY</Text>
         {detailed.map(d => (
           <View key={d.line.lineId} style={styles.item}>
             <SmartImage uri={d.product.image} label={d.product.title} style={styles.thumb} />
@@ -119,12 +119,12 @@ const CheckoutScreen: React.FC = () => {
               <Text style={typography.body} numberOfLines={1}>{d.product.title}</Text>
               <Text style={styles.sub}>{d.line.color} · {d.line.size} · Qty {d.line.quantity}</Text>
             </View>
-            <Text style={typography.body}>{formatPrice(d.lineTotal)}</Text>
+            <Text style={typography.body} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(d.lineTotal)}</Text>
           </View>
         ))}
         <View style={styles.sumRow}><Text style={styles.sub}>Subtotal</Text><Text style={typography.body}>{formatPrice(subtotal)}</Text></View>
         <View style={styles.sumRow}><Text style={styles.sub}>Pickup</Text><Text style={typography.body}>Free</Text></View>
-        <View style={styles.sumRow}><Text style={typography.h2}>Total</Text><Text style={typography.h2}>{formatPrice(subtotal)}</Text></View>
+        <View style={styles.sumRow}><Text style={typography.h2} maxFontSizeMultiplier={FONT_CAP}>Total</Text><Text style={typography.h2} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(subtotal)}</Text></View>
 
         <View style={styles.banner}>
           <DemoBanner text="Demo checkout: no payment is taken. The order is saved on the local demo server only." />
