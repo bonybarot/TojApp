@@ -34,7 +34,7 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
   return (
     <Screen scroll padded>
       <Text style={styles.title} maxFontSizeMultiplier={FONT_CAP} accessibilityRole="header">Welcome to TOJ</Text>
-      <Input label="Your name" value={name} onChangeText={t => { setName(t); setError(undefined); }} error={error} autoFocus autoCapitalize="words" />
+      <Input label="Your name" value={name} onChangeText={t => { setName(t); setError(undefined); }} error={error} autoFocus autoCapitalize="words" maxLength={60} />
       <Button title="Create account" onPress={submit} loading={busy} />
     </Screen>
   );
