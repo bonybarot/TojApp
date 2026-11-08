@@ -1,11 +1,13 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { deleteReview, myReviews, saveReview } from '../../api/reviews';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Screen } from '../../components/Screen';
+import { ErrorState, LoadingState } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
+import { useProductStore } from '../../store/productStore';
 import { colors, typography, FONT_CAP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WriteReview'>;
@@ -18,19 +20,31 @@ const WriteReviewScreen: React.FC<Props> = ({ route, navigation }) => {
   const [existing, setExisting] = useState(false);
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
+  // Form waits for any existing review: saving is an upsert, so an empty form would silently replace it.
+  const [load, setLoad] = useState<'loading' | 'ready' | 'error'>('loading');
 
-  useEffect(() => {
-    myReviews()
-      .then(list => {
+  const fetchMine = useCallback(() => {
+    setLoad('loading');
+    myReviews().then(
+      list => {
         const r = list.find(x => x.productId === productId);
         if (r) { setRating(r.rating); setBody(r.body); setExisting(true); }
-      })
-      .catch(() => {});
+        setLoad('ready');
+      },
+      () => setLoad('error'),
+    );
   }, [productId]);
+  useEffect(fetchMine, [fetchMine]);
 
   const run = (p: Promise<unknown>) => {
     setBusy(true);
-    p.then(() => navigation.goBack(), (e: Error) => { setError(e.message); setBusy(false); });
+    p.then(
+      () => {
+        useProductStore.getState().loadProducts(); // fresh ★ average on cards
+        navigation.goBack();
+      },
+      (e: Error) => { setError(e.message); setBusy(false); },
+    );
   };
   const save = () => (rating ? run(saveReview(productId, rating, body.trim())) : setError('Choose a star rating.'));
   const remove = () =>
@@ -38,6 +52,10 @@ const WriteReviewScreen: React.FC<Props> = ({ route, navigation }) => {
       { text: 'Keep', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => run(deleteReview(productId)) },
     ]);
+
+  if (load !== 'ready') {
+    return <Screen>{load === 'error' ? <ErrorState onRetry={fetchMine} /> : <LoadingState />}</Screen>;
+  }
 
   return (
     <Screen scroll padded>

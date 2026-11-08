@@ -23,6 +23,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const pickup = useProductStore(s => s.pickup);
   const id = route.params.orderId;
   const [reviewed, setReviewed] = useState<string[]>([]);
+  const [cancelling, setCancelling] = useState(false);
   const collected = order?.status === 'COLLECTED';
   const pull = usePull(useCallback(() => useOrderStore.getState().refreshOne(id), [id]));
   useFocusEffect(
@@ -42,7 +43,10 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const confirmCancel = () =>
     Alert.alert('Cancel order', `Cancel ${order.id}?`, [
       { text: 'Keep order', style: 'cancel' },
-      { text: 'Cancel order', style: 'destructive', onPress: () => { cancel(order.id).catch((e: Error) => Alert.alert('Could not cancel', e.message)); } },
+      { text: 'Cancel order', style: 'destructive', onPress: () => {
+        setCancelling(true);
+        cancel(order.id).catch((e: Error) => Alert.alert('Could not cancel', e.message)).finally(() => setCancelling(false));
+      } },
     ]);
 
   return (
@@ -73,7 +77,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <SmartImage uri={i.image} label={i.title} style={styles.thumb} />
           </Pressable>
           <View style={styles.itemText}>
-            <Text style={typography.body} onPress={() => navigation.navigate('ProductDetails', { productId: i.productId })}>{i.title}</Text>
+            <Text style={typography.body} accessibilityRole="link" onPress={() => navigation.navigate('ProductDetails', { productId: i.productId })}>{i.title}</Text>
             <Text style={styles.sub}>{i.color} · {i.size} · Qty {i.quantity}</Text>
             {collected && order.items.findIndex(x => x.productId === i.productId) === n && (
               <Pressable
@@ -112,7 +116,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       </View>
 
       {CANCELLABLE.includes(order.status) && (
-        <Button title="Cancel order" variant="secondary" onPress={confirmCancel} style={styles.cancel} />
+        <Button title="Cancel order" variant="secondary" onPress={confirmCancel} loading={cancelling} style={styles.cancel} />
       )}
     </Screen>
   );
