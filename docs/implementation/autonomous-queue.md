@@ -59,6 +59,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A21 Personal info save busy/unchanged state; reset demo data confirms result
 - [x] A22 Branded iOS launch screen (TOJ wordmark)
 - [x] A23 Read-only Input styling
+- [x] A24 Shop: All products / Sale tiles get their own images
 
 ## Blocked: needs owner
 
@@ -93,3 +94,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A21: PersonalInfo busy + disabled-when-unchanged; Settings reset alerts "Demo data cleared" or server error. Android verified both
 - 2026-11-08 A22: iOS LaunchScreen.storyboard was the RN template; now "T O J" light 40pt centred. Removed empty NSLocationWhenInUseUsageDescription. iOS rebuilt (xcodebuild OK, warning gone), splash screenshot checked
 - 2026-11-08 A23: Input editable=false styled surface/secondary; iOS screenshot of Personal Information checked. iOS walk also confirmed: session survives reinstall, Save disabled when unchanged
+- 2026-11-08 A24: Shop 'All products' and 'Sale' tiles reused Tops/Outerwear images; now pick product images not used by any category (sale tile from a discounted product). iOS: reset-demo confirm + 'Demo data cleared' alert verified; Shop grid shows 7 distinct tiles
