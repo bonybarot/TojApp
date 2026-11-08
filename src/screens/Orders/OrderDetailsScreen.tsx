@@ -13,7 +13,7 @@ import { CANCELLABLE, useOrderStore } from '../../store/orderStore';
 import { useProductStore } from '../../store/productStore';
 import { formatDate, formatPrice } from '../../utils/format';
 import { PAYMENT_LABEL, STATUS_COLOR, STATUS_LABEL, timelineFor } from '../../utils/orderStatus';
-import { colors, typography, FONT_CAP } from '../../utils/theme';
+import { colors, typography, FONT_CAP, LINK_SLOP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 
@@ -82,7 +82,7 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             {collected && order.items.findIndex(x => x.productId === i.productId) === n && (
               <Pressable
                 onPress={() => navigation.navigate('WriteReview', { productId: i.productId, title: i.title })}
-                hitSlop={12}
+                hitSlop={LINK_SLOP}
                 accessibilityRole="button"
                 accessibilityLabel={`${reviewed.includes(i.productId) ? 'Edit your review of' : 'Write a review of'} ${i.title}`}
               >

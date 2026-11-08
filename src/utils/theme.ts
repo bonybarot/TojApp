@@ -52,5 +52,7 @@ export const elevation: Record<'sm' | 'md', ViewStyle> = {
 };
 
 export const MIN_TOUCH = 44;
+// Text links are ~16dp tall: this slop lifts them to the 44pt target without changing layout.
+export const LINK_SLOP = { top: 14, bottom: 14, left: 10, right: 10 };
 // Cap for display text (logo, headings over images, tabs) so the largest Dynamic Type sizes do not clip it; body text scales freely.
 export const FONT_CAP = 1.4;

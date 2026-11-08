@@ -9,7 +9,7 @@ import { DEMO_OTP } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
 import { useUserStore } from '../../store/userStore';
 import { finishAuth } from '../../utils/authFlow';
-import { colors, typography, FONT_CAP } from '../../utils/theme';
+import { colors, typography, FONT_CAP, LINK_SLOP } from '../../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Otp'>;
 
@@ -84,7 +84,7 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
         autoFocus
       />
       <Button title="Verify" onPress={() => verify()} loading={busy} />
-      <Pressable onPress={resend} disabled={wait > 0 || sending} hitSlop={8} accessibilityRole="button" accessibilityState={{ disabled: wait > 0 || sending }} style={styles.resend}>
+      <Pressable onPress={resend} disabled={wait > 0 || sending} hitSlop={LINK_SLOP} accessibilityRole="button" accessibilityState={{ disabled: wait > 0 || sending }} style={styles.resend}>
         <Text style={wait > 0 ? styles.waiting : styles.link}>
           {wait > 0 ? `${resent ? 'Code resent. ' : ''}Resend in ${wait}s` : 'Resend code'}
         </Text>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, FONT_CAP, typography } from '../utils/theme';
+import { colors, FONT_CAP, typography, LINK_SLOP } from '../utils/theme';
 
 export const SectionHeader: React.FC<{ title: string; action?: string; onAction?: () => void }> = ({
   title,
@@ -12,7 +12,7 @@ export const SectionHeader: React.FC<{ title: string; action?: string; onAction?
       {title}
     </Text>
     {!!action && (
-      <Pressable onPress={onAction} hitSlop={10} accessibilityRole="button">
+      <Pressable onPress={onAction} hitSlop={LINK_SLOP} accessibilityRole="button">
         <Text style={styles.action} maxFontSizeMultiplier={FONT_CAP}>{action}</Text>
       </Pressable>
     )}

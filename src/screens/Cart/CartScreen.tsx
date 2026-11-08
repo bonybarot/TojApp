@@ -12,7 +12,7 @@ import { reloadProducts, useProductStore } from '../../store/productStore';
 import { useUserStore } from '../../store/userStore';
 import { detailLines, pickupBlockers, subtotalOf } from '../../utils/cart';
 import { formatPrice } from '../../utils/format';
-import { colors, typography, FONT_CAP } from '../../utils/theme';
+import { colors, typography, FONT_CAP, LINK_SLOP } from '../../utils/theme';
 
 // Pull: fresh prices and stock; signed in, the server bag too.
 const reloadBag = () =>
@@ -92,7 +92,7 @@ const CartScreen: React.FC = () => {
                         return now + delta <= 0 ? confirmRemove(d.line.lineId, d.product.title) : setQuantity(d.line.lineId, now + delta);
                       }}
                     />
-                    <Pressable onPress={() => confirmRemove(d.line.lineId, d.product.title)} hitSlop={10} accessibilityRole="button" accessibilityLabel={`Remove ${d.product.title}`}>
+                    <Pressable onPress={() => confirmRemove(d.line.lineId, d.product.title)} hitSlop={LINK_SLOP} accessibilityRole="button" accessibilityLabel={`Remove ${d.product.title}`}>
                       <Text style={styles.remove}>Remove</Text>
                     </Pressable>
                   </View>
