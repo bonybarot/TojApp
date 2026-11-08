@@ -13,7 +13,7 @@ export const Input: React.FC<Props> = ({ label, error, style, ...rest }) => (
     <TextInput
       accessibilityLabel={label}
       placeholderTextColor={colors.disabled}
-      style={[styles.input, !!error && styles.inputError, style]}
+      style={[styles.input, rest.editable === false && styles.readOnly, !!error && styles.inputError, style]}
       {...rest}
     />
     {!!error && (
@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     backgroundColor: colors.background,
   },
+  readOnly: { backgroundColor: colors.surface, color: colors.textSecondary },
   inputError: { borderColor: colors.error },
   error: { ...typography.caption, color: colors.error, marginTop: 4 },
 });
