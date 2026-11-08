@@ -81,7 +81,7 @@ const CartScreen: React.FC = () => {
                 </Pressable>
                 <View style={styles.info}>
                   <Text style={styles.name} numberOfLines={2}>{d.product.title}</Text>
-                  <Text style={styles.meta}>{d.line.color} · Size {d.line.size}</Text>
+                  <Text style={styles.meta}>{d.line.color} · {d.line.size}</Text>
                   <Text style={styles.price} maxFontSizeMultiplier={FONT_CAP}>{formatPrice(d.lineTotal)}</Text>
                   <View style={styles.actions}>
                     <QuantityStepper
