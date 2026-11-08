@@ -9,6 +9,7 @@
 - Android release signing reads the upload key from `TOJ_UPLOAD_*` gradle properties (BUILD-01 config; falls back to the debug key for local builds).
 - Guest bag survives a cold start (Keychain service `toj.guestBag`, ADR-0006 amendment); wiped once a session exists. Guest wishlist hearts too (`toj.guestWishlist`).
 - Product reviews ([ADR-0028](../decisions/0028-reviews.md)): REVIEWS section on product details; "Write a review" on collected orders; `WriteReview` screen; `src/api/reviews.ts`.
+- Product details shows the star average and review count under the price (above the fold).
 
 ### Changed
 - Bag tab screen-reader label says "1 item", not "1 items".
