@@ -75,6 +75,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A37 Product page pickup line uses the server store
 - [x] A38 My Orders shows a spinner on first load and +N for long orders
 - [x] A39 Guest bag waits for the catalogue instead of showing empty
+- [x] A40 Android: no crash when the activity is recreated
 
 ## Blocked: needs owner
 
@@ -125,3 +126,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A37: the product page's "Available at …" line read the fixture store, not `GET /pickup-locations` (same miss as A32). It now reads `useProductStore.pickup`; only the store's initial value still comes from the fixture. Same text today, so no visible change.
 - 2026-11-08 A38: My Orders flashed "No orders yet" before the first load finished; it now shows the spinner until the list arrives. Orders with more than four lines show "+N" after the thumbnails. Checked on Android.
 - 2026-11-08 A39: on a cold start the Bag tab could show "Your bag is empty" for a saved guest bag, because it read the catalogue once with `getState()` and never re-rendered when it arrived. It now subscribes to the catalogue and shows a spinner, or an error with Try again, until it loads. Checked on Android with the API paused (SIGSTOP): spinner, then error after the 10 s timeout, then the bag after resume and Try again.
+- 2026-11-08 A40: Android crashed ("Screen fragments should never be restored") whenever MainActivity was recreated: changing the system font size or language, or restoring the app after the OS killed it in the background. `MainActivity.onCreate` now sets react-native-screens' `RNScreensFragmentFactory`, as its README says. Checked on the emulator: font scale 1.3 then 1.0 while on My Orders; the app restarts at Home with no crash and stays signed in. Layout at 1.3x checked on Home and the product page.
