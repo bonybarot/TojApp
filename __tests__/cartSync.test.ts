@@ -4,9 +4,14 @@ import { useProductStore } from '../src/store/productStore';
 
 // Signed in; each request stays pending until the test answers it.
 const mockPending: ((qty: number) => void)[] = [];
+const mockFail: (() => void)[] = [];
 jest.mock('../src/api/client', () => ({
   hasSession: () => true,
-  api: () => new Promise(resolve => mockPending.push(qty => resolve(qty ? { lines: [{ ...mockLine, quantity: qty }] } : { lines: [], warnings: [{ code: 'UNAVAILABLE' }] }))),
+  api: () =>
+    new Promise((resolve, reject) => {
+      mockPending.push(qty => resolve(qty ? { lines: [{ ...mockLine, quantity: qty }] } : { lines: [], warnings: [{ code: 'UNAVAILABLE' }] }));
+      mockFail.push(() => reject(new Error('NETWORK')));
+    }),
 }));
 
 const p = { ...products[0], stock: { 'Navy|L': 10 }, variants: [{ id: 'v1', sku: 's', color: 'Navy', size: 'L', stock: 10 }] };
@@ -47,4 +52,14 @@ test('a refresh that answers after a tap does not undo the tap', async () => {
   await refresh;
   await flush();
   expect(useCartStore.getState().lines[0].quantity).toBe(2);
+});
+
+test('offline: a failed change shows the last bag the server confirmed, not the tap', async () => {
+  useCartStore.getState().setQuantity(`${p.id}|Navy|L`, 3); // server holds 2
+  mockFail.at(-1)!(); // the PUT fails
+  await flush();
+  mockFail.at(-1)!(); // and so does the re-fetch
+  await flush();
+  expect(useCartStore.getState().lines[0].quantity).toBe(2);
+  expect(useCartStore.getState().notice).toMatch(/Could not update/);
 });

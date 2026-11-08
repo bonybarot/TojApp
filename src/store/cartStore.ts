@@ -69,6 +69,9 @@ export const useCartStore = create<CartStore>((set, get) => {
   let mergeKey = '';
   // The server ADDS merged quantities, so only one merge may be in flight, and no PUT beside it.
   let merging: Promise<void> | null = null;
+  // Last bag the server confirmed: shown again when a change fails and the server is unreachable.
+  let confirmed: CartLine[] | null = null;
+  const take = (c: ServerCart) => (confirmed = fromServer(c));
   const sync = (l: CartLine, quantity: number) => {
     // Unmerged: edits stay local and ride in the retried merge (the server adds merged quantities).
     if (!hasSession() || unmerged || merging) {
@@ -83,15 +86,22 @@ export const useCartStore = create<CartStore>((set, get) => {
       quantity > 0
         ? api<ServerCart>(`/me/cart/items/${vid}`, { method: 'PUT', body: { quantity: Math.min(quantity, 20) } })
         : api<ServerCart>(`/me/cart/items/${vid}`, { method: 'DELETE' });
-    const adopt = (c: ServerCart) => mine === latest && set({ lines: fromServer(c) });
+    const adopt = (c: ServerCart) => {
+      const lines = take(c);
+      return mine === latest && set({ lines });
+    };
     req
       .then(adopt, () => {
         if (!hasSession()) {
           return; // Signed out meanwhile: nothing to report or re-adopt.
         }
-        // Failed change: say so, then fall back to the server's bag (if reachable; else the focus refresh fixes it).
+        // Failed change: say so, then fall back to the server's bag, or, offline, the last one it confirmed.
         set({ notice: 'Could not update your bag. Check your connection and try again.' });
-        return api<ServerCart>('/me/cart').then(adopt);
+        return api<ServerCart>('/me/cart').then(adopt, () => {
+          if (mine === latest && confirmed && hasSession()) {
+            set({ lines: confirmed });
+          }
+        });
       })
       .catch(() => {});
   };
@@ -126,7 +136,7 @@ export const useCartStore = create<CartStore>((set, get) => {
     unmerged = false;
     merging = null; // the re-applied taps below must sync
     const after = get().lines;
-    set({ lines: fromServer(c), notice: noticeOf(c) });
+    set({ lines: take(c), notice: noticeOf(c) });
     // Taps while the merge ran stayed local: re-apply them as changes on top of the merged bag.
     const qty = (ls: CartLine[], id: string) => ls.find(l => l.lineId === id)?.quantity ?? 0;
     for (const l of new Set([...before, ...after].map(x => x.lineId))) {
@@ -183,6 +193,7 @@ export const useCartStore = create<CartStore>((set, get) => {
     },
     clearCart: () => {
       unmerged = false;
+      confirmed = null;
       set({ lines: [] });
     },
     mergeIntoServer: () => {
@@ -201,7 +212,7 @@ export const useCartStore = create<CartStore>((set, get) => {
         return; // A tap meanwhile (its own answer is newer), or signed out.
       }
       // Keep an unread notice: the Bag's own focus refresh comes back clean.
-      set({ lines: fromServer(c), notice: noticeOf(c) ?? get().notice });
+      set({ lines: take(c), notice: noticeOf(c) ?? get().notice });
     },
   };
 });

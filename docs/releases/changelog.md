@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- Bag: a quantity change that fails offline now shows the bag as the server last confirmed it, with the "Could not update" notice, instead of the unsaved quantity (A63)
 - Backend: a deactivated admin is locked out at once instead of when the access token expires (B18)
 - Shop: the "All products" and "Sale" tiles no longer repeat the Tops and Outerwear images; they use catalogue product images no category uses (A24).
 - Product details: "Add to bag" without a size now scrolls to the size picker so the "Please select a size" hint is visible (A25).
