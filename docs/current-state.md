@@ -1,7 +1,7 @@
 # Current State
 
 Status: Current State (branch `feature/api-integration`)
-Last Verified: 2026-11-05
+Last Verified: 2026-11-08
 Source: working tree; code is the final authority
 
 This is the single, accurate description of what TojApp is today. It replaces the former
@@ -16,13 +16,13 @@ baseline commit. Screen-by-screen detail and verification results live in
 
 | Aspect | Reality |
 |---|---|
-| Product | Men's clothing customer app, single store, UI prototype (see [product-vision](requirements/product-vision.md)) |
+| Product | Men's clothing customer app, single store, running against the local API with seeded dummy data (see [product-vision](requirements/product-vision.md)) |
 | Platform | React Native 0.82.1, React 19.1.1, iOS + Android |
 | Language | TypeScript 5.8 (`strict`); all source is `.ts`/`.tsx` |
 | Navigation | React Navigation v7: root native-stack + bottom tabs (Home, Shop, Bag, Account). No drawer |
 | State | Zustand 4.5: cart, user, wishlist, address, order, product. Session tokens in Keychain/Keystore (ADR-0006); server is source of truth when signed in |
 | Styling | `StyleSheet.create` + tokens in `src/utils/theme.ts`; no inline styles (ESLint) |
-| Data | Local `toj-backend` API (`src/api/client.ts`, base URL `src/config/env.ts`) per [ADR-0031](decisions/0031-app-api-integration.md). Fixtures in `src/data/` remain for tests and pre-load defaults |
+| Data | Local `toj-backend` API (`src/api/client.ts`, base URL `src/config/env.ts`) per [ADR-0031](decisions/0031-app-api-integration.md). Fixtures in `src/data/` remain for tests and offline category fallback |
 | Money | Integer paise, INR (`₹`, Indian grouping) via `utils/format.ts` |
 | Backend | Separate repository `toj-backend` (`../toj-backend`, [ADR-0030](decisions/0030-separate-backend-repository.md)): Day-1 foundation (NestJS 12, Prisma 7, Postgres 17, Node 24). Catalogue, OTP auth, cart, wishlist, addresses, pickup checkout, orders, reviews, admin (branch `feature/backend-core`). The app calls it. Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Real SMS OTP, payment, push | NOT IMPLEMENTED. OTP is a fixed demo code on the server; payment is simulated |
@@ -54,14 +54,16 @@ __tests__/                   App render test, business-logic tests
   support pickup. No delivery fee. Orders are stored by the server; nothing is charged.
 - The backend must be running (`../toj-backend`, `npm run start:dev`); otherwise the catalogue
   shows an error state.
-- Tokens are in the Keychain/Keystore: a cold start keeps the session; logout wipes it. Guest cart and wishlist merge at sign-in.
+- Tokens are in the Keychain/Keystore: a cold start keeps the session; logout wipes it. Guest bag and wishlist are kept on the device and merge at sign-in.
+- Launched while the API is down: the app stays guest and keeps the saved session; it resumes once the catalogue loads again (Try again or foreground).
 
 ## Known issues and gaps
 
-- Android `release` build is signed with the committed debug keystore (`android/app/build.gradle`).
+- Android `release` uses the upload key when `TOJ_UPLOAD_*` gradle properties are set, else the debug keystore; the real key is not generated.
 - `nativewind` and `@react-navigation/drawer` are installed but unused. Whether to remove them is
   UNKNOWN / undecided.
 - Search, filters, sort and sale rails exist although D-12 deferred them; flagged for product review.
-- VoiceOver/TalkBack not run; Dynamic Type not systematically reviewed; Android walkthrough partial.
-- All planning documents (requirements, architecture, implementation) are plans, not descriptions
-  of built code. Backend/auth/payment phases are gated on ADRs that do not exist yet.
+- VoiceOver/TalkBack not run. Large text checked (iOS AX5, Android 1.3) on main screens 2026-11-08.
+- A revoked session stays usable until its access token expires (JWT guard does not check the session table).
+- Planning documents (requirements, architecture, implementation) are plans, not descriptions
+  of built code. Payment, real SMS OTP, seller/admin products and hosting are not approved.

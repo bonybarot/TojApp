@@ -2,6 +2,16 @@
 
 Status: Completion report for the autonomous queue ([autonomous-queue.md](autonomous-queue.md))
 
+## Where it stands (2026-11-08)
+| Check | Result |
+|---|---|
+| App tsc, lint | 0 errors, 0 warnings |
+| App jest | 6 suites, 15 tests |
+| Backend lint, typecheck, unit, e2e | clean, clean, 18/18, 28/28 |
+| Queue | A1-A12, B1-B11 done |
+
+Sections below are a dated log; numbers in older sections were true at their time.
+
 ## Completed
 - **Backend B1-B9** (`toj-backend`, branch `feature/backend-core`): schema and seed, common error and request handling, catalogue, OTP auth with JWT refresh rotation, wishlist, addresses, cart, checkout and orders with idempotency and no-oversell, admin orders and inventory, `openapi.json`. Lint and typecheck clean; unit 17, e2e 27.
 - **App A1-A5** (`TojApp`, branch `feature/api-integration`): fetch API client, catalogue, OTP auth, cart, wishlist, addresses, pickup-only checkout and orders against the local API ([ADR-0031](../decisions/0031-app-api-integration.md)).
@@ -89,7 +99,7 @@ New account (9000000123, name validation), empty states, profile edit, wishlist 
 - Non-pickup items could reach the bag but never be ordered: product details and bag now block them.
 - Checkout kept stale stock after `INSUFFICIENT_STOCK`: now refreshes catalogue and server cart (order TOJ-1009 placed after refresh, then cancelled; inventory restored).
 
-Dev note: Metro hot reload of a store or client module re-creates the in-memory session, so the app signs out. Expected for in-memory tokens.
+Dev note (superseded 2026-11-08): tokens were in memory then, so a Metro reload signed the app out. They now live in the Keychain/Keystore (ADR-0006).
 
 ## Backend-down and token refresh (2026-11-05 09:10 IST, Android)
 - API paused: Home and All products show skeleton then "Something went wrong / Try again" after the 10 s timeout; sign-in shows "Cannot reach the TOJ server". Resuming the API and tapping Try again loads 21 products.
@@ -153,4 +163,9 @@ Same account (9000000123) signed in on the Pixel 9 Pro emulator and the iPhone 1
 - Android 360x640 dp, signed-in walk: sign-in (keyboard hides Send code; form scrolls; keyboard submit added), OTP, Account, Personal Information, Bag, Checkout, confirmation, order details, cancel (TOJ-1019, cancelled) all fit.
 
 ## Reviews (2026-11-08, Android)
-Ravi (9000000123), collected TOJ-1018: "Write a review" shown; posting without stars shows "Choose a star rating."; 4-star review posted; order then shows "Edit your review", editor prefills; product details shows "★★★★☆ 4.0 · 1 review" with "Ravi · 8 Nov 2026 · Verified purchase". Backend e2e 28/28. iOS not run for this feature.
+Ravi (9000000123), collected TOJ-1018: "Write a review" shown; posting without stars shows "Choose a star rating."; 4-star review posted; order then shows "Edit your review", editor prefills; product details shows "★★★★☆ 4.0 · 1 review" with "Ravi · 8 Nov 2026 · Verified purchase". Backend e2e 28/28. iOS walked 2026-11-08 (A9, below).
+
+## Reviews on iOS, large text, API-down states (2026-11-08)
+- A9 iOS (iPhone 17), 9876543210 on collected order 1002: write 4★, edit to 5★, delete; API and product details agree each step. Fixed: order items open product details; My Orders keeps its scroll position on return.
+- A10 large text: display text capped at `FONT_CAP` 1.4 (tabs 1.2), icon glyphs fixed size, body text scales. Checked iOS AX5 and Android 1.3.
+- A11 API down: Search and Wishlist showed "no results" / "empty"; now loading or error with Try again. Addresses reloads on open, shows an error with retry; failed delete alerts. Found on iOS: launched offline with a saved session, the app stayed guest after the API came back (retry goes error, loading, ready, so the first fix never fired). Now resumes the session once the catalogue loads; jest covers the real sequence.

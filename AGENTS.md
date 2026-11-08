@@ -1,7 +1,7 @@
 # AGENTS.md — Instructions for AI Coding Agents
 
 Status: Current State
-Last Verified: 2026-11-05 (backend moved to its own repository, ADR-0030)
+Last Verified: 2026-11-08 (A12 doc sweep)
 Source: branch `feature/toj-customer-ui`, on top of commit `66044c5`. The UI described below lands in the commit that follows this documentation baseline
 
 Read this file first. Then read the documentation it points to. Then read the code.
@@ -11,8 +11,8 @@ Read this file first. Then read the documentation it points to. Then read the co
 ## 1. What this project currently is
 
 **TojApp** is a React Native 0.82.1 customer-facing **men's clothing** app. The UI for the
-whole v1 customer journey is implemented against **mock data**. It is a UI prototype, not a
-production system.
+whole v1 customer journey runs against the **local API with seeded dummy data**. It is not a
+production system and is not deployed.
 
 On branch `feature/api-integration` the app **calls the local `toj-backend` API** ([ADR-0031](docs/decisions/0031-app-api-integration.md)); the backend lives in the separate **`toj-backend`** repository (sibling folder `../toj-backend`; see §1a, §7b, [ADR-0030](docs/decisions/0030-separate-backend-repository.md)). Fixtures in `src/data/` remain for tests.
 
@@ -64,8 +64,8 @@ The full statements, and everything that is still OPEN, are in
 [`docs/requirements/product-vision.md`](docs/requirements/product-vision.md) — the
 authoritative product-goal document.
 
-**Customer UI against mock data is implemented** (§1, §3). Backend, real auth, payments,
-seller/admin and persistence are not. The planning set that follows from these decisions:
+**Customer UI is implemented against the local API** (§1, §3). Payments, real SMS OTP,
+seller/admin products and hosting are not. The planning set that follows from these decisions:
 
 | Read for | Document |
 |---|---|
@@ -253,8 +253,7 @@ Swagger: `/api/docs` (non-production). Details: `toj-backend/docs/LOCAL_DEVELOPM
 
 ## 8. Before you change anything
 
-1. The UI layer is implemented against mock data. The backend is approved and in progress
-   (§1a). Payment and real SMS OTP are **not** approved; do not start
+1. The UI calls the local backend, which is approved and in progress (§1a). Payment and real SMS OTP are **not** approved; do not start
    them until their ADRs exist.
 2. If you believe something must change, write it down — an issue, an ADR, a note on the
    relevant page — rather than changing it.

@@ -45,7 +45,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A9 iOS: walk write/edit/delete review as demo customer 9876543210 (collected order 1002); fix what breaks
 - [x] A10 Large text: Android font scale 1.3 and iOS largest Dynamic Type on Home, PDP, Bag, Checkout, Order details; fix clipping
 - [x] A11 Pass over every screen for empty, loading and API-down states; fix gaps
-- [ ] A12 Sweep `docs/` for stale statements (test counts, NOT IMPLEMENTED lists); refresh `overnight-report.md`
+- [x] A12 Sweep `docs/` for stale statements (test counts, NOT IMPLEMENTED lists); refresh `overnight-report.md`
 
 ## Blocked: needs owner
 
@@ -71,3 +71,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A10: display text (logo, headings, labels, prices, buttons, tabs) capped at `FONT_CAP` 1.4 (tabs 1.2); glyph icons do not scale; body text scales fully. Checked iOS AX5 Home/PDP/Bag/Account/Orders/Order details, Android 1.3 Home/Bag.
 - 2026-11-08 B11 admin `DELETE /admin/reviews/:id` (backend `85f021e`). A9 iOS: write 4★, edit 5★, delete; API and PDP agree each step. Fixed: order items open product details; My Orders kept its scroll position on return (focus reload no longer drives the iOS pull-to-refresh spinner)
 - 2026-11-08 A11: Search and Wishlist show loading/error instead of "no results"/"empty" before the catalogue arrives; Addresses reloads on focus, shows an error with retry, delete failure alerts. Offline launch with a saved session resumes it once the catalogue loads again (iOS verified: API down, guest; API up, Try again, signed in)
+- 2026-11-08 A12: current-state refreshed (signing, offline resume, large text, revoked-session note); overnight report gets a current summary and A9-A11; test counts 15 everywhere
