@@ -106,6 +106,7 @@ export interface Order {
   fulfilment: FulfilmentMethod;
   address?: Address;
   pickupStore?: string;
+  pickupLocationId?: string;
   paymentMethod: string;
   orderNumber?: number;
   paymentStatus?: 'PENDING' | 'PAID' | 'REFUNDED';

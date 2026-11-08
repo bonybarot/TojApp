@@ -9,6 +9,7 @@ import { SmartImage } from '../../components/SmartImage';
 import { EmptyState } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { CANCELLABLE, useOrderStore } from '../../store/orderStore';
+import { useProductStore } from '../../store/productStore';
 import { formatDate, formatPrice } from '../../utils/format';
 import { PAYMENT_LABEL, STATUS_COLOR, STATUS_LABEL, timelineFor } from '../../utils/orderStatus';
 import { colors, typography, FONT_CAP } from '../../utils/theme';
@@ -18,6 +19,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const order = useOrderStore(s => s.orders.find(o => o.id === route.params.orderId));
   const cancel = useOrderStore(s => s.cancelOrder);
+  const pickup = useProductStore(s => s.pickup);
   const id = route.params.orderId;
   const [reviewed, setReviewed] = useState<string[]>([]);
   const collected = order?.status === 'COLLECTED';
@@ -88,7 +90,10 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
       <Text style={styles.h} maxFontSizeMultiplier={FONT_CAP}>{order.fulfilment === 'pickup' ? 'PICKUP' : 'DELIVERY ADDRESS'}</Text>
       {order.fulfilment === 'pickup' ? (
-        <Text style={typography.body}>{order.pickupStore}</Text>
+        <>
+          <Text style={typography.body}>{order.pickupStore}</Text>
+          {!cancelled && pickup.id === order.pickupLocationId && <Text style={styles.sub}>{pickup.address}{'\n'}{pickup.hours}</Text>}
+        </>
       ) : order.address ? (
         <Text style={typography.body}>
           {order.address.fullName}{'\n'}{order.address.line1}{order.address.line2 ? `, ${order.address.line2}` : ''}{'\n'}{order.address.city} {order.address.postalCode}
