@@ -1,6 +1,6 @@
 import { Alert, AppState } from 'react-native';
 import { create } from 'zustand';
-import { api, currentRefreshToken, setSessionLostHandler, setTokens, Tokens } from '../api/client';
+import { api, currentRefreshToken, hasSession, setSessionLostHandler, setTokens, storedTokens, Tokens } from '../api/client';
 import { navigationRef } from '../navigation/ref';
 import { User } from '../types';
 import { useAddressStore } from './addressStore';
@@ -22,10 +22,20 @@ interface UserState {
   verifyOtp: (phone: string, code: string, name?: string) => Promise<'ok' | 'needsProfile'>;
   updateName: (name: string) => Promise<void>;
   logout: () => Promise<void>;
+  /** App start: resume the session saved in the Keychain, if any. */
+  restore: () => Promise<void>;
 }
 
 /** The API stores +91XXXXXXXXXX; the app shows and edits the 10-digit number. */
 const toUser = (c: VerifyOk['customer']): User => ({ id: c.id, name: c.name, phone: c.phone.slice(-10) });
+
+const loadAccountData = () =>
+  Promise.allSettled([
+    useCartStore.getState().mergeIntoServer(),
+    useWishlistStore.getState().mergeIntoServer(),
+    useAddressStore.getState().load(),
+    useOrderStore.getState().load(),
+  ]);
 
 const clearAccountData = () => {
   useCartStore.getState().clearCart();
@@ -48,12 +58,7 @@ export const useUserStore = create<UserState>(set => ({
     setTokens({ accessToken: r.accessToken, refreshToken: r.refreshToken });
     set({ user: toUser(r.customer), isLoggedIn: true });
     // Guest bag and hearts move into the account (D-8); then load account data.
-    await Promise.allSettled([
-      useCartStore.getState().mergeIntoServer(),
-      useWishlistStore.getState().mergeIntoServer(),
-      useAddressStore.getState().load(),
-      useOrderStore.getState().load(),
-    ]);
+    await loadAccountData();
     return 'ok';
   },
   updateName: async name => {
@@ -68,6 +73,23 @@ export const useUserStore = create<UserState>(set => ({
     setTokens(null);
     set({ user: null, isLoggedIn: false });
     clearAccountData();
+  },
+  restore: async () => {
+    const t = await storedTokens();
+    if (!t) {
+      return;
+    }
+    setTokens(t, false);
+    try {
+      set({ user: toUser(await api<VerifyOk['customer']>('/me')), isLoggedIn: true });
+    } catch {
+      // Expired or revoked: api() already cleared it. Offline: stay guest this run, keep it for the next launch.
+      if (hasSession()) {
+        setTokens(null, false);
+      }
+      return;
+    }
+    await loadAccountData();
   },
 }));
 

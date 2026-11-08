@@ -1,6 +1,6 @@
 # Development Setup
 
-> **Baseline note (2026-10-31).** Written against the pre-UI baseline (commit `66044c5`). Statements about failing tests, `.js`/`.ts` shadowing, the drawer or electronics data are historical. Today: `npx tsc --noEmit` 0 errors, `npm run lint` clean, `npm test` 5 suites / 9 tests pass. Current facts: [../current-state.md](../current-state.md).
+> **Baseline note (2026-10-31).** Written against the pre-UI baseline (commit `66044c5`). Statements about failing tests, `.js`/`.ts` shadowing, the drawer or electronics data are historical. Today: `npx tsc --noEmit` 0 errors, `npm run lint` clean, `npm test` 6 suites / 12 tests pass. Current facts: [../current-state.md](../current-state.md).
 
 Status: Current state as of 2026-09-03
 Last Verified: 2026-09-03 (Node and Ruby versions verified on the maintainer's machine; a clean-machine install was **not** performed)
@@ -54,7 +54,7 @@ cd ios && bundle exec pod install
 | Command | What it does | Current status |
 |---|---|---|
 | `npm start` | `react-native start` — starts Metro | works |
-| `npm run android` | `react-native run-android` | builds; the release variant is signed with the debug key (issue BUILD-01) |
+| `npm run android` | `react-native run-android` | builds; release is signed with the upload key when `TOJ_UPLOAD_*` is set, else the debug key |
 | `npm run ios` | `react-native run-ios` | requires `pod install` first; signing is unconfigured (no `DEVELOPMENT_TEAM`, no `CODE_SIGN_STYLE`) |
 | `npm run lint` | `eslint .` | **fails** — 6 errors, 2 warnings |
 | `npm test` | `jest` | **fails** — the suite cannot load; 0 tests execute |
@@ -98,9 +98,16 @@ Expect all three. A clean checkout reproduces them exactly. Details:
 - New Architecture and Hermes are both **on** (`android/gradle.properties`).
 - `applicationId` is `com.tojapp` (`android/app/build.gradle:82`).
 - Four ABIs are configured; `enableProguardInReleaseBuilds = false`.
-- `android/app/debug.keystore` is committed **and used by the release build type**
-  (`build.gradle:103`). This is issue BUILD-01, the only P0 in the register. Do not ship a
-  release build from this configuration.
+- Release signing (BUILD-01, fixed 2026-11-08): put the upload key in `~/.gradle/gradle.properties`
+  (never in the repo):
+  ```properties
+  TOJ_UPLOAD_STORE_FILE=/abs/path/toj-upload.keystore
+  TOJ_UPLOAD_STORE_PASSWORD=...
+  TOJ_UPLOAD_KEY_ALIAS=toj-upload
+  TOJ_UPLOAD_KEY_PASSWORD=...
+  ```
+  Without these, `release` falls back to the committed `debug.keystore`: fine for local demo
+  builds, never for a store upload.
 
 Full detail: [../archive/pre-ui-baseline/current-state/android.md](../archive/pre-ui-baseline/current-state/android.md).
 

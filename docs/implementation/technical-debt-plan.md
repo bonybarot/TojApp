@@ -46,7 +46,7 @@ the one irreversible risk.
 
 | ID | Sev | Issue | Disposition | Why now |
 |---|---|---|---|---|
-| BUILD-01 | **P0** | Release signed with the committed debug keystore | Fix Now | Irreversible once published — the signing identity cannot be changed afterwards without a new package name. Nothing else in the plan competes with this for priority |
+| BUILD-01 | **P0** | Release signed with the committed debug keystore | Config fixed 2026-11-08 (`TOJ_UPLOAD_*` gradle properties, setup.md); generating the real upload key stays with the owner | Irreversible once published — the signing identity cannot be changed afterwards without a new package name. Nothing else in the plan competes with this for priority |
 | QUAL-01 | P1 | 0 tests execute (Reanimated 4 ESM transform) | Fix Now | **The single highest-leverage fix in the plan.** Until tests run, every later phase is unverifiable and every "done" is an assertion |
 | QUAL-02 | P2 | Duplicate `fontWeight` — the only TypeScript error | Fix Now | One line. Blocks a clean `tsc` gate |
 | QUAL-03 | P2 | `npm run lint` fails, 6 errors 2 warnings | Fix Now | A red gate cannot be enforced, so it protects nothing |
