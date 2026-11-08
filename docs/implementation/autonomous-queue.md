@@ -57,6 +57,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A19 Bag: notice for server-removed sold-out lines and clamped quantities; guest sold-out lines block checkout
 - [x] A20 OTP resend countdown (30 s, server cooldown)
 - [x] A21 Personal info save busy/unchanged state; reset demo data confirms result
+- [x] A22 Branded iOS launch screen (TOJ wordmark)
 
 ## Blocked: needs owner
 
@@ -89,3 +90,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A19: cart `warnings` were ignored, so sold-out lines vanished silently. Bag notice + guest "Sold out" block; Android walked signed-in drop, guest block, merge at sign-in (stock set to 0 via psql, restored). jest 17
 - 2026-11-08 A20: OTP resend countdown; Android screenshot "Code resent. Resend in 5s", then sign-in. uiautomator dumps go stale while the timer ticks (UI never idle); use screencap there
 - 2026-11-08 A21: PersonalInfo busy + disabled-when-unchanged; Settings reset alerts "Demo data cleared" or server error. Android verified both
+- 2026-11-08 A22: iOS LaunchScreen.storyboard was the RN template; now "T O J" light 40pt centred. Removed empty NSLocationWhenInUseUsageDescription. iOS rebuilt (xcodebuild OK, warning gone), splash screenshot checked
