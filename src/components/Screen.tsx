@@ -14,6 +14,8 @@ interface Props {
   edges?: Edge[];
   footer?: React.ReactNode;
   padded?: boolean;
+  /** Lets a screen scroll itself, e.g. to a field that needs attention. */
+  scrollRef?: React.RefObject<ScrollView | null>;
 }
 
 /** Common screen shell: safe area, optional scroll + keyboard handling, sticky footer. */
@@ -23,6 +25,7 @@ export const Screen: React.FC<Props> = ({
   edges = ['bottom'],
   footer,
   padded,
+  scrollRef,
 }) => {
   // KAV compares its parent-relative frame with the window-absolute keyboard top,
   // so offset it by where its parent sits on screen (below any stack header).
@@ -46,6 +49,7 @@ export const Screen: React.FC<Props> = ({
       >
         {scroll ? (
           <ScrollView
+            ref={scrollRef}
             style={styles.root}
             contentContainerStyle={padded && styles.padded}
             keyboardShouldPersistTaps="handled"
