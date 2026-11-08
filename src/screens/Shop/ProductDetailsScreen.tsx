@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -94,6 +95,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     productReviews(route.params.productId).then(setReviews, () => setReviews(null));
   }, [route.params.productId]);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // The size row can sit below the fold; scroll to it when the customer must pick one.
+  const scrollRef = useRef<ScrollView>(null);
+  const bodyY = useRef(0);
+  const sizeY = useRef(0);
 
   useEffect(() => {
     if (product && !color) {
@@ -151,6 +156,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const onAdd = () => {
     if (!size) {
       setMsg({ text: 'Please select a size.', ok: false });
+      scrollRef.current?.scrollTo({ y: Math.max(0, bodyY.current + sizeY.current - 120) });
       return;
     }
     const r = addToCart(product.id, color, size);
@@ -173,6 +179,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   return (
     <Screen
       scroll
+      scrollRef={scrollRef}
       footer={
         <StickyFooter>
           {!!msg && (
@@ -229,7 +236,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           ))}
         </View>
       )}
-      <View style={styles.body}>
+      <View style={styles.body} onLayout={e => { bodyY.current = e.nativeEvent.layout.y; }}>
         {!!product.tag && (
           <Text style={styles.tag}>{product.tag.toUpperCase()}</Text>
         )}
@@ -256,7 +263,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           ))}
         </View>
 
-        <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP}>SIZE</Text>
+        <Text style={styles.label} maxFontSizeMultiplier={FONT_CAP} onLayout={e => { sizeY.current = e.nativeEvent.layout.y; }}>SIZE</Text>
         <View style={styles.row}>
           {product.sizes.map(z => (
             <Chip
