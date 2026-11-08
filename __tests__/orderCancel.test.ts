@@ -1,9 +1,12 @@
 import { useOrderStore } from '../src/store/orderStore';
 
 // Server: cancel is refused (store already packed it); GET returns the packed order.
+let mockList: (items: unknown[]) => void = () => {};
 jest.mock('../src/api/client', () => ({
   api: (path: string) =>
-    path.endsWith('/cancel')
+    path.startsWith('/orders?')
+      ? new Promise(r => (mockList = items => r({ items })))
+      : path.endsWith('/cancel')
       ? Promise.reject(new Error('This order can no longer be cancelled'))
       : Promise.resolve({ id: 'TOJ-1', status: 'PACKED' }),
 }));
@@ -13,4 +16,13 @@ test('a refused cancel shows the real status', async () => {
   await expect(useOrderStore.getState().cancelOrder('TOJ-1')).rejects.toThrow('no longer');
   await new Promise<void>(r => setTimeout(r, 0));
   expect(useOrderStore.getState().orders[0].status).toBe('PACKED');
+});
+
+test('an order placed while the list loads is not dropped by the older list', async () => {
+  useOrderStore.setState({ orders: [] });
+  const load = useOrderStore.getState().load();
+  await useOrderStore.getState().placeOrder({ pickupLocationId: 'p', paymentMethod: 'PAY_AT_STORE', idempotencyKey: 'k', expectedTotal: 1 });
+  mockList([{ id: 'TOJ-0', status: 'COMPLETED' }]);
+  await load;
+  expect(useOrderStore.getState().orders.map(o => o.id)).toEqual(['TOJ-1', 'TOJ-0']);
 });

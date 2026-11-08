@@ -38,3 +38,13 @@ test('a sold-out line the server dropped leaves a notice that a clean refresh ke
   await again;
   expect(useCartStore.getState().notice).toMatch(/sold out/);
 });
+
+test('a refresh that answers after a tap does not undo the tap', async () => {
+  const refresh = useCartStore.getState().refresh();
+  useCartStore.getState().setQuantity(`${p.id}|Navy|L`, 2);
+  mockPending.at(-1)!(2); // the tap's PUT answers first
+  mockPending.at(-2)!(1); // then the older GET
+  await refresh;
+  await flush();
+  expect(useCartStore.getState().lines[0].quantity).toBe(2);
+});
