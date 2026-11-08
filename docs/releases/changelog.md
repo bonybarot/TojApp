@@ -30,6 +30,8 @@
 
 ### Fixed
 
+- Order details: each reached step shows its time, a cancelled order shows when (and why) it was cancelled, and payment shows Paid / Refunded / Due at pickup (A64)
+- App: a render crash shows "Something went wrong / Try again" instead of a blank screen; Try again remounts navigation (A64)
 - Bag: a quantity change that fails offline now shows the bag as the server last confirmed it, with the "Could not update" notice, instead of the unsaved quantity (A63)
 - Backend: a deactivated admin is locked out at once instead of when the access token expires (B18)
 - Shop: the "All products" and "Sale" tiles no longer repeat the Tops and Outerwear images; they use catalogue product images no category uses (A24).
