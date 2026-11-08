@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CategoryCard } from '../../components/CategoryCard';
 import { Icon } from '../../components/Icon';
@@ -8,7 +8,7 @@ import { SectionHeader } from '../../components/SectionHeader';
 import { SmartImage } from '../../components/SmartImage';
 import { ProductGridSkeleton } from '../../components/Skeleton';
 import { ErrorState } from '../../components/States';
-import { useRootNavigation } from '../../hooks';
+import { usePull, useRootNavigation } from '../../hooks';
 import { useProductStore } from '../../store/productStore';
 import { colors, FONT_CAP, typography } from '../../utils/theme';
 
@@ -17,6 +17,7 @@ const HomeScreen: React.FC = () => {
   // Square on phones; capped so tablets keep the categories above the fold.
   const heroHeight = Math.min(useWindowDimensions().width - 32, 420);
   const { products, categories, status, loadProducts } = useProductStore();
+  const pull = usePull(loadProducts);
   const hero = products.find(p => p.tag === 'New') ?? products[0];
   const newIn = products.filter(p => p.tag === 'New' || p.tag === 'Bestseller').slice(0, 8);
   const sale = products.filter(p => p.compareAtPrice).slice(0, 8);
@@ -34,7 +35,7 @@ const HomeScreen: React.FC = () => {
           <Icon name="search" size={22} />
         </Pressable>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll} refreshControl={<RefreshControl {...pull} />}>
         {status === 'error' ? (
           <ErrorState onRetry={loadProducts} />
         ) : status !== 'ready' || !hero ? (

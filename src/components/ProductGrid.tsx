@@ -1,16 +1,16 @@
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, FlatListProps, StyleSheet, View } from 'react-native';
 import { padGrid, useGridColumns, useRootNavigation } from '../hooks';
 import { Product } from '../types';
 import { ProductCard } from './ProductCard';
 
-interface Props {
+interface Props extends Pick<FlatListProps<Product | null>, 'refreshing' | 'onRefresh'> {
   data: Product[];
   header?: React.ReactElement | null;
   empty?: React.ReactElement | null;
 }
 
-export const ProductGrid: React.FC<Props> = ({ data, header, empty }) => {
+export const ProductGrid: React.FC<Props> = ({ data, header, empty, refreshing, onRefresh }) => {
   const nav = useRootNavigation();
   const cols = useGridColumns();
   return (
@@ -21,6 +21,8 @@ export const ProductGrid: React.FC<Props> = ({ data, header, empty }) => {
       keyExtractor={(p, i) => p?.id ?? `pad-${i}`}
       ListHeaderComponent={header}
       ListEmptyComponent={empty}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) =>

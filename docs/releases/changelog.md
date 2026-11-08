@@ -12,6 +12,7 @@
 - Product reviews ([ADR-0028](../decisions/0028-reviews.md)): REVIEWS section on product details; "Write a review" on collected orders; `WriteReview` screen; `src/api/reviews.ts`.
 - Product details shows the star average and review count under the price (above the fold).
 - Order details: tapping an item's image or title opens its product.
+- Pull-to-refresh on Home (catalogue), Bag (prices, stock, server bag) and Wishlist; shared `usePull` hook in `src/hooks.ts` (My Orders uses it too).
 
 ### Changed
 - Bag tab screen-reader label says "1 item", not "1 items".

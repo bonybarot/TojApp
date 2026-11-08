@@ -6,18 +6,24 @@ import { Button } from '../../components/Button';
 import { QuantityStepper } from '../../components/QuantityStepper';
 import { SmartImage } from '../../components/SmartImage';
 import { EmptyState } from '../../components/States';
-import { useRootNavigation } from '../../hooks';
+import { usePull, useRootNavigation } from '../../hooks';
 import { useCartStore } from '../../store/cartStore';
+import { useProductStore } from '../../store/productStore';
 import { useUserStore } from '../../store/userStore';
 import { detailLines, pickupBlockers, subtotalOf } from '../../utils/cart';
 import { formatPrice } from '../../utils/format';
 import { colors, typography, FONT_CAP } from '../../utils/theme';
+
+// Pull: fresh prices and stock; signed in, the server bag too.
+const reloadBag = () =>
+  Promise.all([useProductStore.getState().loadProducts(), useUserStore.getState().isLoggedIn && useCartStore.getState().refresh()]);
 
 const CartScreen: React.FC = () => {
   const nav = useRootNavigation();
   const lines = useCartStore(s => s.lines);
   const { setQuantity, removeLine } = useCartStore.getState();
   const isLoggedIn = useUserStore(s => s.isLoggedIn);
+  const pull = usePull(reloadBag);
   // Signed in: server cart is the truth; re-adopt it on focus so a change that failed offline does not linger.
   useFocusEffect(
     useCallback(() => {
@@ -54,6 +60,7 @@ const CartScreen: React.FC = () => {
           <FlatList
             data={detailed}
             keyExtractor={d => d.line.lineId}
+            {...pull}
             contentContainerStyle={styles.list}
             renderItem={({ item: d }) => (
               <View style={styles.line}>
