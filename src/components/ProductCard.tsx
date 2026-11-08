@@ -53,6 +53,11 @@ export const ProductCard: React.FC<Props> = ({ product, onPress }) => {
         {product.title}
       </Text>
       <Price product={product} />
+      {!!product.rating && (
+        <Text style={styles.rating} accessibilityLabel={`Rated ${product.rating.average} out of 5 from ${product.rating.count}`}>
+          ★ {product.rating.average.toFixed(1)} ({product.rating.count})
+        </Text>
+      )}
     </Pressable>
   );
 };
@@ -84,5 +89,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  rating: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
   heartText: { fontSize: 20, color: colors.text },
 });

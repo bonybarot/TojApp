@@ -4,6 +4,7 @@
 ## [Unreleased] — 2026-11-05 app connected to the local API (`feature/api-integration`)
 
 ### Added
+- Product cards show the star average and review count when rated; the API carries `rating` on products (ADR-0028)
 - `src/api/client.ts`, `src/config/env.ts`; [ADR-0031](../decisions/0031-app-api-integration.md).
 - Session survives a cold start: tokens in Keychain/Keystore via `react-native-keychain` 10.0.0, restored with `GET /me` at launch; wiped on logout and session loss ([ADR-0006](../decisions/0006-secure-token-storage.md), `__tests__/sessionRestore.test.ts`).
 - Android release signing reads the upload key from `TOJ_UPLOAD_*` gradle properties (BUILD-01 config; falls back to the debug key for local builds).

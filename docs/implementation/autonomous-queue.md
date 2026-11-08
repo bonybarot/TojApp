@@ -35,6 +35,18 @@ Owner instruction (2026-11-05, verbatim summary): push work to new branches, nev
 - [x] A6 Run on iOS simulator against local backend, walk the demo journey, fix what breaks
 - [x] A7 Docs: ADR for API integration choices, `current-state.md`, `AGENTS.md`, changelog
 
+## Phase 2 (added 2026-11-08; owner: "keep working, fix all gaps, improve features and UI")
+
+Also after each task: merge `feature/api-integration` into `integration/v1` (`git worktree add -q ../.int-toj integration/v1`, `git pull --ff-only`, merge, push, `git worktree remove ../.int-toj`). Never merge into `main`. Never run Android and iOS builds at once (8 GB Mac).
+
+- [x] B10 Product list and detail carry `rating: { average, count } | null` (one grouped aggregate per page, no N+1). e2e
+- [x] A8 Product cards show `★ 4.0 (3)` when rated; PDP uses product rating for the summary line
+- [ ] B11 Moderation: `DELETE /admin/reviews/:id` (admin role), e2e; docs
+- [ ] A9 iOS: walk write/edit/delete review as demo customer 9876543210 (collected order 1002); fix what breaks
+- [ ] A10 Large text: Android font scale 1.3 and iOS largest Dynamic Type on Home, PDP, Bag, Checkout, Order details; fix clipping
+- [ ] A11 Pass over every screen for empty, loading and API-down states; fix gaps
+- [ ] A12 Sweep `docs/` for stale statements (test counts, NOT IMPLEMENTED lists); refresh `overnight-report.md`
+
 ## Blocked: needs owner
 
 (none yet)
@@ -55,3 +67,4 @@ Owner instruction (2026-11-05, verbatim summary): push work to new branches, nev
 - 2026-11-05 06:58 UI journey walked on iOS simulator (TOJ-1007 placed and cancelled); copy fixes `577450f`; Android emulator build and launch OK
 - 2026-11-05 08:13 re-verification run: no open tasks; backend lint/typecheck clean, unit 17, e2e 27; app tsc/lint clean, jest 5
 - 2026-11-05 08:37 UI journey walked on Android emulator (TOJ-1008 placed and cancelled); no fixes needed
+- 2026-11-08 B10 product `rating` on list/detail/wishlist (backend `46087a7`); A8 cards show `★ 4.0 (n)`, PDP summary uses it until reviews load. Verified Android Tops grid
