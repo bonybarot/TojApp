@@ -16,7 +16,7 @@ const SettingsScreen: React.FC = () => (
       onPress={() =>
         Alert.alert('Reset demo data', 'This cannot be undone.', [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Reset', style: 'destructive', onPress: () => { resetDemoData(); } },
+          { text: 'Reset', style: 'destructive', onPress: () => { resetDemoData().then(ok => Alert.alert(ok ? 'Demo data cleared' : 'Could not reach the demo server', ok ? 'Your bag and wishlist are empty.' : 'Some items may come back. Try again when online.')); } },
         ])
       }
     />

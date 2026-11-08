@@ -11,16 +11,20 @@ const PersonalInfoScreen: React.FC = () => {
   const [name, setName] = useState(user?.name ?? '');
   const [error, setError] = useState<string>();
   const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
   const save = () => {
     if (name.trim().length < 2) { setError('Enter your name.'); return; }
-    useUserStore.getState().updateName(name.trim()).then(() => setSaved(true), (e: Error) => setError(e.message));
+    setBusy(true);
+    useUserStore.getState().updateName(name.trim())
+      .then(() => setSaved(true), (e: Error) => setError(e.message))
+      .finally(() => setBusy(false));
   };
   return (
     <Screen scroll padded>
       <Input label="Name" value={name} onChangeText={t => { setName(t); setError(undefined); setSaved(false); }} error={error} autoCapitalize="words" />
       <Input label="Mobile number" value={user ? `+91 ${user.phone}` : ''} editable={false} />
       <Text style={styles.note}>Your mobile number is your sign-in and cannot be changed here.</Text>
-      <Button title="Save changes" onPress={save} />
+      <Button title="Save changes" onPress={save} loading={busy} disabled={name.trim() === user?.name} />
       {saved && <Text style={styles.ok} accessibilityRole="alert">Saved</Text>}
     </Screen>
   );

@@ -29,6 +29,8 @@
 - Addresses and AddressForm screens and `addressStore`: unreachable with pickup-only checkout; backend API unchanged.
 
 ### Fixed
+- Personal Information: Save showed no progress and could send twice; it now shows a spinner and is disabled while the name is unchanged.
+- Settings → Reset demo data gave no feedback; it now confirms, or says the server could not be reached.
 - `src/screens/auth/` was tracked lowercase while imports and disk use `Auth/`; a case-sensitive clone (Linux CI) could not resolve the sign-in screens. Renamed in git.
 - Bag quantities doubled when Fast Refresh re-ran session restore while signed in; `restore()` now returns early when already signed in.
 - Product-card wishlist heart was unreachable by VoiceOver/TalkBack (nested in the card button); the card now offers "Add to wishlist" as an accessibility action.
