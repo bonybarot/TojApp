@@ -48,7 +48,7 @@ Six states, used consistently across the whole documentation set:
 | D-9 | Initial credential type is **mobile number + OTP** | 2026-09-03, from the user |
 | D-10 | **Store pickup** is a supported fulfilment option, modelled **per product** | 2026-09-03, from the user |
 | D-11 | Notifications are **order-related only** initially | 2026-09-03, from the user |
-| D-12 | **Search, filters and promotions are deferred**; categories are the discovery mechanism | 2026-09-03, from the user |
+| D-12 | **Search, filters and promotions are deferred**; categories are the discovery mechanism. Amended by Q-7 (2026-10-31): the built search/filters/sort/sale UI is kept, server-backed; promotions stay deferred | 2026-09-03, from the user |
 | D-13 | Profile contains exactly Personal Information, My Orders, Wishlist, Help/Support, Logout. Settings stay minimal and functional only | 2026-09-03, from the user |
 | D-14 | **Wishlist and reviews are desired for MVP, conditional** on not delaying the core flow. Reviews are restricted to verified purchasers | 2026-09-03, from the user |
 | D-15 | Development strategy: **UI + static data first**; backend, payments, seller platform and marketplace infrastructure are not built prematurely | 2026-09-03, from the user |
