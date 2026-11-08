@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '../../components/Screen';
@@ -21,6 +21,12 @@ const OrderHistoryScreen: React.FC = () => {
     useOrderStore.getState().load().catch(() => {});
   }, []);
   useFocusEffect(reload);
+  // Spinner only for a user pull: a programmatic `refreshing` on iOS scrolls the list to the top.
+  const [pulling, setPulling] = useState(false);
+  const pull = useCallback(() => {
+    setPulling(true);
+    useOrderStore.getState().load().catch(() => {}).finally(() => setPulling(false));
+  }, []);
   if (status === 'error' && orders.length === 0) {
     return (
       <Screen>
@@ -33,8 +39,8 @@ const OrderHistoryScreen: React.FC = () => {
       <FlatList
         data={orders}
         keyExtractor={o => o.id}
-        refreshing={status === 'loading'}
-        onRefresh={reload}
+        refreshing={pulling}
+        onRefresh={pull}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <EmptyState title="No orders yet" message="Your orders will appear here." actionLabel="Start shopping" onAction={() => nav.navigate('Tabs', { screen: 'Shop' })} />
