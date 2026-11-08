@@ -6,6 +6,7 @@ import { Screen } from '../../components/Screen';
 import { DemoBanner } from '../../components/States';
 import { RootStackParamList } from '../../navigation/types';
 import { useOrderStore } from '../../store/orderStore';
+import { useProductStore } from '../../store/productStore';
 import { formatPrice } from '../../utils/format';
 import { colors, typography, FONT_CAP } from '../../utils/theme';
 
@@ -13,6 +14,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'OrderConfirmation'>;
 
 const OrderConfirmationScreen: React.FC<Props> = ({ route, navigation }) => {
   const order = useOrderStore(s => s.orders.find(o => o.id === route.params.orderId));
+  const pickup = useProductStore(s => s.pickup);
   return (
     <Screen edges={['top', 'bottom']} padded>
       <View style={styles.center}>
@@ -22,6 +24,9 @@ const OrderConfirmationScreen: React.FC<Props> = ({ route, navigation }) => {
           Order {route.params.orderId}
           {order ? ` · ${formatPrice(order.total)} · ${order.fulfilment === 'pickup' ? 'Store pickup' : 'Delivery'}` : ''}
         </Text>
+        {order?.pickupLocationId === pickup.id && (
+          <Text style={styles.sub}>Collect from {pickup.name}, {pickup.address}{'\n'}{pickup.hours}</Text>
+        )}
         <View style={styles.banner}>
           <DemoBanner text="Demo order: nothing was charged. Track pickup status in My Orders." />
         </View>

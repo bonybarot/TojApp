@@ -14,8 +14,8 @@ Tabs (bottom): **Home**, **Shop**, **Bag**, **Account**.
 | Product | ProductDetails (image pager, colour/size, per-variant stock, per-product pickup note, star summary, reviews, wishlist heart, add to bag) |
 | Bag | Bag (quantity stepper with stock cap, remove with confirmation, totals, empty state) |
 | Auth (demo OTP) | Login (phone), Otp, CompleteProfile (new accounts) |
-| Checkout | Checkout (pickup location, payment, summary), OrderConfirmation |
-| Orders | OrderHistory, OrderDetails (timeline, cancel with confirmation, items open the product), WriteReview |
+| Checkout | Checkout (pickup location, payment, summary), OrderConfirmation (pickup address and hours) |
+| Orders | OrderHistory, OrderDetails (timeline, pickup address and hours, cancel with confirmation, items open the product), WriteReview |
 | Account | Profile, PersonalInfo, Settings (reset demo data), Support (static FAQ) |
 
 Pull to refresh: Home, Bag, Wishlist, My Orders.

@@ -53,6 +53,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A15 Remove unused packages and unreachable address screens (ADR-0032)
 - [x] A16 Android walk: filters, search, wishlist, checkout, cancel, Support, Settings
 - [x] A17 Unlabeled tap targets: Android scan clean; card heart exposed as a screen-reader action
+- [x] A18 Pickup address and hours on order confirmation and order details
 
 ## Blocked: needs owner
 
@@ -81,3 +82,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A12: current-state refreshed (signing, offline resume, large text, revoked-session note); overnight report gets a current summary and A9-A11; test counts 15 everywhere
 - 2026-11-08 A13 Android: offline launch shows Home error, Search shows error not "no results", Try again resumes the session. B12/B13 recorded as backend B-31/B-32 (`92c9085`). A14: `usePull` hook; Home, Bag, Wishlist pull to refresh; Android Home and Bag spinner checked
 - 2026-11-08 A15: removed nativewind, drawer, gesture-handler, reanimated, worklets, new-app-screen and the address screens (ADR-0032); fixed bag doubling when Fast Refresh re-ran `restore()` (test added, jest 16). A16 Android walk TOJ-1021 placed and cancelled. A17 uiautomator scan of tabs, list, PDP, orders: no unlabeled clickables; product-card wishlist heart now a custom accessibility action
+- 2026-11-08 A18: pickup address and hours on confirmation and order details (iOS TOJ-1017, Android TOJ-1022 placed and cancelled)
