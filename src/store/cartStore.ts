@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api, hasSession } from '../api/client';
+import { api, ApiError, hasSession } from '../api/client';
 import { CartLine } from '../types';
 import { keepForGuest } from './guestCopy';
 import { stockFor } from '../utils/catalogue';
@@ -65,9 +65,11 @@ export const useCartStore = create<CartStore>((set, get) => {
   let latest = 0;
   // Sign-in merge failed: the local lines are the guest bag, not yet on the server.
   let unmerged = false;
+  // The server ADDS merged quantities, so only one merge may be in flight, and no PUT beside it.
+  let merging: Promise<void> | null = null;
   const sync = (l: CartLine, quantity: number) => {
     // Unmerged: edits stay local and ride in the retried merge (the server adds merged quantities).
-    if (!hasSession() || unmerged) {
+    if (!hasSession() || unmerged || merging) {
       return;
     }
     const vid = variantIdFor(l.productId, l.color, l.size);
@@ -90,6 +92,45 @@ export const useCartStore = create<CartStore>((set, get) => {
         return api<ServerCart>('/me/cart').then(adopt);
       })
       .catch(() => {});
+  };
+
+  const merge = async () => {
+    const before = get().lines;
+    const items = before.flatMap(l => {
+      const variantId = variantIdFor(l.productId, l.color, l.size);
+      return variantId ? [{ variantId, quantity: Math.min(l.quantity, 20) }] : [];
+    });
+    let c: ServerCart;
+    try {
+      c = await (items.length
+        ? api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
+        : api<ServerCart>('/me/cart'));
+    } catch (e) {
+      // Retry later only what may pass later (offline, 5xx, 429); not after sign-out, not a rejected payload.
+      const retry = e instanceof ApiError && (e.code === 'NETWORK' || e.status >= 500 || e.status === 429);
+      if (retry && hasSession()) {
+        // Keep the guest lines on screen; the next refresh (Bag focus, foreground) retries the merge.
+        // ponytail: a merge that landed but timed out is added twice on retry (server clamps to stock / 20); add an Idempotency-Key if seen.
+        unmerged = true;
+        set({ notice: 'Could not add your bag to your account yet. Check your connection.' });
+      }
+      throw e;
+    }
+    unmerged = false;
+    merging = null; // the re-applied taps below must sync
+    const after = get().lines;
+    set({ lines: fromServer(c), notice: noticeOf(c) });
+    // Taps while the merge ran stayed local: re-apply them as changes on top of the merged bag.
+    const qty = (ls: CartLine[], id: string) => ls.find(l => l.lineId === id)?.quantity ?? 0;
+    for (const l of new Set([...before, ...after].map(x => x.lineId))) {
+      const d = qty(after, l) - qty(before, l);
+      const line = [...after, ...before].find(x => x.lineId === l)!;
+      if (d && get().lines.some(x => x.lineId === l)) {
+        get().setQuantity(l, qty(get().lines, l) + d);
+      } else if (d > 0) {
+        get().addToCart(line.productId, line.color, line.size, d);
+      }
+    }
   };
 
   return {
@@ -137,26 +178,14 @@ export const useCartStore = create<CartStore>((set, get) => {
       unmerged = false;
       set({ lines: [] });
     },
-    mergeIntoServer: async () => {
-      const items = get().lines.flatMap(l => {
-        const variantId = variantIdFor(l.productId, l.color, l.size);
-        return variantId ? [{ variantId, quantity: Math.min(l.quantity, 20) }] : [];
+    mergeIntoServer: () => {
+      merging ??= merge().finally(() => {
+        merging = null;
       });
-      const c = await (items.length
-        ? api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items } })
-        : api<ServerCart>('/me/cart')
-      ).catch(e => {
-        unmerged = true;
-        // Keep the guest lines on screen; the next refresh (Bag focus, foreground) retries the merge.
-        // ponytail: a merge that landed but timed out is added twice on retry (server clamps to stock / 20); add an Idempotency-Key if seen.
-        set({ notice: 'Could not add your bag to your account yet. Check your connection.' });
-        throw e;
-      });
-      unmerged = false;
-      set({ lines: fromServer(c), notice: noticeOf(c) });
+      return merging;
     },
     refresh: async () => {
-      if (unmerged) {
+      if (unmerged || merging) {
         return get().mergeIntoServer();
       }
       const mine = latest;
