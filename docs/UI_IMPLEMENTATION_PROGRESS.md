@@ -47,7 +47,8 @@ Root native-stack (`src/navigation/RootNavigator.tsx`) containing the tab naviga
 - Dynamic Type at large sizes was not systematically reviewed.
 - Android: partial flow only (see Android section).
 - Typing in the simulator through idb occasionally drops characters; that is tooling, not app behaviour.
-- Real backend, auth, payment, push notifications, persistence, reviews: NOT IMPLEMENTED.
+- Payment, real SMS OTP, push notifications: NOT IMPLEMENTED.
+- Reviews ([ADR-0028](decisions/0028-reviews.md)): product details shows a REVIEWS section (average, count, first name, "Verified purchase"); a collected order offers "Write a review" / "Edit your review" per product, opening the Review screen (stars, optional text, delete).
 
 ## Android
 Pixel_9_Pro emulator (API per AVD). `react-native run-android` built and installed the debug APK (BUILD SUCCESSFUL, 3m). No native config was changed.

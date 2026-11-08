@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { ProductReviews, productReviews, stars } from '../../api/reviews';
 import { Button } from '../../components/Button';
 import { Chip } from '../../components/Chip';
 import { Price } from '../../components/Price';
@@ -17,6 +18,7 @@ import { EmptyState } from '../../components/States';
 import { PICKUP_STORE } from '../../data/stores';
 import { RootStackParamList } from '../../navigation/types';
 import { useCartStore } from '../../store/cartStore';
+import { formatDate } from '../../utils/format';
 import { useProductStore } from '../../store/productStore';
 import { useWishlistStore } from '../../store/wishlistStore';
 import { isSoldOut, stockFor } from '../../utils/catalogue';
@@ -39,6 +41,36 @@ const HeartButton: React.FC<{ productId: string }> = ({ productId }) => {
         {liked ? '♥' : '♡'}
       </Text>
     </Pressable>
+  );
+};
+
+/** ADR-0028. Read-only here; customers write from a collected order. */
+const Reviews: React.FC<{ productId: string }> = ({ productId }) => {
+  const [r, setR] = useState<ProductReviews | null>(null);
+  useEffect(() => {
+    productReviews(productId).then(setR, () => setR(null));
+  }, [productId]);
+  if (!r) {
+    return null;
+  }
+  return (
+    <>
+      <Text style={styles.label}>REVIEWS</Text>
+      {r.average === null ? (
+        <Text style={styles.boxText}>No reviews yet. Customers who collect this item can review it from My Orders.</Text>
+      ) : (
+        <Text style={styles.rSummary} accessibilityLabel={`Rated ${r.average} out of 5 from ${r.count} ${r.count === 1 ? 'review' : 'reviews'}`}>
+          <Text style={styles.rStars}>{stars(r.average)}</Text>  {r.average.toFixed(1)} · {r.count} {r.count === 1 ? 'review' : 'reviews'}
+        </Text>
+      )}
+      {r.items.map(x => (
+        <View key={x.id} style={styles.review} accessible accessibilityLabel={`${x.rating} out of 5 by ${x.author}. ${x.body}`}>
+          <Text style={styles.rStars}>{stars(x.rating)}</Text>
+          {!!x.body && <Text style={styles.desc}>{x.body}</Text>}
+          <Text style={styles.boxText}>{x.author} · {formatDate(x.createdAt)} · Verified purchase</Text>
+        </View>
+      ))}
+    </>
   );
 };
 
@@ -254,6 +286,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             • {d}
           </Text>
         ))}
+        <Reviews productId={product.id} />
       </View>
     </Screen>
   );
@@ -322,6 +355,9 @@ const styles = StyleSheet.create({
   boxText: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
   desc: { ...typography.body, color: colors.text, marginBottom: 4 },
   msg: { ...typography.caption, textAlign: 'center', marginBottom: 8 },
+  rSummary: { ...typography.body, marginBottom: 8 },
+  rStars: { color: colors.warning, fontSize: 16 },
+  review: { paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
 });
 
 export default ProductDetailsScreen;

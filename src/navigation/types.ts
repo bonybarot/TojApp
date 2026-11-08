@@ -19,6 +19,7 @@ export type RootStackParamList = {
   OrderConfirmation: { orderId: string };
   OrderHistory: undefined;
   OrderDetails: { orderId: string };
+  WriteReview: { productId: string; title: string };
   PersonalInfo: undefined;
   Addresses: { selecting?: boolean } | undefined;
   AddressForm: { addressId?: string } | undefined;
