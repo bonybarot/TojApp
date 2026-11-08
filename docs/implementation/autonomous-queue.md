@@ -65,6 +65,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A27 Order details: pull to refresh
 - [x] A28 After order: Back goes to My Orders
 - [x] A29 App display name TOJ
+- [x] A30 Unbranded shoe and coat images
 
 ## Blocked: needs owner
 
@@ -105,3 +106,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-08 A27: Order details only refreshed on focus, so a status change while open (store confirms, collects) stayed stale and still offered Cancel. `Screen` takes a `pull` prop (RefreshControl); Order details uses it. Android verified: admin CONFIRMED TOJ-1025, pull showed it. Also walked guest bag, sign-in redirect to Checkout, order, collect, review post/edit on Android
 - 2026-11-08 A28: "View order" after checkout replaced the confirmation, so Back landed on the emptied Bag/Home. Now resets to Account tab > My Orders > Order. Android verified (TOJ-1026)
 - 2026-11-08 A29: home-screen name was "TojApp"; now "TOJ" (`CFBundleDisplayName`, Android `app_name`, `app.json` displayName). Verified built Info.plist and `aapt` label
+- 2026-11-08 A30: shoe tile and shoe products showed Nike logos, Wool Coat a woman. Swapped seed + fixture images for unbranded ones; re-seeded; checked Shop > Shoes on Android.
