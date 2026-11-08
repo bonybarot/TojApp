@@ -11,6 +11,7 @@ export const QuantityStepper: React.FC<{
   <View style={styles.row}>
     <Pressable
       style={styles.btn}
+      hitSlop={SLOP}
       onPress={() => onStep(-1)}
       accessibilityRole="button"
       accessibilityLabel="Decrease quantity"
@@ -22,6 +23,7 @@ export const QuantityStepper: React.FC<{
     </Text>
     <Pressable
       style={[styles.btn, value >= max && styles.dim]}
+      hitSlop={SLOP}
       disabled={value >= max}
       onPress={() => onStep(1)}
       accessibilityRole="button"
@@ -31,6 +33,9 @@ export const QuantityStepper: React.FC<{
     </Pressable>
   </View>
 );
+
+// 38 tall to keep the bordered pill compact; the slop brings the target to MIN_TOUCH.
+const SLOP = { top: (MIN_TOUCH - 38) / 2, bottom: (MIN_TOUCH - 38) / 2 };
 
 const styles = StyleSheet.create({
   dim: { opacity: 0.35 },
