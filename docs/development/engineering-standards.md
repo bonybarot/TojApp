@@ -1,7 +1,7 @@
 # Engineering Standards
 
 Status: **DECIDED / PRESCRIPTIVE** — approved by the project owner 2026-09-03
-Last Verified: 2026-09-03
+Last Verified: 2026-11-09 (conformance column and §3 baseline refreshed; standards text unchanged)
 Source: project owner direction, 2026-09-03
 
 > Two pages describe how this code is written, and they are not the same thing:
@@ -22,20 +22,20 @@ Source: project owner direction, 2026-09-03
 
 | ID | Standard | Current conformance |
 |---|---|---|
-| **C1** | Use **strict TypeScript** | `strict: true` is on; 6 untyped `.js` files exist and 1 `tsc` error stands |
-| **C2** | Avoid `any`. Use it only when explicitly justified **and documented** | 6 occurrences, none justified in writing |
-| **C3** | Split meaningful complex/reusable UI into components — but **do not over-componentize** | 4 components; largely reasonable |
-| **C4** | Avoid unnecessary abstraction. Create one when reuse, complexity or maintainability genuinely justifies it | No abstraction layer exists at all today |
-| **C5** | Business logic stays **out of UI components** wherever practical | Violated: cart total computed in 3 screens, category filter in 2, `getStatusColor` duplicated byte-for-byte |
-| **C6** | Screens must **not** directly access fixture/API data. Use a data-access boundary | Violated: screens import `src/data/*` directly |
+| **C1** | Use **strict TypeScript** | Conforms: `strict: true`, no `.js` source in `src/`, `tsc` 0 errors (2026-11-09) |
+| **C2** | Avoid `any`. Use it only when explicitly justified **and documented** | 1 occurrence (`src/api/client.ts`, parsed JSON body before shape checks), not yet justified in a comment |
+| **C3** | Split meaningful complex/reusable UI into components — but **do not over-componentize** | 15 components in `src/components/`; largely reasonable |
+| **C4** | Avoid unnecessary abstraction. Create one when reuse, complexity or maintainability genuinely justifies it | API client (`src/api/`) and business rules in `src/utils/`; no speculative layers |
+| **C5** | Business logic stays **out of UI components** wherever practical | Mostly conforms: cart, filter, order-status and catalogue rules live once in `src/utils/` |
+| **C6** | Screens must **not** directly access fixture/API data. Use a data-access boundary | Mostly conforms: screens read stores, stores call `src/api/`. Exceptions: Login/OTP import the `DEMO_OTP` constant, `productStore` seeds categories and pickup store from fixtures |
 | **C7** | Keep **Zustand** for appropriate client/application state | Conforms |
-| **C8** | Introduce **TanStack Query** when real server/API state arrives — **not before** | Not installed. Correct for the current phase |
-| **C9** | React Native **`StyleSheet`** with **centralized design tokens** | Half-conformant: colours are centralized, spacing/typography/radius are hardcoded and the exported tokens are imported by nothing |
+| **C8** | Introduce **TanStack Query** when real server/API state arrives — **not before** | Not installed. Server state is held in Zustand stores with hand-written refresh/epoch guards (ADR-0031); revisit if that grows |
+| **C9** | React Native **`StyleSheet`** with **centralized design tokens** | Conforms: `src/utils/theme.ts` tokens imported by 34 files; no inline styles (ESLint-enforced) |
 | **C10** | Strict, consistent naming conventions | Mostly conformant; exceptions listed in [coding-standards.md](coding-standards.md) |
 | **C11** | **Feature-first** project organization | Not conformant: organized by technical type (`screens/`, `store/`, `data/`) |
-| **C12** | Consistent **typed error handling** | Not conformant: 0 `try`/`catch` and 0 error boundaries in `src/` |
-| **C13** | No uncontrolled `console.log`. Use a centralized logging/debugging approach | Conformant by accident (0 `console.*` in `src/`); no logging approach exists |
-| **C14** | Write tests alongside important functionality; broader testing at **phase gates** | Not conformant: 0 tests execute |
+| **C12** | Consistent **typed error handling** | Partial: `ApiError` from `src/api/client.ts`, store-level try/catch, app error boundary in `App.tsx` (A64) |
+| **C13** | No uncontrolled `console.log`. Use a centralized logging/debugging approach | Conforms (0 `console.*` in `src/`); no logging approach exists |
+| **C14** | Write tests alongside important functionality; broader testing at **phase gates** | Partial: 10 Jest suites / 34 tests (logic, sync, session, order cancel); no screen tests |
 | **C15** | Follow the AI development workflow in §3 | — |
 
 ### C6 in concrete terms
@@ -86,13 +86,13 @@ INSPECT → EXPLAIN → PLAN → IMPLEMENT → TYPECHECK → LINT → TEST → F
 **Do not skip verification.** The three verification steps run against real commands:
 
 ```bash
-npx tsc --noEmit     # currently 1 error
-npx eslint .         # currently 6 errors, 2 warnings
-npx jest             # currently 0 tests executed
+npx tsc --noEmit     # 0 errors (2026-11-09)
+npx eslint .         # 0 errors, 0 warnings
+npx jest             # 10 suites, 34 tests pass
 ```
 
-Those three baselines are the reason Phase 0 exists — until they are green, "TYPECHECK →
-LINT → TEST" cannot distinguish a working change from a broken one. See
+Those three baselines were the reason Phase 0 existed (on 2026-09-03: 1 tsc error, 6 lint
+errors, 0 tests). All three are green now and must stay green. See
 [../implementation/implementation-phases.md](../implementation/implementation-phases.md).
 
 **REPORT CHANGES** means stating what was changed, what was verified, and what was *not*
