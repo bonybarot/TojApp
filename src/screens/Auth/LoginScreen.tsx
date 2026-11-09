@@ -36,7 +36,7 @@ const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
       // Back from the code screen within the resend cooldown: the code already sent still works.
       const wait = e instanceof ApiError && e.status === 429 ? (e.details as { retryAfter?: number })?.retryAfter : undefined;
       if (wait !== undefined && wait <= 30) {
-        navigation.navigate('Otp', { phone, redirect: route.params?.redirect });
+        navigation.navigate('Otp', { phone, redirect: route.params?.redirect, wait });
         return;
       }
       setError((e as Error).message);

@@ -22,7 +22,10 @@ const OtpScreen: React.FC<Props> = ({ navigation, route }) => {
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [resent, setResent] = useState(false);
-  const [wait, setWait] = useState(COOLDOWN_S);
+  // Arrived via a resend refusal: the server cooldown is already partly spent.
+  const [wait, setWait] = useState(route.params.wait ?? COOLDOWN_S);
+  // Back from CompleteProfile after an expired code: drop the dead code so a new one can be typed.
+  useEffect(() => navigation.addListener('focus', () => { setCode(''); setError(undefined); }), [navigation]);
   useEffect(() => {
     if (wait <= 0) {
       return;
