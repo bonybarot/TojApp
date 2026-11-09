@@ -118,6 +118,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] B23 Backend purges a phone's OTP challenges older than the rate window on its next request, and a customer's expired sessions on sign-in (tables grew forever)
 - [x] A74 Screen review fixes: one-tap search results with keyboard open, Checkout re-prices on catalogue refresh, guest Wishlist row, OTP screen drops a dead code on return and seeds the resend wait from a 429, product reviews refetch on focus, hero kicker only for New
 - [x] B24 Backend review pass: page query capped, cart clamp/drop writes guarded against a parallel PUT, public reviews 404 for withdrawn/unknown products, admin restock creates a missing stock row
+- [x] A75 My Orders pages older orders in (50 per page) on scroll; a refresh keeps pages already shown. Android font scale 1.6, dark mode and offline (bag edit, checkout retry) checked: no change needed
 - [x] D2 Engineering standards conformance column and testing how-to status match the code (was the 2026-09-03 baseline)
 
 ## Blocked: needs owner
@@ -225,3 +226,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09: B23 toj-backend auth.service deleteMany in issueOtp (per phone, under lock) and verifyOtp (per customer, expired). Android: guest bag to Ravi sign-in merge, 4 rapid + taps, app 5 = server 5. Backend unit 19, e2e 39.
 - 2026-11-09: A74 ProductGrid keyboardShouldPersistTaps=handled; CheckoutScreen subscribes to products; ProfileScreen guest Wishlist row; OtpScreen focus listener clears code, wait param from LoginScreen 429 retryAfter; ProductDetails reviews in useFocusEffect; Home kicker gated on tag New. Android: search one tap with keyboard shown opens product. iOS: signed-in cold start resumes Demo Customer. App 10 suites, 42 tests.
 - 2026-11-09: B24 toj-backend pagination @Max(100000); cart view updateMany/deleteMany guarded by read quantity; reviews list checks isActive; admin adjust creates Inventory on positive delta. Android: checkout repriced live after a DB price change + foreground, order TOJ-1039 placed and cancelled. Backend unit 19, e2e 40.
+- 2026-11-09: A75 orderStore total/loadMore (page counter, single in-flight, dedup), load keeps older pages, placeOrder bumps total; OrderHistory onEndReached. Android: font_scale 1.6 Home/PDP/Bag/Checkout/Account fit; night mode keeps light theme with readable inputs; offline bag edit shows notice, offline checkout shows retry text, online retry placed one order TOJ-1040 (then cancelled). App 10 suites, 43 tests.
