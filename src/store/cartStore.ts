@@ -252,7 +252,7 @@ export const selectCartCount = (s: CartStore): number =>
 
 // Guest bag: drop lines whose product left the catalogue (the server does this for signed-in bags),
 // so the tab badge never counts items the Bag cannot show.
-// ponytail: assumes the whole catalogue is loaded (<=50, productStore); check page.total when paging lands.
+// ponytail: assumes the whole catalogue is loaded (productStore pages up to 500 products).
 useProductStore.subscribe(({ status, products }) => {
   const { lines } = useCartStore.getState();
   const keep = lines.filter(l => products.some(p => p.id === l.productId));

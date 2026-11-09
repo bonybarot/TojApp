@@ -22,12 +22,14 @@ interface ProductState {
 
 /**
  * Catalogue from GET /products, /categories, /pickup-locations.
- * ponytail: the whole catalogue (<=50 items, one page) is loaded once and searched/filtered
- * on the device; switch to server-side q/filters when it outgrows one page.
+ * ponytail: the whole catalogue (up to MAX_PAGES pages of 50) is loaded and searched/filtered
+ * on the device; switch to server-side q/filters when it outgrows that.
  */
 // One request at a time. A caller during one (e.g. after placing an order) gets one queued follow-up,
 // shared by every such caller: the running request may predate the change they need to see.
 let inflight: Promise<boolean> | null = null;
+const MAX_PAGES = 10;
+const productPage = (page: number) => api<Page<Product>>(`/products?limit=50&sort=featured&page=${page}`);
 let queued: Promise<boolean> | null = null;
 
 export const useProductStore = create<ProductState>((set, get) => ({
@@ -50,12 +52,16 @@ export const useProductStore = create<ProductState>((set, get) => ({
       }
       try {
         const [page, categories, pickups] = await Promise.all([
-          api<Page<Product>>('/products?limit=50&sort=featured'),
+          productPage(1),
           api<Category[]>('/categories'),
           api<PickupLocation[]>('/pickup-locations'),
         ]);
+        const pages = Math.min(Math.ceil(page.total / 50), MAX_PAGES);
+        const rest = await Promise.all(Array.from({ length: Math.max(pages - 1, 0) }, (_, i) => productPage(i + 2)));
+        // A product moving between pages mid-load can appear twice: keep its first row.
+        const all = [...page.items, ...rest.flatMap(r => r.items)];
         set({
-          products: page.items,
+          products: all.filter((p, i) => all.findIndex(x => x.id === p.id) === i),
           categories,
           pickup: pickups[0] ?? get().pickup,
           status: 'ready',

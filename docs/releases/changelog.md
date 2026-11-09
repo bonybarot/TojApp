@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- The catalogue no longer stops at 50 products: every page (up to 500 products) loads (A76).
 - My Orders no longer stops at the 50 most recent orders: older ones load as you scroll (A75).
 - API: oversized page numbers are rejected; a bag read no longer undoes a quantity change made at the same moment; reviews of withdrawn products are no longer public; an admin restock works for a variant with no stock row (B24).
 - Search results open on the first tap while the keyboard is up; Checkout totals follow a catalogue refresh; guests can open their Wishlist from Account; the code screen clears an expired code and keeps the server's resend wait; a product page shows a review saved meanwhile; the Home hero says "New season" only for a New product (A74).

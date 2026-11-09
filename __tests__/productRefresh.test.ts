@@ -2,11 +2,14 @@ import { reloadProducts, useProductStore } from '../src/store/productStore';
 
 let mockFail = false;
 let mockPrice = 299900;
+let mockTotal = 1;
 jest.mock('../src/api/client', () => ({
   api: (path: string) =>
     mockFail
       ? Promise.reject(new Error('offline'))
-      : Promise.resolve(path.startsWith('/products') ? { items: [{ id: 'p1', price: mockPrice }], total: 1 } : []),
+      : Promise.resolve(path.startsWith('/products')
+          ? { items: path.endsWith('page=2') ? [{ id: 'p1' }, { id: 'p2' }] : [{ id: 'p1', price: mockPrice }], total: mockTotal }
+          : []),
 }));
 
 test('a catalogue refresh is quiet: keeps old data on failure, adopts new prices on success', async () => {
@@ -37,4 +40,11 @@ test('a load asked for during another one fetches again afterwards (sees a chang
   const afterOrder = useProductStore.getState().loadProducts();
   await Promise.all([background, afterOrder]);
   expect(useProductStore.getState().products[0].price).toBe(200);
+});
+
+test('a catalogue over one page loads every page, without repeating a product', async () => {
+  mockTotal = 51;
+  await useProductStore.getState().loadProducts();
+  expect(useProductStore.getState().products.map(p => p.id)).toEqual(['p1', 'p2']);
+  mockTotal = 1;
 });
