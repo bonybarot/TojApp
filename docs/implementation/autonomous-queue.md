@@ -108,6 +108,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] B19 Same-key checkout double-tap returns the placed order to both requests (was 409 `CART_EMPTY` on the second)
 - [x] B20 Search escapes LIKE wildcards: "%" or "_" alone matched every product
 - [x] A67 Checkout hardening from review: bag no longer refilled by a pre-order cart answer, payment switch gets its own idempotency key, clear message on network failure and unsynced bag, stale stock refetched
+- [x] A68 Cancelling an order refreshes catalogue stock so restocked sizes are offered again
 - [x] D2 Engineering standards conformance column and testing how-to status match the code (was the 2026-09-03 baseline)
 
 ## Blocked: needs owner
@@ -206,3 +207,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09 B19: Sonnet review of backend orders, cart, inventory and admin transitions; oversell, double restock, transitions, money and price snapshot checked safe. Fixed: two parallel `POST /orders` with one Idempotency-Key both missed the replay lookup, the second waited on the customer lock, found the bag empty and returned 409 `CART_EMPTY` for an order that was placed; the lookup now repeats inside the lock (new e2e fails on the old code with [409, 201]; e2e 38). Kept, ponytail note: a replay does not compare its body with the original (the app mints one key per checkout attempt). Not ranked: `DELETE /me/cart` skips the customer lock; `expectedTotal` is optional.
 - 2026-11-09 B20: found on iPhone 17 probing search. Prisma `contains` sends `ILIKE '%text%'` without escaping, so a search for "%" or "_" returned all 21 products. `productWhere` escapes `\`, `%` and `_` (Postgres default LIKE escape). "%" now finds the one product whose text holds a percent sign, "_" none. New unit test fails on the old code; unit 19, e2e 38. Also checked on iPhone: Help & Support text matches the server pickup location; Settings "Reset demo data" cleared the server wishlist (1 to 0). Android: double-tap on Place demo order made one order (TOJ-1036), cancelled from the app.
 - 2026-11-09: A67 checkout review fixes (cartStore clearCart bumps latest; per-payment idempotency key; NETWORK/CART_EMPTY messages; stock refetch). App 10 suites, 37 tests.
+- 2026-11-09: A68 cancel refreshes stock. Android: card order TOJ-1037 placed and cancelled, shows "Card (simulated) · Refunded".
