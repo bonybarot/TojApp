@@ -2,16 +2,21 @@
 
 Status: Completion report for the autonomous queue ([autonomous-queue.md](autonomous-queue.md))
 
-## Where it stands (2026-11-09 06:45 IST)
+## Where it stands (2026-11-09 13:40 IST)
 | Check | Result |
 |---|---|
 | App tsc, lint | 0 errors, 0 warnings |
-| App jest | 10 suites, 34 tests |
-| Backend lint, typecheck, unit, e2e | clean, clean, 18/18, 37/37; no pending migrations |
-| Queue | Every task ticked (B1-B18, A1-A65, D1-D2); open items are under "Blocked: needs owner" in the queue |
-| Heads | TojApp `feature/api-integration`, toj-backend `feature/backend-core` `420473f` (TojApp `6ea8605` before this report); both merged into their `integration/v1` |
+| App jest | 10 suites, 44 tests |
+| App release Metro bundles (iOS, Android) | Build |
+| Backend lint, typecheck, build | Clean; no pending migrations |
+| Backend unit, e2e (vitest) | 19/19, 40/40 |
+| `npm audit` | App 23 (0 critical, 1 high in Metro `image-size`, build-time only); backend production tree 0, full tree 5 (dev-only `@nestjs/mau`) |
+| Queue | Every task ticked (B1-B25, A1-A77, D1-D2); open items under "Blocked: needs owner" in the queue |
+| Heads | TojApp `feature/api-integration` (`c5d80ef` before this report), toj-backend `feature/backend-core` `ef050e9`; both merged into their `integration/v1` |
 
-06:43 run: queue still empty, lock stale (57 min), every check above re-run and passed, no code changed.
+13:22 run: queue was empty (lock stale 5 h). Every check re-run and passed. Added and did B25/A77: lockfile-only `npm audit fix` in both repos (no `package.json` or `Podfile.lock` change). Not done: simulator tap-through after the lockfile bump (JS tooling only; release bundles verified instead).
+
+Run locally: `cd ../toj-backend && eval "$(fnm env)" && fnm use && npm run db:up && npm run db:deploy && npm run start:dev`, then in TojApp `npm start` and `npm run ios` (or `npm run android`). Demo phone `9876543210`, OTP `123456`.
 
 Sections below are a dated log; numbers in older sections were true at their time.
 
