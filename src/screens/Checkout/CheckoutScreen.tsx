@@ -69,6 +69,7 @@ const CheckoutScreen: React.FC = () => {
     }
     setPlacing(true);
     try {
+      await useCartStore.getState().settled();
       const id = await useOrderStore.getState().placeOrder({
         pickupLocationId: pickup.id,
         paymentMethod: card ? 'CARD_SIMULATED' : 'PAY_AT_STORE',
