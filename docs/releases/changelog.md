@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- Cancelling an order refreshes stock, so its sizes stop showing as sold out (A68).
 - Bag no longer refills with old items after placing an order on a slow network; switching payment after a timed-out order no longer replays the first choice; checkout explains network failures and an unsynced bag; a stale stock warning refetches the catalogue (A67).
 - Searching for "%" or "_" no longer lists every product (B20).
 - Double-tapping Place order (or a timed-out retry) no longer reports "bag empty" for an order that was placed: the server returns the same order to both requests (B19).

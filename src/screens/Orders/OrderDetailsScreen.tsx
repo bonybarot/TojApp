@@ -63,7 +63,10 @@ const OrderDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       { text: 'Keep order', style: 'cancel' },
       { text: 'Cancel order', style: 'destructive', onPress: () => {
         setCancelling(true);
-        cancel(order.id).catch((e: Error) => Alert.alert('Could not cancel', e.message)).finally(() => setCancelling(false));
+        cancel(order.id)
+          // The cancel restocked its units: refresh so product pages offer them again.
+          .then(() => { useProductStore.getState().loadProducts(); })
+          .catch((e: Error) => Alert.alert('Could not cancel', e.message)).finally(() => setCancelling(false));
       } },
     ]);
 
