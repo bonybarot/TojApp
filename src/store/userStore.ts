@@ -65,12 +65,14 @@ export const useUserStore = create<UserState>(set => ({
   },
   logout: async () => {
     const rt = currentRefreshToken();
-    if (rt) {
-      await api('/auth/logout', { method: 'POST', body: { refreshToken: rt } }).catch(() => {});
-    }
+    // Signed out on the device at once (offline used to wait for the API timeout); the revoke runs after.
     setTokens(null);
     set({ user: null, isLoggedIn: false });
     clearAccountData();
+    // ponytail: a failed revoke is not retried; the refresh token then lives to its expiry. Queue it if that matters.
+    if (rt) {
+      await api('/auth/logout', { method: 'POST', body: { refreshToken: rt } }).catch(() => {});
+    }
   },
   // Single-flight: launch and the back-online listener can both call it; two merges would double the bag.
   restore: () => (restoring ??= restoreOnce().finally(() => { restoring = null; })),

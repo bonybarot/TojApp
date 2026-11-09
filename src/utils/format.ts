@@ -15,8 +15,12 @@ export const formatDate = (iso: string): string =>
     year: 'numeric',
   });
 
-export const formatDateTime = (iso: string): string =>
-  new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+// Joined by hand: iOS writes "18 Aug at 2:35 PM", Android "18 Aug, 2:35 pm" for the same options.
+export const formatDateTime = (iso: string): string => {
+  const d = new Date(iso);
+  const h = d.getHours();
+  return `${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${h % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+};
 
 // Pasted or autofilled "+91 98765 43210" / "098765 43210": drop the prefix, not the last digits.
 export const localPhone = (t: string) => {

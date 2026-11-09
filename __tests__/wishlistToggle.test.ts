@@ -3,11 +3,15 @@ import { useWishlistStore } from '../src/store/wishlistStore';
 
 const mockSent: string[] = [];
 let mockRelease = () => {};
+let mockMergeFails = true;
 jest.mock('../src/api/client', () => ({
   hasSession: () => true,
   api: (path: string, o: { method?: string } = {}) => {
     if (path === '/me/wishlist') {
       return Promise.resolve([{ id: 'server-only' }]);
+    }
+    if (path === '/me/wishlist/merge') {
+      return mockMergeFails ? Promise.reject(new Error('NETWORK')) : Promise.resolve([{ id: 'g1' }, { id: 'server-only' }]);
     }
     mockSent.push(`${o.method} ${path}`);
     // The first PUT hangs, then fails: offline blip.
@@ -34,4 +38,14 @@ test('heart on/off in quick succession: requests in tap order, a late failure do
   expect(Alert.alert).not.toHaveBeenCalled();
   await useWishlistStore.getState().refresh(); // nothing pending: server list adopted
   expect(useWishlistStore.getState().ids).toEqual(['server-only']);
+});
+
+test('guest hearts survive a failed sign-in merge: refresh retries the merge, not adopt the server list', async () => {
+  useWishlistStore.setState({ ids: ['g1'] });
+  await expect(useWishlistStore.getState().mergeIntoServer()).rejects.toThrow('NETWORK');
+  await expect(useWishlistStore.getState().refresh()).rejects.toThrow('NETWORK');
+  expect(useWishlistStore.getState().ids).toEqual(['g1']);
+  mockMergeFails = false;
+  await useWishlistStore.getState().refresh();
+  expect(useWishlistStore.getState().ids).toEqual(['g1', 'server-only']);
 });
