@@ -98,6 +98,7 @@ const restoreOnce = async () => {
     }
     return restoreGuest();
   }
+  await restoreGuest(); // a guest copy left from a sign-in whose merge never finished
   await loadAccountData();
 };
 

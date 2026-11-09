@@ -42,7 +42,7 @@ test('logout wipes the saved session', async () => {
   expect(await storedTokens()).toBeNull();
 });
 
-test('guest bag survives a cold start; signing in moves it to the server and wipes the device copy', async () => {
+test('guest bag survives a cold start; the device copy goes once the sign-in merge lands', async () => {
   const BAG = { service: 'toj.guestBag' };
   const line = { lineId: 'p1|Black|M', productId: 'p1', color: 'Black', size: 'M', quantity: 2 };
   useCartStore.setState({ lines: [line] });
@@ -54,10 +54,17 @@ test('guest bag survives a cold start; signing in moves it to the server and wip
   await restoreGuestBag();
   expect(useCartStore.getState().lines).toEqual([line]);
   setTokens(saved, false);
-  useCartStore.setState({ lines: [line] });
-  await new Promise<void>(r => setTimeout(r, 0));
-  expect(await Keychain.getGenericPassword(BAG)).toBe(false);
-  setTokens(null, false);
+  try {
+    useCartStore.setState({ lines: [{ ...line, quantity: 3 }] });
+    await new Promise<void>(r => setTimeout(r, 0));
+    expect(await Keychain.getGenericPassword(BAG)).toBeTruthy(); // kept until the merge lands (app may be killed first)
+    require('../src/store/productStore').useProductStore.setState({ status: 'ready' });
+    fetchMock.mockImplementation(() => reply({ lines: [] }));
+    await useCartStore.getState().mergeIntoServer();
+    expect(await Keychain.getGenericPassword(BAG)).toBe(false);
+  } finally {
+    setTokens(null, false);
+  }
 });
 
 test('guest wishlist survives a cold start', async () => {
@@ -90,4 +97,25 @@ test('restore while already signed in does nothing (no second bag merge)', async
   useUserStore.setState({ user: { id: 'c1', name: 'Ravi', phone: '9000000123' }, isLoggedIn: true });
   await useUserStore.getState().restore();
   expect(fetchMock).not.toHaveBeenCalled();
+});
+
+test('signed-in cold start: a guest bag whose sign-in merge never landed is merged now', async () => {
+  const { useProductStore } = require('../src/store/productStore');
+  const v = { id: 'v9', sku: 's', color: 'Black', size: 'M', stock: 5 };
+  useProductStore.setState({ status: 'ready', products: [{ id: 'p1', price: 100, stock: { 'Black|M': 5 }, variants: [v] }] });
+  useCartStore.setState({ lines: [] });
+  await new Promise<void>(r => setTimeout(r, 0));
+  const line = { lineId: 'p1|Black|M', productId: 'p1', color: 'Black', size: 'M', quantity: 2 };
+  await Keychain.setGenericPassword('toj', JSON.stringify([line]), { service: 'toj.guestBag' });
+  await Keychain.setGenericPassword('toj', JSON.stringify(saved), STORE);
+  fetchMock.mockImplementation((url: string) =>
+    reply(url.endsWith('/me') ? { id: 'c1', name: 'Ravi', phone: '+919000000123' } : url.includes('/orders') ? { items: [] } : { lines: [] }),
+  );
+  try {
+    await useUserStore.getState().restore();
+    const merge = fetchMock.mock.calls.find(c => String(c[0]).endsWith('/me/cart/merge'));
+    expect(JSON.parse(merge![1].body)).toEqual({ items: [{ variantId: 'v9', quantity: 2 }] });
+  } finally {
+    setTokens(null, false);
+  }
 });

@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- Guest bag: survives an app kill between a failed sign-in merge and its retry; edits made while the merge was pending are no longer lost; signing in offline no longer drops bag lines; quick edits to two items can no longer undo one of them (A73).
 - Signing out and back in while an old request was refreshing its token no longer ends the new session; switching payment method after a checkout timeout reuses the same order key, so no duplicate order; stock shown after placing or cancelling an order is never from a request that started before it (A72).
 - Coming back to the app refreshes prices, stock and product details (A71).
 - Losing the answer to a token refresh no longer signs you out (30 s retry grace, B21); new-account sign-up no longer uses up an OTP attempt.

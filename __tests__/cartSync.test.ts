@@ -18,16 +18,18 @@ const p = { ...products[0], stock: { 'Navy|L': 10 }, variants: [{ id: 'v1', sku:
 const mockLine = { variantId: 'v1', productId: p.id, color: 'Navy', size: 'L', unitPrice: p.price };
 const flush = () => new Promise<void>(r => setTimeout(r, 0));
 
-test('an older server answer does not undo a newer tap', async () => {
+test('rapid taps go to the server one at a time, in order; the last answer wins', async () => {
   useProductStore.setState({ products: [p] });
   const { addToCart, setQuantity } = useCartStore.getState();
   addToCart(p.id, 'Navy', 'L');
   setQuantity(`${p.id}|Navy|L`, 2);
   setQuantity(`${p.id}|Navy|L`, 3);
-  mockPending[2](3); // newest answers first
-  mockPending[1](2);
-  mockPending[0](1);
   await flush();
+  expect(mockPending).toHaveLength(1); // the others wait: two in flight could be applied out of order
+  for (const q of [1, 2, 3]) {
+    mockPending.at(-1)!(q);
+    await flush();
+  }
   expect(useCartStore.getState().lines[0].quantity).toBe(3);
   expect(mockPending).toHaveLength(3); // prices match: no catalogue reload
 });
@@ -47,6 +49,7 @@ test('a sold-out line the server dropped leaves a notice that a clean refresh ke
 test('a refresh that answers after a tap does not undo the tap', async () => {
   const refresh = useCartStore.getState().refresh();
   useCartStore.getState().setQuantity(`${p.id}|Navy|L`, 2);
+  await flush();
   mockPending.at(-1)!(2); // the tap's PUT answers first
   mockPending.at(-2)!(1); // then the older GET
   await refresh;
@@ -56,6 +59,7 @@ test('a refresh that answers after a tap does not undo the tap', async () => {
 
 test('offline: a failed change shows the last bag the server confirmed, not the tap', async () => {
   useCartStore.getState().setQuantity(`${p.id}|Navy|L`, 3); // server holds 2
+  await flush();
   mockFail.at(-1)!(); // the PUT fails
   await flush();
   mockFail.at(-1)!(); // and so does the re-fetch

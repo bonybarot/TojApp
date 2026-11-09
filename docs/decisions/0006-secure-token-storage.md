@@ -30,3 +30,10 @@ Tokens lived in memory only, so every cold start signed the customer out. A shop
 - Why the Keychain and not AsyncStorage: `react-native-keychain` is already installed, so no new native dependency or rebuild. Ceiling: it is a secure store used as a small key-value store; move to AsyncStorage if more non-secret device state appears.
 - Restored lines are not re-clamped to stock on start; the server clamps them at sign-in merge, and Checkout requires sign-in (D-8).
 - Guest wishlist hearts follow the same rules under service `toj.guestWishlist` (product ids). Both go through `src/store/guestCopy.ts`.
+
+## Amendment 2026-11-09: copy kept until the sign-in merge lands (A73)
+
+- Supersedes "wiped when ... a session exists" and "loaded at start only when no session is restored" above.
+- Signed in, the device copy is no longer wiped on the next store change. It is wiped (`forget`) once the sign-in merge into the account succeeds, or the server rejects it outright. While a bag merge is pending (failed offline), edits keep updating the copy.
+- At a signed-in cold start a copy still present means its merge never landed: it is restored and merged then. Before, killing the app between a failed merge and its retry lost the guest bag.
+- Known window: killed while the merge request is on the wire, the next start merges again under a new idempotency key (double add if the first landed).

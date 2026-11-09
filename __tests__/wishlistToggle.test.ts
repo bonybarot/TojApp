@@ -20,7 +20,7 @@ jest.mock('../src/api/client', () => ({
       : Promise.resolve({});
   },
 }));
-jest.mock('../src/store/guestCopy', () => ({ keepForGuest: () => () => {} }));
+jest.mock('../src/store/guestCopy', () => ({ keepForGuest: () => ({ restore: async () => {}, forget: () => {} }) }));
 
 test('heart on/off in quick succession: requests in tap order, a late failure does not flip it back', async () => {
   jest.spyOn(Alert, 'alert').mockImplementation(() => {});
