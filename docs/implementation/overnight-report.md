@@ -2,14 +2,16 @@
 
 Status: Completion report for the autonomous queue ([autonomous-queue.md](autonomous-queue.md))
 
-## Where it stands (2026-11-09 05:50 IST)
+## Where it stands (2026-11-09 06:45 IST)
 | Check | Result |
 |---|---|
 | App tsc, lint | 0 errors, 0 warnings |
 | App jest | 10 suites, 34 tests |
 | Backend lint, typecheck, unit, e2e | clean, clean, 18/18, 37/37; no pending migrations |
 | Queue | Every task ticked (B1-B18, A1-A65, D1-D2); open items are under "Blocked: needs owner" in the queue |
-| Heads | TojApp `feature/api-integration`, toj-backend `feature/backend-core` `420473f`; both merged into their `integration/v1` |
+| Heads | TojApp `feature/api-integration`, toj-backend `feature/backend-core` `420473f` (TojApp `6ea8605` before this report); both merged into their `integration/v1` |
+
+06:43 run: queue still empty, lock stale (57 min), every check above re-run and passed, no code changed.
 
 Sections below are a dated log; numbers in older sections were true at their time.
 
