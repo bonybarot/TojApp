@@ -192,6 +192,7 @@ export const useCartStore = create<CartStore>((set, get) => {
       }
     },
     clearCart: () => {
+      latest++; // An in-flight GET/PUT from before the order must not refill the bag.
       unmerged = false;
       confirmed = null;
       set({ lines: [] });
