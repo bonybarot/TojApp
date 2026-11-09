@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
+import { AppState } from 'react-native';
 import PersonalInfoScreen from '../screens/Account/PersonalInfoScreen';
 import SettingsScreen from '../screens/Account/SettingsScreen';
 import SupportScreen from '../screens/Account/SupportScreen';
@@ -27,6 +28,9 @@ export const RootNavigator: React.FC = () => {
   const loadProducts = useProductStore(s => s.loadProducts);
   useEffect(() => {
     loadProducts();
+    // Back from the background: prices, stock and pickup may have changed meanwhile (quiet reload, keeps data on failure).
+    const sub = AppState.addEventListener('change', st => st === 'active' && loadProducts());
+    return () => sub.remove();
   }, [loadProducts]);
 
   return (

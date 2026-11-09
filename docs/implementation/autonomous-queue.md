@@ -112,6 +112,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A69 Place order waits for bag edits still on the wire, so a quick +/- before checkout no longer reads as "prices changed"
 - [x] B21 Refresh retry inside 30 s keeps the session; needsProfile does not use an OTP attempt
 - [x] A70 Product details per product (shoes and watch said "Machine washable"), seed and fixture
+- [x] A71 Catalogue reloads quietly when the app returns to the foreground (prices, stock, details were stale until relaunch)
 - [x] D2 Engineering standards conformance column and testing how-to status match the code (was the 2026-09-03 baseline)
 
 ## Blocked: needs owner
@@ -213,3 +214,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09: A68 cancel refreshes stock. Android: card order TOJ-1037 placed and cancelled, shows "Card (simulated) · Refunded".
 - 2026-11-09: A69 cartStore.settled(); checkout awaits it. Reviewer item 7 (merge retry after guest-bag edit replays old body) left: fix trades a silent drop for a double add. App 10 suites, 38 tests.
 - 2026-11-09: B21 + A70 from a Sonnet auth/reviews/wishlist review and an iPhone look at Slim Fit Jeans ("Regular fit" bullet). Client already single-flights refresh; the grace covers a lost answer. Backend unit 19, e2e 38; app 10 suites, 38 tests.
+- 2026-11-09: A71 RootNavigator AppState listener calls loadProducts on 'active' (inflight-deduped, quiet, keeps data on failure). iPhone 17: backgrounded, reseeded details, foregrounded; Chino Pants page updated in place.
