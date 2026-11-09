@@ -39,8 +39,9 @@ const CheckoutScreen: React.FC = () => {
   const [card, setCard] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // One key per checkout visit: a retried tap after a timeout cannot create a second order.
-  const idempotencyKey = useRef(uuid()).current;
+  // One key per checkout visit and payment choice: a retried tap after a timeout cannot create a second
+  // order, and a switch to the other payment cannot replay the first one (it gets CART_EMPTY instead).
+  const keys = useRef({ store: uuid(), card: uuid() }).current;
 
   const detailed = detailLines(lines);
   const subtotal = subtotalOf(detailed);
@@ -62,6 +63,8 @@ const CheckoutScreen: React.FC = () => {
     }
     if (detailed.some(d => d.maxQuantity < d.line.quantity)) {
       setError('Some items in your bag are no longer available in the requested quantity.');
+      // Catalogue stock may be stale (restock, own cancel): refetch so the next tap judges fresh stock.
+      useProductStore.getState().loadProducts();
       return;
     }
     setPlacing(true);
@@ -69,7 +72,7 @@ const CheckoutScreen: React.FC = () => {
       const id = await useOrderStore.getState().placeOrder({
         pickupLocationId: pickup.id,
         paymentMethod: card ? 'CARD_SIMULATED' : 'PAY_AT_STORE',
-        idempotencyKey,
+        idempotencyKey: card ? keys.card : keys.store,
         expectedTotal: subtotal,
       });
       useCartStore.getState().clearCart();
@@ -80,7 +83,14 @@ const CheckoutScreen: React.FC = () => {
       if (e instanceof ApiError && STALE_BAG.includes(e.code)) {
         // Catalogue is loaded once per launch; fetch fresh stock and prices, then the clamped cart.
         await Promise.all([useProductStore.getState().loadProducts(), useCartStore.getState().refresh()]).catch(() => {});
-        setError(`${e.message}. Your bag has been updated, please review it and place the order again.`);
+        // CART_EMPTY with lines still showing: the sign-in merge has not reached the server yet.
+        setError(
+          e.code === 'CART_EMPTY' && useCartStore.getState().lines.length
+            ? 'Your bag has not synced to your account yet. Check your connection and try again.'
+            : `${e.message}. Your bag has been updated, please review it and place the order again.`,
+        );
+      } else if (e instanceof ApiError && e.code === 'NETWORK') {
+        setError('We could not confirm your order. Tap Place order again (it will not be placed twice), or check My Orders.');
       } else {
         setError((e as Error).message);
       }

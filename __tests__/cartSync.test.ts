@@ -63,3 +63,11 @@ test('offline: a failed change shows the last bag the server confirmed, not the 
   expect(useCartStore.getState().lines[0].quantity).toBe(2);
   expect(useCartStore.getState().notice).toMatch(/Could not update/);
 });
+
+test('a cart answer from before the order does not refill the bag after clearCart', async () => {
+  const refresh = useCartStore.getState().refresh();
+  useCartStore.getState().clearCart(); // order placed meanwhile
+  mockPending.at(-1)!(2);
+  await refresh;
+  expect(useCartStore.getState().lines).toHaveLength(0);
+});
