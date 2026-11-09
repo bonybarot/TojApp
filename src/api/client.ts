@@ -100,12 +100,13 @@ async function raw<T>(path: string, o: Options = {}): Promise<T> {
 }
 
 // Single-flight: concurrent 401s share one refresh call (rotation would revoke the family otherwise).
-let refreshing: Promise<boolean> | null = null;
+// Tagged with its session: a call from a newer sign-in must not share the old session's refresh.
+let refreshing: { epoch: number; p: Promise<boolean> } | null = null;
 const refresh = (): Promise<boolean> => {
-  if (!refreshing) {
+  if (refreshing?.epoch !== sessionEpoch) {
     const rt = tokens?.refreshToken;
     const epoch = sessionEpoch;
-    refreshing = (rt
+    const p: Promise<boolean> = (rt
       ? raw<Tokens>('/auth/refresh', { method: 'POST', body: { refreshToken: rt } }).then(
           t => {
             // Logged out while renewing: do not bring the old session back.
@@ -120,10 +121,13 @@ const refresh = (): Promise<boolean> => {
         )
       : Promise.resolve(false)
     ).finally(() => {
-      refreshing = null;
+      if (refreshing?.p === p) {
+        refreshing = null;
+      }
     });
+    refreshing = { epoch, p };
   }
-  return refreshing;
+  return refreshing!.p;
 };
 
 export async function api<T>(path: string, o: Options = {}): Promise<T> {
@@ -138,6 +142,7 @@ export async function api<T>(path: string, o: Options = {}): Promise<T> {
 }
 
 async function call<T>(path: string, o: Options): Promise<T> {
+  const epoch = sessionEpoch;
   try {
     return await raw<T>(path, o);
   } catch (e) {
@@ -148,7 +153,8 @@ async function call<T>(path: string, o: Options): Promise<T> {
       return raw<T>(path, o);
     }
     // Concurrent 401s share one failed refresh (or a logout meanwhile): only the first ends the session.
-    if (!tokens) {
+    // A sign-out and new sign-in meanwhile: the old session's failure must not end the new one.
+    if (!tokens || epoch !== sessionEpoch) {
       throw e;
     }
     setTokens(null);

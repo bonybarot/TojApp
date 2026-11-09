@@ -25,16 +25,24 @@ interface ProductState {
  * ponytail: the whole catalogue (<=50 items, one page) is loaded once and searched/filtered
  * on the device; switch to server-side q/filters when it outgrows one page.
  */
-// One request at a time; a second caller (e.g. a pull during a focus refresh) shares its outcome.
+// One request at a time. A caller during one (e.g. after placing an order) gets one queued follow-up,
+// shared by every such caller: the running request may predate the change they need to see.
 let inflight: Promise<boolean> | null = null;
+let queued: Promise<boolean> | null = null;
 
 export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
   categories: fixtureCategories,
   pickup: { id: '', ...PICKUP_STORE },
   status: 'idle',
-  loadProducts: () =>
-    (inflight ??= (async () => {
+  loadProducts: () => {
+    if (inflight) {
+      return (queued ??= inflight.then(() => {
+        queued = null;
+        return get().loadProducts();
+      }));
+    }
+    return (inflight = (async () => {
       // A refresh (catalogue already shown) stays quiet: no skeleton flash, and a failure keeps the old data.
       const quiet = get().products.length > 0;
       if (!quiet) {
@@ -61,7 +69,8 @@ export const useProductStore = create<ProductState>((set, get) => ({
       } finally {
         inflight = null;
       }
-    })()),
+    })());
+  },
 }));
 
 /** For pull-to-refresh: rejects on failure so the pull can say so. */

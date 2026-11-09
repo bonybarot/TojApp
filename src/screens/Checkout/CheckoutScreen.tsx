@@ -39,9 +39,9 @@ const CheckoutScreen: React.FC = () => {
   const [card, setCard] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // One key per checkout visit and payment choice: a retried tap after a timeout cannot create a second
-  // order, and a switch to the other payment cannot replay the first one (it gets CART_EMPTY instead).
-  const keys = useRef({ store: uuid(), card: uuid() }).current;
+  // One key per attempt, kept across a timeout even if the payment choice changes: the retry replays the
+  // order that may have landed instead of making a second. A definite refusal starts a new attempt.
+  const key = useRef(uuid());
 
   const detailed = detailLines(lines);
   const subtotal = subtotalOf(detailed);
@@ -73,7 +73,7 @@ const CheckoutScreen: React.FC = () => {
       const id = await useOrderStore.getState().placeOrder({
         pickupLocationId: pickup.id,
         paymentMethod: card ? 'CARD_SIMULATED' : 'PAY_AT_STORE',
-        idempotencyKey: card ? keys.card : keys.store,
+        idempotencyKey: key.current,
         expectedTotal: subtotal,
       });
       useCartStore.getState().clearCart();
@@ -81,6 +81,9 @@ const CheckoutScreen: React.FC = () => {
       useProductStore.getState().loadProducts();
       nav.reset({ index: 1, routes: [{ name: 'Tabs' }, { name: 'OrderConfirmation', params: { orderId: id } }] });
     } catch (e) {
+      if (!(e instanceof ApiError && e.code === 'NETWORK')) {
+        key.current = uuid();
+      }
       if (e instanceof ApiError && STALE_BAG.includes(e.code)) {
         // Catalogue is loaded once per launch; fetch fresh stock and prices, then the clamped cart.
         await Promise.all([useProductStore.getState().loadProducts(), useCartStore.getState().refresh()]).catch(() => {});
