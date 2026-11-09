@@ -1,13 +1,13 @@
 import { useOrderStore } from '../src/store/orderStore';
 
 // Server: cancel is refused (store already packed it); GET returns the packed order.
-let mockList: (items: unknown[]) => void = () => {};
+let mockList: (items: unknown[], total?: number) => void = () => {};
 let mockSession = true;
 jest.mock('../src/api/client', () => ({
   hasSession: () => mockSession,
   api: (path: string) =>
     path.startsWith('/orders?')
-      ? new Promise(r => (mockList = items => r({ items })))
+      ? new Promise(r => (mockList = (items, total) => r({ items, total })))
       : path.endsWith('/cancel')
       ? Promise.reject(new Error('This order can no longer be cancelled'))
       : Promise.resolve({ id: 'TOJ-1', status: 'PACKED' }),
@@ -64,4 +64,21 @@ test('a list or order answered after sign-out does not reappear', async () => {
   await Promise.all([load, one]);
   expect(useOrderStore.getState()).toMatchObject({ orders: [], status: 'idle' });
   mockSession = true;
+});
+
+test('older orders page in on demand, and a refresh keeps the pages already shown', async () => {
+  useOrderStore.getState().reset();
+  const load = useOrderStore.getState().load();
+  mockList([{ id: 'TOJ-3' }, { id: 'TOJ-2' }], 3);
+  await load;
+  const more = useOrderStore.getState().loadMore();
+  expect(useOrderStore.getState().loadMore()).toBe(more); // one page on the wire at a time
+  mockList([{ id: 'TOJ-2' }, { id: 'TOJ-1' }], 3); // a shifted page repeats a row: deduped
+  await more;
+  expect(useOrderStore.getState().orders.map(o => o.id)).toEqual(['TOJ-3', 'TOJ-2', 'TOJ-1']);
+  const again = useOrderStore.getState().load();
+  mockList([{ id: 'TOJ-3' }, { id: 'TOJ-2' }], 3);
+  await again;
+  expect(useOrderStore.getState().orders).toHaveLength(3);
+  await useOrderStore.getState().loadMore(); // all loaded: no request
 });

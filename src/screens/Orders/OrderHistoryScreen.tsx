@@ -44,6 +44,8 @@ const OrderHistoryScreen: React.FC = () => {
         keyExtractor={o => o.id}
         {...pull}
         contentContainerStyle={styles.list}
+        onEndReached={() => { useOrderStore.getState().loadMore().catch(() => {}); }}
+        onEndReachedThreshold={0.5}
         ListEmptyComponent={
           <EmptyState title="No orders yet" message="Your orders will appear here." actionLabel="Start shopping" onAction={() => nav.navigate('Tabs', { screen: 'Shop' })} />
         }
