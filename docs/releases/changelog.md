@@ -30,6 +30,8 @@
 
 ### Fixed
 
+- Losing the answer to a token refresh no longer signs you out (30 s retry grace, B21); new-account sign-up no longer uses up an OTP attempt.
+- Product details are product-specific; shoes, watch and backpack no longer say "Machine washable" (A70).
 - Placing an order right after changing a quantity no longer fails with "Prices changed" (A69).
 - Cancelling an order refreshes stock, so its sizes stop showing as sold out (A68).
 - Bag no longer refills with old items after placing an order on a slow network; switching payment after a timed-out order no longer replays the first choice; checkout explains network failures and an unsynced bag; a stale stock warning refetches the catalogue (A67).
