@@ -2,7 +2,7 @@
 
 Status: Completion report for the autonomous queue ([autonomous-queue.md](autonomous-queue.md))
 
-## Where it stands (2026-11-09 15:50 IST)
+## Where it stands (2026-11-09 16:50 IST)
 | Check | Result |
 |---|---|
 | App tsc, lint | 0 errors, 0 warnings |
@@ -15,6 +15,8 @@ Status: Completion report for the autonomous queue ([autonomous-queue.md](autono
 | Heads | toj-backend `feature/backend-core` `264b21b`; TojApp `feature/api-integration` (this report's commit); both merged into their `integration/v1` |
 
 15:43 run: queue empty (lock stale 50 min). No code change: backend migrate status up to date, lint, typecheck, unit 19, e2e 40 x3; app tsc, lint, jest 10/44; both heads already in `integration/v1`.
+
+16:43 run: queue empty (lock stale 58 min). No code change: backend migrate status up to date, lint, typecheck, unit 19, e2e 40; app tsc, lint, jest 10/44. Re-checked A61 leftover "wishlist ids missing from the catalogue": WishlistScreen already filters to catalogue products and shows a loading state, nothing to fix.
 
 14:43 run: queue was empty (lock stale 74 min). Re-ran every check: backend e2e failed once in seven runs. Cause: admin order search `q=TOJ-1426` also matched customers whose phone contains `1426`. Fixed as B26 (a `TOJ-` term searches the order number only; bare 4+ digits still match order number or phone). A78: iOS smoke after the lockfile bump (launch and Home render only; simulator tap tools are not available to scheduled runs, so no tap-through).
 

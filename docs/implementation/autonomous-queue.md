@@ -238,3 +238,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09: B26 toj-backend 264b21b admin.controller: digits empty when term starts TOJ-; API spec + progress doc. Backend lint, typecheck, unit 19, e2e 40 x10 runs clean (was 1 fail in 7 before).
 - 2026-11-09: A78 no code change. iOS iPhone 17 relaunch, Metro bundle after A77 lockfile, Home hero + categories from API (simctl screenshot; simulator tap tools unavailable in scheduled runs). App tsc, lint, jest 10/44.
 - 2026-11-09: 15:43 run, queue empty. Re-ran all checks, all pass (backend lint, typecheck, unit 19, e2e 40 x3; app tsc, lint, jest 10/44). No code change.
+- 2026-11-09: 16:43 run, queue empty. All checks pass (backend lint, typecheck, unit 19, e2e 40; app tsc, lint, jest 10/44). A61 wishlist leftover already handled. No code change.
