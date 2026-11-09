@@ -2,13 +2,14 @@
 
 Status: Completion report for the autonomous queue ([autonomous-queue.md](autonomous-queue.md))
 
-## Where it stands (2026-11-08)
+## Where it stands (2026-11-09 05:50 IST)
 | Check | Result |
 |---|---|
 | App tsc, lint | 0 errors, 0 warnings |
-| App jest | 6 suites, 15 tests |
-| Backend lint, typecheck, unit, e2e | clean, clean, 18/18, 28/28 |
-| Queue | A1-A12, B1-B11 done |
+| App jest | 10 suites, 34 tests |
+| Backend lint, typecheck, unit, e2e | clean, clean, 18/18, 37/37; no pending migrations |
+| Queue | Every task ticked (B1-B18, A1-A65, D1-D2); open items are under "Blocked: needs owner" in the queue |
+| Heads | TojApp `feature/api-integration`, toj-backend `feature/backend-core` `420473f`; both merged into their `integration/v1` |
 
 Sections below are a dated log; numbers in older sections were true at their time.
 
@@ -169,3 +170,18 @@ Ravi (9000000123), collected TOJ-1018: "Write a review" shown; posting without s
 - A9 iOS (iPhone 17), 9876543210 on collected order 1002: write 4★, edit to 5★, delete; API and product details agree each step. Fixed: order items open product details; My Orders keeps its scroll position on return.
 - A10 large text: display text capped at `FONT_CAP` 1.4 (tabs 1.2), icon glyphs fixed size, body text scales. Checked iOS AX5 and Android 1.3.
 - A11 API down: Search and Wishlist showed "no results" / "empty"; now loading or error with Try again. Addresses reloads on open, shows an error with retry; failed delete alerts. Found on iOS: launched offline with a saved session, the app stayed guest after the API came back (retry goes error, loading, ready, so the first fix never fired). Now resumes the session once the catalogue loads; jest covers the real sequence.
+
+## Run 2026-11-09 05:43 IST
+- Queue had no unchecked tasks. Re-ran every check (table above): all pass.
+- D2 (`b0608a3`): `engineering-standards.md` conformance column and `testing.md` status still described the 2026-09-03 baseline; refreshed against `src/`. Docs only, no code changed.
+- Skipped: simulator walks (no code change to verify).
+- Owner decisions still open: see "Blocked: needs owner" in [autonomous-queue.md](autonomous-queue.md) (bundle ID, open-order cap, review moderation policy, customer disable flow, OTP abuse, idempotency mismatch, tokenised search, paging, admin lockout, DELIVERED in verified purchase, pg adapter, iPhone SE grant).
+
+### Run everything locally
+```bash
+eval "$(fnm env)" && cd ../toj-backend && fnm use
+npm run db:up && npm run db:deploy && npm run start:dev   # API at http://localhost:3000/api/v1
+cd ../TojApp && npm start                                  # Metro
+npm run ios      # or: npm run android (not both at once on this Mac)
+```
+Demo sign-in: 9876543210, OTP 123456.
