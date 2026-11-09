@@ -76,3 +76,22 @@ test('logging out while the token is being renewed does not bring the session ba
   await expect(pending).rejects.toBeDefined();
   expect(hasSession()).toBe(false);
 });
+
+test('an old call whose refresh fails after a new sign-in does not end the new session', async () => {
+  let renew!: (v: unknown) => void;
+  fetchMock.mockImplementation((url: string) =>
+    url.endsWith('/auth/refresh')
+      ? new Promise(r => {
+          renew = r;
+        })
+      : status(401),
+  );
+  const pending = api('/me/cart');
+  await new Promise<void>(r => setTimeout(r, 0));
+  setTokens(null, false); // log out
+  setTokens({ accessToken: 'new', refreshToken: 'new-r' }, false); // sign in again
+  renew({ ok: false, status: 401, json: () => Promise.resolve({}) });
+  await expect(pending).rejects.toBeDefined();
+  expect(hasSession()).toBe(true);
+  expect(lost).not.toHaveBeenCalled();
+});

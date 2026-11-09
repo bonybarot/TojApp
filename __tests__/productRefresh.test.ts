@@ -1,11 +1,12 @@
 import { reloadProducts, useProductStore } from '../src/store/productStore';
 
 let mockFail = false;
+let mockPrice = 299900;
 jest.mock('../src/api/client', () => ({
   api: (path: string) =>
     mockFail
       ? Promise.reject(new Error('offline'))
-      : Promise.resolve(path.startsWith('/products') ? { items: [{ id: 'p1', price: 299900 }], total: 1 } : []),
+      : Promise.resolve(path.startsWith('/products') ? { items: [{ id: 'p1', price: mockPrice }], total: 1 } : []),
 }));
 
 test('a catalogue refresh is quiet: keeps old data on failure, adopts new prices on success', async () => {
@@ -27,4 +28,13 @@ test('a pull during a background load shares its outcome (a failed load fails th
   await expect(reloadProducts()).rejects.toThrow();
   expect(await background).toBe(false);
   mockFail = false;
+});
+
+test('a load asked for during another one fetches again afterwards (sees a change made meanwhile)', async () => {
+  mockPrice = 100;
+  const background = useProductStore.getState().loadProducts();
+  mockPrice = 200; // e.g. an order was placed after the background request left
+  const afterOrder = useProductStore.getState().loadProducts();
+  await Promise.all([background, afterOrder]);
+  expect(useProductStore.getState().products[0].price).toBe(200);
 });
