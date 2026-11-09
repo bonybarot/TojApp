@@ -25,6 +25,7 @@ export const ProductGrid: React.FC<Props> = ({ data, header, empty, refreshing, 
       onRefresh={onRefresh}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
       renderItem={({ item }) =>
         item ? (
           <ProductCard product={item} onPress={() => nav.navigate('ProductDetails', { productId: item.id })} />

@@ -53,7 +53,7 @@ const HomeScreen: React.FC = () => {
               <SmartImage uri={hero.image} label={hero.title} style={[styles.heroImg, { height: heroHeight }]} />
               <View style={styles.heroScrim} />
               <View style={styles.heroText}>
-                <Text style={styles.heroKicker} maxFontSizeMultiplier={FONT_CAP}>NEW SEASON</Text>
+                {hero.tag === 'New' && <Text style={styles.heroKicker} maxFontSizeMultiplier={FONT_CAP}>NEW SEASON</Text>}
                 <Text style={styles.heroTitle} maxFontSizeMultiplier={FONT_CAP} numberOfLines={2}>{hero.title}</Text>
                 <Text style={styles.heroCta} maxFontSizeMultiplier={FONT_CAP}>SHOP NOW</Text>
               </View>

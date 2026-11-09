@@ -24,7 +24,7 @@ export type RootStackParamList = {
   Support: undefined;
   Settings: undefined;
   Login: { redirect?: AuthRedirect } | undefined;
-  Otp: { phone: string; redirect?: AuthRedirect };
+  Otp: { phone: string; redirect?: AuthRedirect; wait?: number };
   CompleteProfile: { phone: string; code: string; redirect?: AuthRedirect };
 };
 

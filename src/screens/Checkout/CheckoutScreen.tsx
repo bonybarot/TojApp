@@ -36,6 +36,7 @@ const CheckoutScreen: React.FC = () => {
   const nav = useRootNavigation();
   const lines = useCartStore(s => s.lines);
   const pickup = useProductStore(s => s.pickup);
+  useProductStore(s => s.products); // re-render on a catalogue refresh: detailLines reads current prices
   const [card, setCard] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);

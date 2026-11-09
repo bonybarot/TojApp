@@ -1,5 +1,6 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -92,9 +93,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [added, setAdded] = useState(false);
   const [reviews, setReviews] = useState<ProductReviews | null>(null);
-  useEffect(() => {
-    productReviews(route.params.productId).then(setReviews, () => setReviews(null));
-  }, [route.params.productId]);
+  // On focus, not mount: back from WriteReview shows the saved review and new average.
+  useFocusEffect(
+    useCallback(() => {
+      productReviews(route.params.productId).then(setReviews, () => setReviews(null));
+    }, [route.params.productId]),
+  );
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   // The size row can sit below the fold; scroll to it when the customer must pick one.
   const scrollRef = useRef<ScrollView>(null);

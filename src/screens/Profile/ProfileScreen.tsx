@@ -31,6 +31,7 @@ const ProfileScreen: React.FC = () => {
         <Text style={styles.sub}>Browse as a guest. Sign in to check out and track orders.</Text>
         <Button title="Sign in or create account" onPress={() => nav.navigate('Login', {})} />
         <View style={styles.links}>
+          <Row title="Wishlist" onPress={() => nav.navigate('Wishlist')} />
           <Row title="Help & Support" onPress={() => nav.navigate('Support')} />
           <Row title="Settings" onPress={() => nav.navigate('Settings')} />
         </View>
