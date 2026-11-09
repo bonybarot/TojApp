@@ -27,7 +27,7 @@ On branch `feature/api-integration` the app **calls the local `toj-backend` API*
 | Money | Integer paise, INR; format via `utils/format.ts` |
 | Backend | Separate repo `toj-backend` (`../toj-backend`), NestJS 12, Prisma 7, PostgreSQL 17, Node 24: catalogue, OTP auth, cart, wishlist, addresses, pickup orders, reviews ([ADR-0028](docs/decisions/0028-reviews.md)), admin (branch `feature/backend-core`). Progress: `toj-backend/docs/IMPLEMENTATION_PROGRESS.md` |
 | Payment / real OTP | NOT IMPLEMENTED. All simulated and labelled as demo in the UI |
-| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts` + `__tests__/productRefresh.test.ts` + `__tests__/sessionRestore.test.ts` + `__tests__/guestBagPrune.test.ts` + `__tests__/sessionRefresh.test.ts` + `__tests__/cartMergeRetry.test.ts` + `__tests__/wishlistToggle.test.ts`; 37 tests pass |
+| Tests | Jest: `__tests__/App.test.tsx` (render) + `__tests__/logic.test.ts` + `__tests__/cartSync.test.ts` + `__tests__/orderCancel.test.ts` + `__tests__/productRefresh.test.ts` + `__tests__/sessionRestore.test.ts` + `__tests__/guestBagPrune.test.ts` + `__tests__/sessionRefresh.test.ts` + `__tests__/cartMergeRetry.test.ts` + `__tests__/wishlistToggle.test.ts`; 38 tests pass |
 | tsc / ESLint | 0 errors / 0 warnings |
 
 Screen inventory, navigation and mock behaviour:
@@ -201,7 +201,7 @@ npm run android      # build + run Android
 npm run ios          # build + run iOS (requires pod install first)
 npm run lint         # eslint .            → 0 errors, 0 warnings
 npx tsc --noEmit     # type check          → 0 errors
-npm test             # jest                → 10 suites, 37 tests pass
+npm test             # jest                → 10 suites, 38 tests pass
 ```
 
 Full detail: [`docs/development/setup.md`](docs/development/setup.md)

@@ -109,6 +109,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] B20 Search escapes LIKE wildcards: "%" or "_" alone matched every product
 - [x] A67 Checkout hardening from review: bag no longer refilled by a pre-order cart answer, payment switch gets its own idempotency key, clear message on network failure and unsynced bag, stale stock refetched
 - [x] A68 Cancelling an order refreshes catalogue stock so restocked sizes are offered again
+- [x] A69 Place order waits for bag edits still on the wire, so a quick +/- before checkout no longer reads as "prices changed"
 - [x] D2 Engineering standards conformance column and testing how-to status match the code (was the 2026-09-03 baseline)
 
 ## Blocked: needs owner
@@ -208,3 +209,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09 B20: found on iPhone 17 probing search. Prisma `contains` sends `ILIKE '%text%'` without escaping, so a search for "%" or "_" returned all 21 products. `productWhere` escapes `\`, `%` and `_` (Postgres default LIKE escape). "%" now finds the one product whose text holds a percent sign, "_" none. New unit test fails on the old code; unit 19, e2e 38. Also checked on iPhone: Help & Support text matches the server pickup location; Settings "Reset demo data" cleared the server wishlist (1 to 0). Android: double-tap on Place demo order made one order (TOJ-1036), cancelled from the app.
 - 2026-11-09: A67 checkout review fixes (cartStore clearCart bumps latest; per-payment idempotency key; NETWORK/CART_EMPTY messages; stock refetch). App 10 suites, 37 tests.
 - 2026-11-09: A68 cancel refreshes stock. Android: card order TOJ-1037 placed and cancelled, shows "Card (simulated) · Refunded".
+- 2026-11-09: A69 cartStore.settled(); checkout awaits it. Reviewer item 7 (merge retry after guest-bag edit replays old body) left: fix trades a silent drop for a double add. App 10 suites, 38 tests.

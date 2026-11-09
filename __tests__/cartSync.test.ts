@@ -71,3 +71,14 @@ test('a cart answer from before the order does not refill the bag after clearCar
   await refresh;
   expect(useCartStore.getState().lines).toHaveLength(0);
 });
+
+test('settled waits for a bag edit still on the wire', async () => {
+  useCartStore.getState().addToCart(p.id, 'Navy', 'L');
+  let done = false;
+  const s = useCartStore.getState().settled().then(() => (done = true));
+  await flush();
+  expect(done).toBe(false);
+  mockPending.at(-1)!(1);
+  await s;
+  expect(done).toBe(true);
+});

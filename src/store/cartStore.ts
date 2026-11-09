@@ -26,6 +26,8 @@ interface CartStore {
   mergeIntoServer: () => Promise<void>;
   /** Signed in: adopt the server cart (it clamps lines to current stock). */
   refresh: () => Promise<void>;
+  /** Resolves once bag edits already sent have been answered (checkout must price the edited bag). */
+  settled: () => Promise<void>;
 }
 
 const keyOf = (l: { productId: string; color: string; size: string }) => `${l.productId}|${l.color}|${l.size}`;
@@ -71,6 +73,8 @@ export const useCartStore = create<CartStore>((set, get) => {
   let merging: Promise<void> | null = null;
   // Last bag the server confirmed: shown again when a change fails and the server is unreachable.
   let confirmed: CartLine[] | null = null;
+  // Bag edits still on the wire; checkout waits for them so the server prices the bag the user sees.
+  let inFlight: Promise<void> = Promise.resolve();
   const take = (c: ServerCart) => (confirmed = fromServer(c));
   const sync = (l: CartLine, quantity: number) => {
     // Unmerged: edits stay local and ride in the retried merge (the server adds merged quantities).
@@ -90,6 +94,7 @@ export const useCartStore = create<CartStore>((set, get) => {
       const lines = take(c);
       return mine === latest && set({ lines });
     };
+    inFlight = Promise.all([inFlight, req.catch(() => {})]).then(() => {}); // value dropped: no nested-array growth
     req
       .then(adopt, () => {
         if (!hasSession()) {
@@ -214,6 +219,9 @@ export const useCartStore = create<CartStore>((set, get) => {
       }
       // Keep an unread notice: the Bag's own focus refresh comes back clean.
       set({ lines: take(c), notice: noticeOf(c) ?? get().notice });
+    },
+    settled: async () => {
+      await Promise.all([inFlight, merging?.catch(() => {})]);
     },
   };
 });
