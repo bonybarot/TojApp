@@ -58,6 +58,9 @@ const maxFor = (l: { productId: string; color: string; size: string }): number =
   return p ? stockFor(p, l.color, l.size) : 0;
 };
 
+let guestCopy: ReturnType<typeof keepForGuest>;
+let unmerged = false; // Sign-in merge failed: the local lines are the guest bag, not yet on the server.
+
 export const useCartStore = create<CartStore>((set, get) => {
   /**
    * Signed in: the server cart is the source of truth. The local change is applied
@@ -65,10 +68,11 @@ export const useCartStore = create<CartStore>((set, get) => {
    */
   // Rapid taps send several requests; adopting an older answer would undo newer taps.
   let latest = 0;
-  // Sign-in merge failed: the local lines are the guest bag, not yet on the server.
-  let unmerged = false;
   // One key per guest bag, reused by retries: a merge that landed but timed out is not added twice.
+  // The retry resends the first attempt's body (the server replays by key, ignoring a new body);
+  // edits made meanwhile are re-applied on top afterwards, like taps during the merge.
   let mergeKey = '';
+  let mergeBase: CartLine[] = [];
   // The server ADDS merged quantities, so only one merge may be in flight, and no PUT beside it.
   let merging: Promise<void> | null = null;
   // Last bag the server confirmed: shown again when a change fails and the server is unreachable.
@@ -86,10 +90,13 @@ export const useCartStore = create<CartStore>((set, get) => {
       return;
     }
     const mine = ++latest;
-    const req =
+    // Sent one at a time: two in flight could be applied out of order, and the latest answer
+    // (adopted whole) would then miss the other change.
+    const req = inFlight.then(() =>
       quantity > 0
         ? api<ServerCart>(`/me/cart/items/${vid}`, { method: 'PUT', body: { quantity: Math.min(quantity, 20) } })
-        : api<ServerCart>(`/me/cart/items/${vid}`, { method: 'DELETE' });
+        : api<ServerCart>(`/me/cart/items/${vid}`, { method: 'DELETE' }),
+    );
     const adopt = (c: ServerCart) => {
       const lines = take(c);
       return mine === latest && set({ lines });
@@ -112,16 +119,22 @@ export const useCartStore = create<CartStore>((set, get) => {
   };
 
   const merge = async () => {
-    const before = get().lines;
-    const items = before.flatMap(l => {
-      const variantId = variantIdFor(l.productId, l.color, l.size);
-      return variantId ? [{ variantId, quantity: Math.min(l.quantity, 20) }] : [];
-    });
     if (!unmerged) {
       mergeKey = uuid();
+      mergeBase = get().lines;
     }
+    const before = mergeBase;
     let c: ServerCart;
     try {
+      // Catalogue not loaded (offline start): variants unknown, the lines would be dropped. Load it, or retry later.
+      const ps = useProductStore.getState();
+      if (ps.status !== 'ready' && before.length && !(await ps.loadProducts())) {
+        throw new ApiError(0, 'NETWORK', 'Catalogue not loaded');
+      }
+      const items = before.flatMap(l => {
+        const variantId = variantIdFor(l.productId, l.color, l.size);
+        return variantId ? [{ variantId, quantity: Math.min(l.quantity, 20) }] : [];
+      });
       c = await (items.length
         ? api<ServerCart>('/me/cart/merge', { method: 'POST', body: { items }, headers: { 'Idempotency-Key': mergeKey } })
         : api<ServerCart>('/me/cart'));
@@ -132,6 +145,8 @@ export const useCartStore = create<CartStore>((set, get) => {
         // Keep the guest lines on screen; the next refresh (Bag focus, foreground) retries the merge.
         unmerged = true;
         set({ notice: 'Could not add your bag to your account yet. Check your connection.' });
+      } else if (hasSession()) {
+        guestCopy.forget(); // rejected: resending it on every start would fail the same way
       }
       throw e;
     }
@@ -139,6 +154,7 @@ export const useCartStore = create<CartStore>((set, get) => {
       return; // signed out meanwhile: the account bag must not land in the guest bag
     }
     unmerged = false;
+    guestCopy.forget();
     merging = null; // the re-applied taps below must sync
     const after = get().lines;
     set({ lines: take(c), notice: noticeOf(c) });
@@ -226,7 +242,10 @@ export const useCartStore = create<CartStore>((set, get) => {
   };
 });
 
-export const restoreGuestBag = keepForGuest(useCartStore, 'lines', 'toj.guestBag');
+// ponytail: killed while the merge is on the wire, the next start merges again under a new key (double
+// add if the first landed). Persist mergeKey with the copy if that window matters.
+guestCopy = keepForGuest(useCartStore, 'lines', 'toj.guestBag', () => unmerged);
+export const restoreGuestBag = () => guestCopy.restore();
 
 export const selectCartCount = (s: CartStore): number =>
   s.lines.reduce((n, l) => n + l.quantity, 0);

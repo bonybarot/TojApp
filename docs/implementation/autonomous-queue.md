@@ -114,6 +114,7 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A70 Product details per product (shoes and watch said "Machine washable"), seed and fixture
 - [x] A71 Catalogue reloads quietly when the app returns to the foreground (prices, stock, details were stale until relaunch)
 - [x] A72 Reviewer fixes: an old session's failed refresh no longer signs out a newer sign-in; checkout keeps one idempotency key per attempt (switching payment after a timeout cannot place a second order); a catalogue load asked for mid-request fetches again so post-order stock is fresh
+- [x] A73 Guest bag kept on the device until the sign-in merge lands (a kill before the retry lost it); merge retry resends its first body and re-applies later edits (edits used to vanish); offline catalogue at sign-in no longer drops guest lines; bag edits go to the server one at a time (out-of-order answers could undo a change)
 - [x] D2 Engineering standards conformance column and testing how-to status match the code (was the 2026-09-03 baseline)
 
 ## Blocked: needs owner
@@ -217,3 +218,4 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09: B21 + A70 from a Sonnet auth/reviews/wishlist review and an iPhone look at Slim Fit Jeans ("Regular fit" bullet). Client already single-flights refresh; the grace covers a lost answer. Backend unit 19, e2e 38; app 10 suites, 38 tests.
 - 2026-11-09: A71 RootNavigator AppState listener calls loadProducts on 'active' (inflight-deduped, quiet, keeps data on failure). iPhone 17: backgrounded, reseeded details, foregrounded; Chino Pants page updated in place.
 - 2026-11-09: A72 client.ts refresh tagged with sessionEpoch, call() ignores failures from an older epoch; CheckoutScreen single useRef key, rotated only on a definite (non-NETWORK) refusal; productStore queues one follow-up load behind an in-flight one. App 10 suites, 40 tests.
+- 2026-11-09: A73 guestCopy returns {restore, forget}; signed-in restore before merge; cart merge keeps mergeBase across retries and reloads the catalogue first; sync chains on inFlight. ADR-0006 amendment. App 10 suites, 42 tests.

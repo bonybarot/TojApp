@@ -54,7 +54,7 @@ const mockLine = {
 };
 
 test('a failed sign-in merge keeps the guest bag, says so, and retries on the next refresh', async () => {
-  useProductStore.setState({ products: [p] });
+  useProductStore.setState({ products: [p], status: 'ready' });
   useCartStore.setState({
     lines: [
       {
@@ -73,12 +73,15 @@ test('a failed sign-in merge keeps the guest bag, says so, and retries on the ne
   expect(mockCalls).toHaveLength(1);
   mockFail = false;
   await useCartStore.getState().refresh();
-  expect(mockCalls.at(-1)).toEqual({
-    path: '/me/cart/merge',
-    body: { items: [{ variantId: 'v1', quantity: 3 }] },
-    key: mockCalls[0].key, // the retry reuses the key: a merge that landed is not added twice
-  });
+  await new Promise<void>(r => setTimeout(r, 0));
+  // The retry resends the first body under the same key (a merge that landed is not added twice;
+  // the server would replay it whatever the body), then applies the edit made meanwhile on top.
+  expect(mockCalls.slice(-2)).toEqual([
+    { path: '/me/cart/merge', body: { items: [{ variantId: 'v1', quantity: 2 }] }, key: mockCalls[0].key },
+    { path: '/me/cart/items/v1', body: { quantity: 3 }, key: undefined },
+  ]);
   expect(mockCalls[0].key).toBeTruthy();
+  expect(mockServer).toBe(3);
   expect(useCartStore.getState().lines[0].quantity).toBe(3);
   await useCartStore.getState().refresh();
   expect(mockCalls.at(-1)!.path).toBe('/me/cart');
@@ -126,4 +129,16 @@ test('a tap while the merge is in flight is applied once, on top of the merged b
   await new Promise<void>(r => setTimeout(r, 0));
   expect(mockServer).toBe(4); // 1 + merged 2 + tapped 1
   expect(useCartStore.getState().lines[0].quantity).toBe(4);
+});
+
+test('sign-in with the catalogue not loaded (offline start): the bag waits for it instead of being dropped', async () => {
+  mockCalls.length = 0;
+  mockFail = true;
+  useProductStore.setState({ status: 'error' });
+  useCartStore.getState().clearCart();
+  useCartStore.setState({ lines: [{ lineId: `${p.id}|Navy|L`, productId: p.id, color: 'Navy', size: 'L', quantity: 1 }] });
+  await expect(useCartStore.getState().mergeIntoServer()).rejects.toThrow('NETWORK');
+  expect(mockCalls.some(c => c.path === '/me/cart/merge')).toBe(false);
+  expect(useCartStore.getState().lines).toHaveLength(1);
+  expect(useCartStore.getState().notice).toMatch(/Could not add your bag/);
 });
