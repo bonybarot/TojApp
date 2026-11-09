@@ -123,6 +123,8 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] D2 Engineering standards conformance column and testing how-to status match the code (was the 2026-09-03 baseline)
 - [x] B25 Backend lockfile: `npm audit fix` within existing ranges (7 -> 5 advisories; production tree clean; rest under dev-only `@nestjs/mau`)
 - [x] A77 App lockfile: `npm audit fix` within existing ranges (37 -> 23 advisories, no critical; rest is React Native 0.82 build tooling, not shipped)
+- [x] B26 Admin order search: a `TOJ-` term matches the order number only (the phone-digit match made the admin e2e flaky, ~1 run in 6)
+- [x] A78 iOS smoke after the A77 lockfile bump: app relaunched on iPhone 17 against the live API, Home renders the catalogue
 
 ## Blocked: needs owner
 
@@ -233,3 +235,5 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09: A76 productStore fetches pages 2..ceil(total/50) (cap 10) in parallel after page 1, dedups by id; cartStore guest-prune comment updated. App 10 suites, 44 tests.
 - 2026-11-09: B25 toj-backend ef050e9 package-lock only; lint, typecheck, unit 19, e2e 40, build, npm ci --dry-run pass.
 - 2026-11-09: A77 TojApp c5d80ef package-lock only; tsc, lint, jest 10/44, release Metro bundles iOS + Android, npm ci --dry-run pass.
+- 2026-11-09: B26 toj-backend 264b21b admin.controller: digits empty when term starts TOJ-; API spec + progress doc. Backend lint, typecheck, unit 19, e2e 40 x10 runs clean (was 1 fail in 7 before).
+- 2026-11-09: A78 no code change. iOS iPhone 17 relaunch, Metro bundle after A77 lockfile, Home hero + categories from API (simctl screenshot; simulator tap tools unavailable in scheduled runs). App tsc, lint, jest 10/44.
