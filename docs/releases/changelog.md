@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- Coming back to the app refreshes prices, stock and product details (A71).
 - Losing the answer to a token refresh no longer signs you out (30 s retry grace, B21); new-account sign-up no longer uses up an OTP attempt.
 - Product details are product-specific; shoes, watch and backpack no longer say "Machine washable" (A70).
 - Placing an order right after changing a quantity no longer fails with "Prices changed" (A69).
