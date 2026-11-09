@@ -121,6 +121,8 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - [x] A75 My Orders pages older orders in (50 per page) on scroll; a refresh keeps pages already shown. Android font scale 1.6, dark mode and offline (bag edit, checkout retry) checked: no change needed
 - [x] A76 Catalogue loads every page (up to 10 x 50), deduped, instead of silently stopping at 50 products
 - [x] D2 Engineering standards conformance column and testing how-to status match the code (was the 2026-09-03 baseline)
+- [x] B25 Backend lockfile: `npm audit fix` within existing ranges (7 -> 5 advisories; production tree clean; rest under dev-only `@nestjs/mau`)
+- [x] A77 App lockfile: `npm audit fix` within existing ranges (37 -> 23 advisories, no critical; rest is React Native 0.82 build tooling, not shipped)
 
 ## Blocked: needs owner
 
@@ -229,3 +231,5 @@ Also after each task: merge `feature/api-integration` into `integration/v1` (`gi
 - 2026-11-09: B24 toj-backend pagination @Max(100000); cart view updateMany/deleteMany guarded by read quantity; reviews list checks isActive; admin adjust creates Inventory on positive delta. Android: checkout repriced live after a DB price change + foreground, order TOJ-1039 placed and cancelled. Backend unit 19, e2e 40.
 - 2026-11-09: A75 orderStore total/loadMore (page counter, single in-flight, dedup), load keeps older pages, placeOrder bumps total; OrderHistory onEndReached. Android: font_scale 1.6 Home/PDP/Bag/Checkout/Account fit; night mode keeps light theme with readable inputs; offline bag edit shows notice, offline checkout shows retry text, online retry placed one order TOJ-1040 (then cancelled). App 10 suites, 43 tests.
 - 2026-11-09: A76 productStore fetches pages 2..ceil(total/50) (cap 10) in parallel after page 1, dedups by id; cartStore guest-prune comment updated. App 10 suites, 44 tests.
+- 2026-11-09: B25 toj-backend ef050e9 package-lock only; lint, typecheck, unit 19, e2e 40, build, npm ci --dry-run pass.
+- 2026-11-09: A77 TojApp c5d80ef package-lock only; tsc, lint, jest 10/44, release Metro bundles iOS + Android, npm ci --dry-run pass.
