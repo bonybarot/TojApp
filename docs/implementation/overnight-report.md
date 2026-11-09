@@ -2,19 +2,19 @@
 
 Status: Completion report for the autonomous queue ([autonomous-queue.md](autonomous-queue.md))
 
-## Where it stands (2026-11-09 13:40 IST)
+## Where it stands (2026-11-09 14:55 IST)
 | Check | Result |
 |---|---|
 | App tsc, lint | 0 errors, 0 warnings |
 | App jest | 10 suites, 44 tests |
-| App release Metro bundles (iOS, Android) | Build |
-| Backend lint, typecheck, build | Clean; no pending migrations |
-| Backend unit, e2e (vitest) | 19/19, 40/40 |
-| `npm audit` | App 23 (0 critical, 1 high in Metro `image-size`, build-time only); backend production tree 0, full tree 5 (dev-only `@nestjs/mau`) |
-| Queue | Every task ticked (B1-B25, A1-A77, D1-D2); open items under "Blocked: needs owner" in the queue |
-| Heads | TojApp `feature/api-integration` (`c5d80ef` before this report), toj-backend `feature/backend-core` `ef050e9`; both merged into their `integration/v1` |
+| iOS simulator (iPhone 17) | Relaunched after the A77 lockfile bump; Home renders the API catalogue |
+| Backend lint, typecheck | Clean; no pending migrations |
+| Backend unit, e2e (vitest) | 19/19; 40/40 on ten consecutive runs after B26 |
+| `npm audit` | Unchanged since A77/B25 |
+| Queue | Every task ticked (B1-B26, A1-A78, D1-D2); open items under "Blocked: needs owner" in the queue |
+| Heads | toj-backend `feature/backend-core` `264b21b`; TojApp `feature/api-integration` (this report's commit); both merged into their `integration/v1` |
 
-13:22 run: queue was empty (lock stale 5 h). Every check re-run and passed. Added and did B25/A77: lockfile-only `npm audit fix` in both repos (no `package.json` or `Podfile.lock` change). Not done: simulator tap-through after the lockfile bump (JS tooling only; release bundles verified instead).
+14:43 run: queue was empty (lock stale 74 min). Re-ran every check: backend e2e failed once in seven runs. Cause: admin order search `q=TOJ-1426` also matched customers whose phone contains `1426`. Fixed as B26 (a `TOJ-` term searches the order number only; bare 4+ digits still match order number or phone). A78: iOS smoke after the lockfile bump (launch and Home render only; simulator tap tools are not available to scheduled runs, so no tap-through).
 
 Run locally: `cd ../toj-backend && eval "$(fnm env)" && fnm use && npm run db:up && npm run db:deploy && npm run start:dev`, then in TojApp `npm start` and `npm run ios` (or `npm run android`). Demo phone `9876543210`, OTP `123456`.
 
