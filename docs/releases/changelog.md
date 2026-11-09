@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- Double-tapping Place order (or a timed-out retry) no longer reports "bag empty" for an order that was placed: the server returns the same order to both requests (B19).
 - Wishlist hearts added as a guest are no longer lost when the sign-in merge fails; logging out offline is instant; order times read the same on iOS and Android (A66).
 - Product page no longer shows "Added" when the stock limit stopped the add; switching colour clears a size sold out in that colour; resending a code within the cooldown opens the code screen; an expired code at sign-up says so; Android buttons no longer announce "busy" after loading (A65).
 - Order details: each reached step shows its time, a cancelled order shows when (and why) it was cancelled, and payment shows Paid / Refunded / Due at pickup (A64)
